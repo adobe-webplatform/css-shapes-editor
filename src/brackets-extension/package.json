@@ -1,0 +1,9 @@
+{
+    "name": "css-shapes-editor",
+    "title": "Edit CSS Shapes Properties inline",
+    "description": "Lets the user edit in the live preview the value of select css shapes properties.",
+    "version": "1.0.0",
+    "author": "François REMY <francois.remy.dev@outlook.com> (http://fremycompany.com/) for Adobe Systems Incorporated",
+    "license": "MIT",
+    "categories": "editing"
+}

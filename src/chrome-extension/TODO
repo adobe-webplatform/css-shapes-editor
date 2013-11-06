@@ -1,0 +1,3 @@
+- replace paths in manifest.json with ../editor/
+- drop devtools.html; use only devtools.js
+- rename options.html to in_devtools.controls.html

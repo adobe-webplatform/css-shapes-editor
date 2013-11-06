@@ -1,0 +1,3 @@
+- replace /third-party/ with files from ../editor
+- remove element swapping logic
+- replace in-borwser controls
