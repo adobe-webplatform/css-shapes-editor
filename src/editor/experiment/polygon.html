@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+#content {
+  position: relative;
+  width: 800px;
+  height: 400px;
+  margin: 0 auto;
+  background: papayawhip;
+  -webkit-shape-inside: polygon(800px 0px, 800px 400px, 0px 400px);
+}
+</style>
+
+<title>Polygon Drawing</title>
+</head>
+<body>
+    <div id='content'>
+      <h1>Playground</h1>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      </p>
+      
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      </p>
+    </div>
+    <script src="../third-party/raphael/in_browser.raphael.js"></script>
+    <script src="../third-party/raphael/in_browser.raphael.free_transform.js"></script>
+    <script src="../in_browser.main.shapes.js"></script>
+    <script src="../in_browser.shape-overlay.js"></script>
+    <script>
+    
+    var init = function(){
+      var target = document.querySelector('#content')
+      
+      function getConfigForShape(target, shape){
+        if (!target || ['shape-inside', 'shape-outside'].indexOf(shape) < 0)
+          return
+        
+        var prefix = '-webkit-'
+        var path = window.getComputedStyle(target, null)[prefix + shape]
+        var config
+        
+        switch (shape){
+          case 'shape-inside':
+            
+            config = {
+              'shape': path,
+              'path': {
+                stroke: 'blue'
+              },
+              'point': {
+                fill: 'blue'
+              }
+            }
+            
+          break;
+          
+          case 'shape-outside':
+            config = {
+              'shape': path,
+              'path': {
+                stroke: 'red'
+              },
+              'point': {
+                fill: 'red'
+              }
+            }
+          break;
+        }
+        
+        return config
+      }
+      
+      
+      var handlers = {}
+      handlers['shape-inside'] = function(){
+        editor.element.style['-webkit-shape-inside'] = editor.getPolygonPath()
+      }
+
+      handlers['shape-outside'] = function(){
+        editor.element.style['-webkit-shape-outside'] = editor.getPolygonPath()
+      }
+      
+      var shapeType = 'shape-inside'
+      var config = getConfigForShape(target, shapeType)
+      var editor = new ShapeOverlay(target, config)
+      editor.shapechange(handlers[shapeType])
+      
+      document.addEventListener('keypress', function(e){
+        if (e.keyCode == 116)
+          editor.toggleTransformEditor()
+      })
+    }
+    
+    document.addEventListener('DOMContentLoaded', init)
+    
+    </script>
+</body>
+</html>
