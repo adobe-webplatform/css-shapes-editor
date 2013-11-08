@@ -8,17 +8,14 @@ define(['Editor'], function(Editor){
         throw "Missing editor"
     }
     
-    function PolygonEditor(){
-        console.log(this)
-    }
-    
-    var abs = {
-        target: function(){
-            return this.target
-        }
+    function PolygonEditor(target, property, value){
+        Editor.apply(this, arguments)
     }
     
     PolygonEditor.prototype = Object.create(Editor.prototype);
+    PolygonEditor.prototype.getCSSValue = function(){
+        
+    }
     PolygonEditor.prototype.constructor = PolygonEditor
     
     return PolygonEditor

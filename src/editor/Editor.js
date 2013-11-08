@@ -8,10 +8,12 @@ define(['eve'], function(eve){
         this.target = target;
         this.property = property;
         this.value = value || null;
+        
+        console.log('Ive been called!', this.value)
     }
     
     Editor.prototype = {
-        value: function(value){
+        xvalue: function(value){
             if (typeof value === 'string') {
                 this.value = value
                 this.trigger('valuechange', this)
