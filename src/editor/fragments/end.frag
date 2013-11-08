@@ -3,6 +3,6 @@
     //module value for 'main' here and return it as the
     //value to use for the public API for the built file.
     
-    // intentional implicit global to expose API
-    superx = require('main');
+    // intentional implicit global var to expose API
+    CSSShapesEditor = require('main');
 }));

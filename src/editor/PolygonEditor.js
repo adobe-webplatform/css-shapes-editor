@@ -1,5 +1,10 @@
-(function(scope){
-    if (!scope.Editor){
+/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
+/*global define */
+
+define(['Editor'], function(Editor){
+    "use strict";
+    
+    if (!Editor){
         throw "Missing editor"
     }
     
@@ -16,5 +21,5 @@
     PolygonEditor.prototype = Object.create(Editor.prototype);
     PolygonEditor.prototype.constructor = PolygonEditor
     
-    scope.PolygonEditor = PolygonEditor
-})(this)
+    return PolygonEditor
+})

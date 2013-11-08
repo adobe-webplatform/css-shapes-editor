@@ -26,18 +26,18 @@
         Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
       </p>
     </div>
-    <script src="../third-party/eve/eve.js"></script>
-    <script src="../Editor.js"></script>
-    <script src="../PolygonEditor.js"></script>
-    <script src="../CSSShapesEditor.js"></script>
+    <script data-main='../main.js' src="../third-party/requirejs/require.js"></script>
+    
     <script>
+    
+    require(['main'], function(CSSShapesEditor){
+      
       var el = document.querySelector('#content');
       var property = '-webkit-shape-inside';
       var value = window.getComputedStyle(el, null)[property];
-      
+
       var ed = new CSSShapesEditor(el, property, value)
-      console.log(ed)
-      
+    })
     </script>
 </body>
 </html>

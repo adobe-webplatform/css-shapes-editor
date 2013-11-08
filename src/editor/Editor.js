@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global define, window, eve */
+/*global define, eve */
 
-(function(glob){
+define(['eve'], function(eve){
     "use strict";
     
     function Editor(target, property, value){
@@ -25,6 +25,5 @@
         trigger: eve
     };   
     
-    glob.Editor = Editor;
-    
-})(this);
+    return Editor;
+})
