@@ -12,6 +12,8 @@ module.exports = function (grunt) {
     'use strict';
   
     require('load-grunt-tasks')(grunt);
+    
+    var pkg = grunt.file.readJSON("package.json");
   
     grunt.initConfig({
         // configurable paths
@@ -20,6 +22,11 @@ module.exports = function (grunt) {
             editor: 'src/editor',
             dist: 'dist'
         },
+        
+        banner: grunt.file.read('./COPYRIGHT')
+                    .replace(/@NAME/, pkg.name)
+                    .replace(/@VERSION/, pkg.version)
+                    .replace(/@DATE/, grunt.template.today("yyyy-mm-dd")) + "\n",
         
         watch: {
             files: ['<%= yeoman.editor %>/{,*/}*.js'],
@@ -45,7 +52,9 @@ module.exports = function (grunt) {
               out: '<%= yeoman.dist %>/optimized.js',
               name: 'main',
               include: ['third-party/almond/almond'],
-              wrap: {
+              wrap: {         
+                  // TODO: figure out why banner crashes build
+                  // startFile: ['<%= banner %>','<%= yeoman.editor %>/fragments/start.frag'],
                   startFile: '<%= yeoman.editor %>/fragments/start.frag',
                   endFile: '<%= yeoman.editor %>/fragments/end.frag'
               },
