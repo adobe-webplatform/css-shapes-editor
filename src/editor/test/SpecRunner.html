@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <link rel="stylesheet" href="jasmine/jasmine.css">
+  <title>Jasmine Spec Runner | CSS Shapes Editor</title>
+  
+  <script src="jasmine/jasmine.js"></script>
+  <script src="jasmine/jasmine-html.js"></script>
+  <script src="/testem.js"></script>
+  
+  <!-- source -->
+  <script src="../third-party/eve/eve.js"></script>
+  <script src="../third-party/jquery/jquery.min.js"></script>
+  <script src="../Editor.js"></script>
+  <script src="../PolygonEditor.js"></script>
+  <script src="../CircleEditor.js"></script>
+  <script src="../CSSShapesEditor.js"></script>
+    
+  <!-- include spec files here... -->
+  <script src="spec/EditorSpec.js"></script>
+  <script src="spec/CSSShapesEditorSpec.js"></script>
+
+  <script type="text/javascript">
+    (function() {
+      var jasmineEnv = jasmine.getEnv();
+      jasmineEnv.updateInterval = 1000;
+
+      var htmlReporter = new jasmine.HtmlReporter();
+
+      jasmineEnv.addReporter(htmlReporter);
+
+      jasmineEnv.specFilter = function(spec) {
+        return htmlReporter.specFilter(spec);
+      };
+
+      var currentWindowOnload = window.onload;
+
+      window.onload = function() {
+        if (currentWindowOnload) {
+          currentWindowOnload();
+        }
+        execJasmine();
+      };
+
+      function execJasmine() {
+        jasmineEnv.execute();
+      }
+
+    })();
+  </script>
+</head>
+<body>
+
+</body>
+</html>
