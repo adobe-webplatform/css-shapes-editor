@@ -14,8 +14,9 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
     
     var pkg = grunt.file.readJSON("package.json");
-  
+
     grunt.initConfig({
+        
         // configurable paths
         yeoman: {
             src: 'src',
@@ -49,7 +50,7 @@ module.exports = function (grunt) {
             options: {
               baseUrl: '<%= yeoman.editor %>',
               mainConfigFile: '<%= yeoman.editor %>/main.js',
-              out: '<%= yeoman.dist %>/optimized.js',
+              out: '<%= yeoman.dist %>/' + pkg.name + '.js',
               name: 'main',
               include: ['third-party/almond/almond'],
               wrap: {         
