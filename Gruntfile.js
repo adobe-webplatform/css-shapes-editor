@@ -17,12 +17,15 @@ module.exports = function (grunt) {
         // configurable paths
         yeoman: {
             src: 'src',
+            editor: 'src/editor',
             dist: 'dist'
         },
+        
         watch: {
-            files: ['<%= yeoman.src %>/editor/{,*/}*.js'],
+            files: ['<%= yeoman.editor %>/{,*/}*.js'],
             // tasks: ['jshint']
         },
+        
         jshint: {
             options: {
                 jshintrc: '.jshintrc'
@@ -33,22 +36,29 @@ module.exports = function (grunt) {
                 // 'test/spec/{,*/}*.js'
             ]
         },
-         
+        
         requirejs: {
           compile: {
             options: {
-              baseUrl: '<%= yeoman.src %>/editor',
-              mainConfigFile: "<%= yeoman.src %>/editor/main.js",
+              baseUrl: '<%= yeoman.editor %>',
+              mainConfigFile: '<%= yeoman.editor %>/main.js',
               out: '<%= yeoman.dist %>/optimized.js',
               name: 'main',
+              include: ['third-party/almond/almond'],
+              wrap: {
+                  startFile: '<%= yeoman.editor %>/fragments/start.frag',
+                  endFile: '<%= yeoman.editor %>/fragments/end.frag'
+              },
               optimize: 'none'
             }
           }
         }
     });
+    
+    grunt.registerTask('build', ['requirejs'])
 
     grunt.registerTask('default', [
-        'jshint'
+        'jshint',
         // 'test',
         // 'build'
     ]); 
