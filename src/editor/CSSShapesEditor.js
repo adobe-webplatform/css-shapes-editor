@@ -9,15 +9,16 @@ define(['PolygonEditor', 'CircleEditor'], function(PolygonEditor, CircleEditor){
             throw TypeError('Value does not contain a shape function')
         }
         
-        var shape = value.split('(')[0].trim()
+        var shape = value.split('(')[0].trim(),
+            factory = function(){ };
         
         switch (shape) {
-            case 'polygon': 
-                return new PolygonEditor(arguments)
+            case 'polygon':
+                factory = PolygonEditor;
             break;
             
             case 'circle':
-                return new CircleEditor(arguments)
+                factory = CircleEditor;
             break;
             
             case 'ellipse':
@@ -32,6 +33,8 @@ define(['PolygonEditor', 'CircleEditor'], function(PolygonEditor, CircleEditor){
                 throw TypeError('Value does not contain a valid shape function')
             break;
         }
+        
+        return new factory(target, property, value, options)
     }
     
     return CSSShapesEditor
