@@ -4,22 +4,31 @@
 define(['eve'], function(eve){
     "use strict";
     
+    function Holder(){
+        var body = document.body
+        return
+    }
+    
     function Editor(target, property, value){
+        
+        if (!target || !target.parentNode){
+            throw TypeError('Target expected as DOM object, but was: ' + typeof target)
+        }
+        
         this.target = target;
         this.property = property;
         this.value = value || null;
         
-        console.log('Ive been called!', this.value)
+        // this.holder = new Holder()
     }
     
     Editor.prototype = {
-        xvalue: function(value){
-            if (typeof value === 'string') {
-                this.value = value
-                this.trigger('valuechange', this)
-            }
-            
-            return this.value;
+        getCSSValue: function(){
+            return this.value
+        },
+        
+        getCSSProperty: function(){
+            return this.property
         },
         
         on: eve.on,

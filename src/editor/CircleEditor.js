@@ -9,7 +9,6 @@ define(['Editor'], function(Editor){
     }
     
     function CircleEditor(){
-        console.log(this)
     }
     
     CircleEditor.prototype = Object.create(Editor.prototype);
