@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define, eve */
 
-define(['eve'], function(eve){
+define(['eve', 'CSSUtils'], function(eve, CSSUtils){
     "use strict";
     
     function Holder(){
@@ -20,28 +20,32 @@ define(['eve'], function(eve){
         this.value = value;
         this.holder = null; // setup by setupEditorHolder()
         
+        // target element offsets with regards to the page
+        // setup by setupOffsets()
+        this.offsets = {
+            left: 0,
+            top: 0
+        }
+        
         this.init()
     }
     
     Editor.prototype = {
-        getCSSValue: function() {
-            return this.value
-        },
-        
-        getCSSProperty: function() {
-            return this.property
-        },
-        
-        parseShape: function(shape){
-            
-        },
-        
         init: function(){
-            this.setupEditorHolder()
+            this.setupEditorHolder();
+            this.setupOffsets();
             
             window.setTimeout(function(){
                 this.trigger('ready')
             }.bind(this)) 
+        },
+        
+        setupOffsets: function() {
+            var rect = this.target.getBoundingClientRect(),
+                box = CSSUtils.getContentBoxOf(this.target);
+                
+            this.offsets.left = rect.left + window.scrollX + box.left;
+            this.offsets.top = rect.top + window.scrollY + box.top;
         },
         
         setupEditorHolder: function() {

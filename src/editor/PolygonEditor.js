@@ -40,6 +40,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // TODO: delegate click on path
         
         this.setup();
+        this.applyOffsets();
         this.draw();
     }
     
@@ -57,8 +58,14 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // Raphael paper onto which to draw TODO: move to Editor.js?
         this.paper = Raphael(this.holder, '100%', '100%');
         
-        // polygon path to visualize the shape
-        this.shape = this.paper.path().attr(this.config.path);
+        window.addEventListener('resize', this.refresh.bind(this))
+    };
+    
+    PolygonEditor.prototype.refresh = function(){
+        this.removeOffsets();
+        this.setupOffsets();
+        this.applyOffsets();
+        this.draw();
     };
     
     /*
@@ -142,15 +149,46 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // TODO: subtract offsets from vertices
         // TODO: return CSS formatted polygon
     };
+
+    /*
+        Mutates the vertices array to account for element offsets on the page.
+        This is required because the editor surface is 100% of the viewport and
+        we are working with absolute units while editing.
+        
+        Offsets must be subtracted when the output polygon value is requested.
+        
+        @see PolygonEditor.removeOffsets()
+    */
+    PolygonEditor.prototype.applyOffsets = function(){
+        this.vertices.forEach(function(v){
+            v.x = v.x + this.offsets.left;
+            v.y = v.y + this.offsets.top;
+        }.bind(this))
+    };
     
-    PolygonEditor.prototype.draw = function() {
+    /*
+        Mutates the vertices array to subtract the offsets.
+        
+        @see PolygonEditor.applyOffsets()
+    */
+    PolygonEditor.prototype.removeOffsets = function(){
+        this.vertices.forEach(function(v){
+            v.x = v.x - this.offsets.left;
+            v.y = v.y - this.offsets.top;
+        }.bind(this))
+    };
+    
+    PolygonEditor.prototype.draw = function(){
         var paper = this.paper,
             config = this.config,
             commands = [];
         
+        // TODO: add container for points and clear that
+        this.paper.clear()
+        
         this.vertices.forEach(function(v, i) {
             
-            // TODO add to fragment, then to page
+            // TODO: add to fragment, then to page
             paper.circle(v.x, v.y, config.point.radius).attr(config.point)
             
             if (i === 0){
@@ -166,8 +204,11 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // close path
         commands.push('z');
         
+        // polygon path to visualize the shape
+        this.shape = this.paper.path().attr(this.config.path);
+        
         // draw the polygon shape
-        this.shape.attr('path', commands);
+        this.shape.attr('path', commands).toBack();
     };
     
     return PolygonEditor
