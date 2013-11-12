@@ -8,22 +8,39 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         throw "Missing editor"
     }
     
+    var _defaults = {
+        path: {
+            stroke: 'black'
+        },
+        point: {
+            radius: 5,
+            stroke: 'black',
+            fill: 'gray',
+        }
+    }
     
-    function PolygonEditor(target, property, value){
-        Editor.apply(this, arguments)
+    function PolygonEditor(target, property, value, options){
+        Editor.apply(this, arguments);
         
         // array of objects with x, y and unit for each vertex
-        this.vertices = []
+        this.vertices = [];
         
         // Raphael polygon path
-        this.shape = null
+        this.shape = null;
+        
+        // Raphael paper for shape overlay.
+        this.paper = null;
+        
+        // TODO: extend with 'options'
+        this.config = _defaults;
         
         // TODO: setup offsets
         // TODO: get default units
-        // TODO: setup Raphael paper -> move to Editor ?
-        // TODO: draw shape
+        // TODO: delegate click on points
+        // TODO: delegate click on path
         
-        this.setup()
+        this.setup();
+        this.draw();
     }
     
     PolygonEditor.prototype = Object.create(Editor.prototype);
@@ -36,6 +53,12 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         if (!this.vertices.length){
             this.vertices = this.inferPolygonFromElement(this.target)
         }
+        
+        // Raphael paper onto which to draw TODO: move to Editor.js?
+        this.paper = Raphael(this.holder, '100%', '100%');
+        
+        // polygon path to visualize the shape
+        this.shape = this.paper.path().attr(this.config.path);
     };
     
     /*
@@ -120,8 +143,31 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // TODO: return CSS formatted polygon
     };
     
-    PolygonEditor.prototype.draw = function(){
-        // TODO: draw vertices onto the paper
+    PolygonEditor.prototype.draw = function() {
+        var paper = this.paper,
+            config = this.config,
+            commands = [];
+        
+        this.vertices.forEach(function(v, i) {
+            
+            // TODO add to fragment, then to page
+            paper.circle(v.x, v.y, config.point.radius).attr(config.point)
+            
+            if (i === 0){
+                // Move cursor to first vertex, then prepare drawing lines
+                ['M', v.x, v.y, 'L'].forEach(function(cmd) {
+                    commands.push(cmd)
+                });
+            } else {
+                commands.push(v.x, v.y);
+            }
+        });
+        
+        // close path
+        commands.push('z');
+        
+        // draw the polygon shape
+        this.shape.attr('path', commands);
     };
     
     return PolygonEditor
