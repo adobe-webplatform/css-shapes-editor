@@ -1,12 +1,13 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['Editor', 'CSSUtils'], function(Editor, CSSUtils){
+define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
     "use strict";
     
     if (!Editor){
         throw "Missing editor"
-    }  
+    }
+    
     
     function PolygonEditor(target, property, value){
         Editor.apply(this, arguments)
