@@ -20,7 +20,7 @@ function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
         })
         
         afterEach(function(){
-            // clean-up markup
+            editor.remove()
             $fixture.empty()
         })
 
