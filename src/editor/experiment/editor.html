@@ -34,10 +34,16 @@
       
       var el = document.querySelector('#content');
       var property = '-webkit-shape-inside';
-      var value = window.getComputedStyle(el, null)[property];
+      var value = getComputedStyle(el, null)[property];
 
       var ed = new CSSShapesEditor(el, property, value)
-      console.log(ed)
+      ed.on('ready', function(){
+        console.log('editor ready')
+      })
+      
+      ed.on('removed', function(e){
+        console.log('editor removed')
+      })
     })
     </script>
 </body>
