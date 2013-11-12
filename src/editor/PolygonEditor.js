@@ -16,7 +16,9 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
             radius: 5,
             stroke: 'black',
             fill: 'gray',
-        }
+        },
+        xUnit: 'px',
+        yUnit: 'px'
     }
     
     function PolygonEditor(target, property, value, options){
@@ -34,7 +36,6 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // TODO: extend with 'options'
         this.config = _defaults;
         
-        // TODO: setup offsets
         // TODO: get default units
         // TODO: delegate click on points
         // TODO: delegate click on path
@@ -48,7 +49,6 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
     PolygonEditor.prototype.constructor = PolygonEditor;
     
     PolygonEditor.prototype.setup = function(){
-        
         this.vertices = this.parseShape(this.value, this.target)
         
         if (!this.vertices.length){
@@ -58,7 +58,10 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // Raphael paper onto which to draw TODO: move to Editor.js?
         this.paper = Raphael(this.holder, '100%', '100%');
         
+        
+        // TODO: throttle sensibly
         window.addEventListener('resize', this.refresh.bind(this))
+        this.holder.addEventListener('mousedown', this.onMouseDown.bind(this))
     };
     
     PolygonEditor.prototype.refresh = function(){
@@ -178,6 +181,54 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         }.bind(this))
     };
     
+    PolygonEditor.prototype.onMouseDown = function(e){
+        // console.log(e.target.tagName === 'circle')
+        // console.log(this)              
+        var edge = this.polygonEdgeNear({x: e.x, y: e.y})
+        
+        if (edge){
+            // insert new vertex
+            // TODO: insert vertex precisely on the segment, or at event ?
+            this.vertices.splice(edge.index1, 0, {
+                x: e.x,
+                y: e.y,
+                // TODO: infer units from the vertices of the edge
+                xUnits: this.config.xUnit,
+                yUnits: this.config.yUnit,
+            });
+            
+            this.draw()
+        }
+    };
+    
+    /*
+        Given a point with x, y coordinates, attempt to find the polygon edge to which it belongs.
+        Returns an object with indexes for the two vertices which define the edge.
+        Returns null if the point does not belong to any edge.
+        
+        @example .polygonEdgeNear({x: 0, y: 100}) // => {index0: 0, index1: 1}
+        
+        @param {Object} p Object with x, y coordinates for the point to find nearby polygon edge.
+        @return {Object | null} 
+    */
+    PolygonEditor.prototype.polygonEdgeNear = function(p){
+        var edge = null,
+            vertices = this.vertices,
+            radius = this.config.point.radius,
+            thresholdDistance = radius * radius;
+        
+        vertices.forEach(function(v, i){
+            var v0 = vertices[i],
+                v1 = vertices[(i + 1) % vertices.length];
+                
+            if (distanceToEdgeSquared(v0, v1, p) < thresholdDistance){
+                edge = {index0: i, index1: (i + 1) % vertices.length};
+            }
+        }) 
+        
+        return edge;
+    }
+    
     PolygonEditor.prototype.draw = function(){
         var paper = this.paper,
             config = this.config,
@@ -189,7 +240,9 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         this.vertices.forEach(function(v, i) {
             
             // TODO: add to fragment, then to page
-            paper.circle(v.x, v.y, config.point.radius).attr(config.point)
+            var point = paper.circle(v.x, v.y, config.point.radius)
+            point.attr(config.point)
+            point.node.setAttribute('data-vertexIndex', i)
             
             if (i === 0){
                 // Move cursor to first vertex, then prepare drawing lines
@@ -210,6 +263,28 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // draw the polygon shape
         this.shape.attr('path', commands).toBack();
     };
+    
+    // See http://paulbourke.net/geometry/pointlineplane/
+    
+    function distanceToEdgeSquared(p1, p2, p3){
+        var dx = p2.x - p1.x;
+        var dy = p2.y - p1.y;
+        
+        if (dx == 0 && dy == 0){
+            return Number.POSITIVE_INFNITY;
+        }
+        
+        var u = ((p3.x - p1.x) * dx + (p3.y - p1.y) * dy) / (dx * dx + dy * dy);
+        
+        if (u < 0 || u > 1){
+            return Number.POSITIVE_INFINITY;
+        }
+        
+        var x = p1.x + u * dx;  // closest point on edge p1,p2 to p3
+        var y = p1.y + u * dy;
+        
+        return Math.pow(p3.x - x, 2) + Math.pow(p3.y - y, 2);
+    }
     
     return PolygonEditor
 })
