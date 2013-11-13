@@ -36,9 +36,14 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // TODO: extend with 'options'
         this.config = _defaults;
         
+        // SVG object reference of vertex being dragged
+        this.activeVertex = null;
+        
+        // Index of vertex being dragged
+        this.activeVertexIndex = null;
+        
         // TODO: get default units
         // TODO: delegate click on points
-        // TODO: delegate click on path
         
         this.setup();
         this.applyOffsets();
@@ -182,24 +187,73 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
     };
     
     PolygonEditor.prototype.onMouseDown = function(e){
-        // console.log(e.target.tagName === 'circle')
-        // console.log(this)              
-        var edge = this.polygonEdgeNear({x: e.x, y: e.y})
         
-        if (edge){
-            // insert new vertex
-            // TODO: insert vertex precisely on the segment, or at event ?
-            this.vertices.splice(edge.index1, 0, {
-                x: e.x,
-                y: e.y,
-                // TODO: infer units from the vertices of the edge
-                xUnits: this.config.xUnit,
-                yUnits: this.config.yUnit,
-            });
+        var edge,
+            // need target as a Raphael obj reference; e.target won't suffice.
+            target = this.paper.getElementByPoint(e.x, e.y);
+        
+        // check if target is a vertex representation i.e. draggable point
+        if (target && target.data && typeof target.data('vertex-index') == 'number'){
             
-            this.draw()
+            this.activeVertex = target;
+            this.activeVertexIndex = target.data('vertex-index');
+            
+        } else {
+            
+            edge = this.polygonEdgeNear({x: e.x, y: e.y});
+            
+            if (edge){
+                // insert new vertex
+                // TODO: insert vertex precisely on the segment, or at event ?
+                this.vertices.splice(edge.index1, 0, {
+                    x: e.x,
+                    y: e.y,
+                    // TODO: infer units from the vertices of the edge
+                    xUnits: this.config.xUnit,
+                    yUnits: this.config.yUnit,
+                });
+                
+                this.draw();
+                
+                this.activeVertex = this.paper.getElementByPoint(e.x, e.y);
+                this.activeVertexIndex = edge.index1;
+            }
         }
+        
+        if (!this.activeVertex || typeof this.activeVertexIndex !== 'number'){
+            return
+        }
+        
+        // attaches mousemove and mouseup
+        this.handleDragging()
     };
+    
+    PolygonEditor.prototype.handleDragging = function(){
+        var self = this;
+        var _mouseMove = function(e){
+            return self.onMouseMove.call(self, e);
+        };
+        
+        var _mouseUp = function(){
+            return function(){
+                this.activeVertex = null;
+                this.activeVertexIndex = null;
+                this.holder.removeEventListener('mousemove', _mouseMove);
+            }.call(self);
+        };
+        
+        this.holder.addEventListener('mousemove', _mouseMove);
+        this.holder.addEventListener('mouseup', _mouseUp);
+    };
+    
+    PolygonEditor.prototype.onMouseMove = function(e){
+        // 'this' is the PolygonEditor instance
+        var vertex = this.vertices[this.activeVertexIndex]
+        vertex.x = e.x;
+        vertex.y = e.y;
+        
+        this.draw();
+    }
     
     /*
         Given a point with x, y coordinates, attempt to find the polygon edge to which it belongs.
@@ -242,7 +296,8 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
             // TODO: add to fragment, then to page
             var point = paper.circle(v.x, v.y, config.point.radius)
             point.attr(config.point)
-            point.node.setAttribute('data-vertexIndex', i)
+            point.data('vertex-index', i)
+            // point.node.setAttribute('data-vertexIndex', i)
             
             if (i === 0){
                 // Move cursor to first vertex, then prepare drawing lines
