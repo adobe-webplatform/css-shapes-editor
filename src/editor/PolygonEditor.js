@@ -43,7 +43,6 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         this.activeVertexIndex = null;
         
         // TODO: get default units
-        // TODO: delegate click on points
         
         this.setup();
         this.applyOffsets();
@@ -288,7 +287,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
             config = this.config,
             commands = [];
         
-        // TODO: add container for points and clear that
+        // TODO: add group for points and clear that. Will obsolete this.activeVertexIndex
         this.paper.clear()
         
         this.vertices.forEach(function(v, i) {
@@ -297,7 +296,6 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
             var point = paper.circle(v.x, v.y, config.point.radius)
             point.attr(config.point)
             point.data('vertex-index', i)
-            // point.node.setAttribute('data-vertexIndex', i)
             
             if (i === 0){
                 // Move cursor to first vertex, then prepare drawing lines
