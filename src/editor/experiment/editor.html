@@ -9,7 +9,7 @@
   height: 400px;
   margin: 0 auto;
   background: papayawhip;
-  -webkit-shape-inside: polygon(800px 0px, 800px 400px, 0px 400px);
+  -webkit-shape-inside: polygon(0 0, 800px 400px, 0 400px);
 }
 </style>
 
@@ -43,6 +43,10 @@
       
       ed.on('removed', function(e){
         console.log('editor removed')
+      })
+      
+      ed.on('shapechange', function(){
+        console.log(ed.target.style[property] = this.getCSSValue())
       })
     })
     </script>

@@ -43,7 +43,6 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         this.activeVertexIndex = null;
         
         // TODO: get default units
-        
         this.setup();
         this.applyOffsets();
         this.draw();
@@ -119,8 +118,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
                 })
             );
             
-            // TODO: rename to 'fillRule' http://dev.w3.org/csswg/css-shapes/#typedef-fill-rule
-            coords.prelude = infos[2];
+            coords.polygonFillRule = infos[2] || '';
         }
         
         return coords
@@ -152,11 +150,38 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         return coords
     };
     
+    /*
+        Return a valid polygon CSS Shape value from the current editor's state.
+        @example polygon(nonzero, 0 0, 100px 0, ...)
+        
+        @return {String}
+    */
     PolygonEditor.prototype.getCSSValue = function(){
-        // TODO: subtract offsets from vertices
-        // TODO: return CSS formatted polygon
-    };
+        var offsetTop = this.offsets.top,
+            offsetLeft = this.offsets.left,
+            element = this.target,
+            // @see http://dev.w3.org/csswg/css-shapes/#typedef-fill-rule
+            fillRule = this.vertices.polygonFillRule,
+            path;
+            
+        path = this.vertices.map(function(vertex, i){
+            var x, y, xCoord, yCoord;
+        
+            // remove offsets
+            x = Math.ceil(vertex.x - offsetLeft);
+            y = Math.ceil(vertex.y - offsetLeft);
 
+            // turn px value into original units
+            xCoord = CSSUtils.convertFromPixels(x, vertex.xUnit, element, false)
+            yCoord = CSSUtils.convertFromPixels(y, vertex.yUnit, element, false)
+            
+            // return space-separted pair
+            return [xCoord, yCoord].join(' ')
+        }) 
+        
+        return 'polygon(' + fillRule + path.join(', ') + ')'
+    };
+    
     /*
         Mutates the vertices array to account for element offsets on the page.
         This is required because the editor surface is 100% of the viewport and
@@ -185,6 +210,14 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         }.bind(this))
     };
     
+    /*
+        Mousedown handler:
+        - get the vertex at event target, if one exists
+        OR
+        - insert a new vertex if event target is close to a polygon edge
+        THEN
+        - attach event handlers for dragging the vertex
+    */
     PolygonEditor.prototype.onMouseDown = function(e){
         
         var edge,
@@ -245,6 +278,10 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         this.holder.addEventListener('mouseup', _mouseUp);
     };
     
+    /*
+        Upate the current active vertex's coordinates with the event x and y,
+        then redraw the shape.
+    */
     PolygonEditor.prototype.onMouseMove = function(e){
         // 'this' is the PolygonEditor instance
         var vertex = this.vertices[this.activeVertexIndex]
@@ -274,7 +311,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
             var v0 = vertices[i],
                 v1 = vertices[(i + 1) % vertices.length];
                 
-            if (distanceToEdgeSquared(v0, v1, p) < thresholdDistance){
+            if (_distanceToEdgeSquared(v0, v1, p) < thresholdDistance){
                 edge = {index0: i, index1: (i + 1) % vertices.length};
             }
         }) 
@@ -315,11 +352,24 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         
         // draw the polygon shape
         this.shape.attr('path', commands).toBack();
+        
+        this.trigger('shapechange', this)
     };
     
-    // See http://paulbourke.net/geometry/pointlineplane/
-    
-    function distanceToEdgeSquared(p1, p2, p3){
+    /*
+        Calculate min distance between a point and a line,
+        @see http://paulbourke.net/geometry/pointlineplane/
+        Accepts three points with x/y keys for unit-less coordinates.
+        
+        @param {Object} p1 Start of line
+        @param {Object} p2 End of line
+        @param {Object} p3 Point away from line
+        
+        @example _distanceToEdgeSquared({x:0, y:0}, {x: 0, y: 100}, {x: 100, 100})
+        
+        @return {Number} distance from point to line
+    */
+    function _distanceToEdgeSquared(p1, p2, p3){
         var dx = p2.x - p1.x;
         var dy = p2.y - p1.y;
         
@@ -337,7 +387,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         var y = p1.y + u * dy;
         
         return Math.pow(p3.x - x, 2) + Math.pow(p3.y - y, 2);
-    }
+    };
     
     return PolygonEditor
 })
