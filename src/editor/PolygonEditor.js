@@ -52,7 +52,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
     PolygonEditor.prototype.constructor = PolygonEditor;
     
     PolygonEditor.prototype.setup = function(){
-        this.vertices = this.parseShape(this.value, this.target)
+        this.vertices = this.parseShape(this.value, this.target);
         
         if (!this.vertices.length){
             this.vertices = this.inferPolygonFromElement(this.target)
@@ -63,8 +63,9 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         
         
         // TODO: throttle sensibly
-        window.addEventListener('resize', this.refresh.bind(this))
-        this.holder.addEventListener('mousedown', this.onMouseDown.bind(this))
+        window.addEventListener('resize', this.refresh.bind(this));
+        this.holder.addEventListener('mousedown', this.onMouseDown.bind(this));
+        this.holder.addEventListener('dblclick', this.onDblClick.bind(this));
     };
     
     PolygonEditor.prototype.refresh = function(){
@@ -317,7 +318,26 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         }) 
         
         return edge;
-    }
+    };
+    
+    /*
+        Double click handler:
+        - if event target is on a vertex, remove it
+        - redraw shape
+        
+        //TODO: prevent delete if less than 2 vertices left?
+    */
+    PolygonEditor.prototype.onDblClick = function(e){
+        var target = this.paper.getElementByPoint(e.x, e.y);
+        
+        // check if target is a vertex representation i.e. draggable point
+        if (target && target.data && typeof target.data('vertex-index') == 'number'){
+            
+            // remove the vertex
+            this.vertices.splice(target.data('vertex-index'), 1);
+            this.draw();
+        }
+    };
     
     PolygonEditor.prototype.draw = function(){
         var paper = this.paper,
