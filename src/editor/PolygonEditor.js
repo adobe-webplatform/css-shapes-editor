@@ -128,7 +128,7 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
                 })
             );
             
-            coords.polygonFillRule = infos[2] || null;
+            coords.polygonFillRule = infos[1] || null;
         }
         
         return coords
