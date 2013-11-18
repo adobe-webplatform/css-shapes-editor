@@ -49,8 +49,6 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
         this.setup();
         this.applyOffsets();
         this.draw();
-        
-        this.toggleFreeTransform()
     }
     
     PolygonEditor.prototype = Object.create(Editor.prototype);
@@ -380,11 +378,11 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
             
             if (i === 0){
                 // Move cursor to first vertex, then prepare drawing lines
-                ['M', v.x, v.y, 'L'].forEach(function(cmd) {
+                ['M', v.x, v.y].forEach(function(cmd) {
                     commands.push(cmd)
                 });
             } else {
-                commands.push(v.x, v.y);
+                commands.push('L', v.x, v.y);
             }
         });
         
