@@ -1,8 +1,8 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
-    "use strict";
+define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSUtils, Raphael, freeTransform){
+    "use strict";  
     
     if (!Editor){
         throw "Missing editor"
@@ -19,7 +19,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         },
         xUnit: 'px',
         yUnit: 'px'
-    }
+    } 
     
     function PolygonEditor(target, property, value, options){
         Editor.apply(this, arguments);
@@ -42,10 +42,15 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // Index of vertex being dragged
         this.activeVertexIndex = null;
         
+        // collection of SVG obj references for drawn vertices
+        this.points = []
+        
         // TODO: get default units
         this.setup();
         this.applyOffsets();
         this.draw();
+        
+        this.toggleFreeTransform()
     }
     
     PolygonEditor.prototype = Object.create(Editor.prototype);
@@ -58,9 +63,13 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
             this.vertices = this.inferPolygonFromElement(this.target)
         }
         
+        this.polygonFillRule = this.vertices.polygonFillRule || 'nonzero'
+        
         // Raphael paper onto which to draw TODO: move to Editor.js?
         this.paper = Raphael(this.holder, '100%', '100%');
         
+        // polygon path to visualize the shape
+        this.shape = this.paper.path().attr(this.config.path);
         
         // TODO: throttle sensibly
         window.addEventListener('resize', this.refresh.bind(this));
@@ -119,7 +128,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
                 })
             );
             
-            coords.polygonFillRule = infos[2] || '';
+            coords.polygonFillRule = infos[2] || null;
         }
         
         return coords
@@ -162,7 +171,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
             offsetLeft = this.offsets.left,
             element = this.target,
             // @see http://dev.w3.org/csswg/css-shapes/#typedef-fill-rule
-            fillRule = this.vertices.polygonFillRule,
+            fillRule = this.polygonFillRule,
             path;
             
         path = this.vertices.map(function(vertex, i){
@@ -170,7 +179,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         
             // remove offsets
             x = Math.ceil(vertex.x - offsetLeft);
-            y = Math.ceil(vertex.y - offsetLeft);
+            y = Math.ceil(vertex.y - offsetTop);
 
             // turn px value into original units
             xCoord = CSSUtils.convertFromPixels(x, vertex.xUnit, element, false)
@@ -342,17 +351,26 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
     PolygonEditor.prototype.draw = function(){
         var paper = this.paper,
             config = this.config,
+            doNotDrawVertices = (this.transformEditor != null),
+            points = this.points,
             commands = [];
+            
+        this.points.forEach(function(p){
+            p.remove()
+        })
         
         // TODO: add group for points and clear that. Will obsolete this.activeVertexIndex
-        this.paper.clear()
+        // this.paper.clear()
         
         this.vertices.forEach(function(v, i) {
             
-            // TODO: add to fragment, then to page
-            var point = paper.circle(v.x, v.y, config.point.radius)
-            point.attr(config.point)
-            point.data('vertex-index', i)
+            if (!doNotDrawVertices){
+                // TODO: add to fragment, then to page
+                var point = paper.circle(v.x, v.y, config.point.radius)
+                point.attr(config.point)
+                point.data('vertex-index', i)
+                points.push(point)
+            }
             
             if (i === 0){
                 // Move cursor to first vertex, then prepare drawing lines
@@ -367,13 +385,50 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         // close path
         commands.push('z');
         
-        // polygon path to visualize the shape
-        this.shape = this.paper.path().attr(this.config.path);
-        
         // draw the polygon shape
         this.shape.attr('path', commands).toBack();
         
         this.trigger('shapechange', this)
+    };
+    
+    PolygonEditor.prototype.toggleFreeTransform = function(){
+        
+        // make a clone of the vertices to avoid compound tranforms
+        var verticesClone = (JSON.parse(JSON.stringify(this.vertices)));
+        
+        function _transformPoints(){
+            
+            var matrix = this.shapeClone.matrix,
+                vertices = this.vertices;
+            
+            verticesClone.forEach(function(v, i){
+                vertices[i].x = matrix.x(v.x,v.y);
+                vertices[i].y = matrix.y(v.x,v.y);
+            }) 
+            
+            this.draw()
+        }
+        
+        if (this.transformEditor){
+            this.shapeClone.remove();
+            this.transformEditor.unplug();
+            delete this.phantomPath
+            delete this.transformEditor
+            
+            return;
+        }
+        
+        // using a phantom shape because we already redraw the path by the transformed coordinates.
+        // using the same path would result in double transformations for the shape
+        this.shapeClone = this.shape.clone().attr('stroke', 'none')
+        
+        this.transformEditor = this.paper.freeTransform(this.shapeClone, {
+            draw: ['bbox'],
+            keepRatio: ['bboxCorners'],
+            rotate: ['axisX'],
+            scale: ['bboxCorners','bboxSides'],
+            distance: '0.6'
+        }, _transformPoints.bind(this));
     };
     
     /*
