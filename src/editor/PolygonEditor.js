@@ -235,6 +235,11 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
             // need target as a Raphael obj reference; e.target won't suffice.
             target = this.paper.getElementByPoint(e.x, e.y);
         
+        // prevent vertex editing while transform editor is on
+        if (this.transformEditor){
+            return
+        }
+        
         // check if target is a vertex representation i.e. draggable point
         if (target && target.data && typeof target.data('vertex-index') == 'number'){
             
