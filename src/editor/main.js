@@ -3,7 +3,8 @@ require.config({
     paths: {
         app: '../app',
         'eve': 'third-party/eve/eve',
-        'Raphael': 'third-party/raphael/raphael-min'
+        'raphael': 'third-party/raphael/raphael-min',
+        'freeTransform': 'third-party/raphael.free_transform/raphael.free_transform'
     }
 });
 
