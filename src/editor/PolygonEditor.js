@@ -5,7 +5,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
     "use strict";
     
     if (!Editor){
-        throw "Missing editor"
+        throw Error("Missing editor");
     }
     
     var _defaults = {
@@ -90,9 +90,9 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         var coords = [],
             infos = null;
         
-        if (infos = /(\s*)polygon\s*\(([a-z, ]*)(([-+0-9.]+[a-z%]*|calc\([^)]*\)|\s|\,)*)\)?(\s*)/i.exec(polygon)) {
+        if (infos = /polygon\s*\(([a-z]*),\s*(([-+0-9.]+[a-z%]*|calc\([^)]*\)|\s|\,)*)\)?(\s*)/i.exec(polygon)) {
             coords = (
-                infos[3]
+                infos[2]
                 .replace(/\s+/g, ' ')
                 .replace(/( ,|, )/g, ',').trim()
                 .split(',')
@@ -119,7 +119,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
                 })
             );
             
-            coords.polygonFillRule = infos[2] || '';
+            coords.polygonFillRule = infos[1] || '';
         }
         
         return coords
@@ -146,7 +146,9 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
             { x: box.width, y: 0, xUnit: 'px', yUnit: 'px' },
             { x: box.width, y: box.height, xUnit: 'px', yUnit: 'px' },
             { x: 0, y: box.height, xUnit: 'px', yUnit: 'px' }
-        ]
+        ];
+        
+        coords.polygonFillRule = 'nonzero';
         
         return coords
     };
@@ -180,7 +182,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
             return [xCoord, yCoord].join(' ')
         }) 
         
-        return 'polygon(' + fillRule + path.join(', ') + ')'
+        return 'polygon(' + [fillRule, path.join(', ')].join(', ') + ')'
     };
     
     /*
@@ -220,7 +222,6 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         - attach event handlers for dragging the vertex
     */
     PolygonEditor.prototype.onMouseDown = function(e){
-        
         var edge,
             // need target as a Raphael obj reference; e.target won't suffice.
             target = this.paper.getElementByPoint(e.x, e.y);
@@ -251,7 +252,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
                 this.activeVertex = this.paper.getElementByPoint(e.x, e.y);
                 this.activeVertexIndex = edge.index1;
             }
-        }
+        } 
         
         if (!this.activeVertex || typeof this.activeVertexIndex !== 'number'){
             return
