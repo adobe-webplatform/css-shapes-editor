@@ -170,7 +170,7 @@ define(['Editor', 'CSSUtils', 'Raphael'], function(Editor, CSSUtils, Raphael){
         
             // remove offsets
             x = Math.ceil(vertex.x - offsetLeft);
-            y = Math.ceil(vertex.y - offsetLeft);
+            y = Math.ceil(vertex.y - offsetTop);
 
             // turn px value into original units
             xCoord = CSSUtils.convertFromPixels(x, vertex.xUnit, element, false)
