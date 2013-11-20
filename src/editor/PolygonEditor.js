@@ -67,7 +67,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         this.vertices = this.parseShape(this.value, this.target);
         
         if (!this.vertices.length){
-            this.vertices = this.inferPolygonFromElement(this.target)
+            this.vertices = this.inferShapeFromElement(this.target)
         }
         
         this.polygonFillRule = this.vertices.polygonFillRule || 'nonzero'
@@ -148,9 +148,9 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         @return {Array}
     */
     
-    PolygonEditor.prototype.inferPolygonFromElement = function(element) {
+    PolygonEditor.prototype.inferShapeFromElement = function(element) {
         if (!(element instanceof HTMLElement)){
-            throw TypeError('inferPolygonFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element)
+            throw TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element)
         }
         
         var box = CSSUtils.getContentBoxOf(element)
@@ -418,7 +418,6 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         if (this.transformEditor){
             this.shapeClone.remove();
             this.transformEditor.unplug();
-            delete this.phantomPath
             delete this.transformEditor
             
             return;
