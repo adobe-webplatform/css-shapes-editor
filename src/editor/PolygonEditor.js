@@ -51,7 +51,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         this.setup();
         this.applyOffsets();
         this.draw();
-        this.toggleFreeTransform()
+        // this.toggleFreeTransform()
     }
     
     PolygonEditor.prototype = Object.create(Editor.prototype);
@@ -349,7 +349,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         //TODO: prevent delete if less than 2 vertices left?
     */
     PolygonEditor.prototype.onDblClick = function(e){
-        var target = this.paper.getElementByPoint(e.x, e.y);
+        var target = Snap.getElementByPoint(e.x, e.y);
         
         // check if target is a vertex representation i.e. draggable point
         if (target && target.data && typeof target.data('vertex-index') == 'number'){
