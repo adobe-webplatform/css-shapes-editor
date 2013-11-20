@@ -1,8 +1,8 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSUtils, Raphael, freeTransform){
-    "use strict";  
+define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], function(Editor, CSSUtils, Snap, freeTransform){
+    "use strict";
     
     if (!Editor){
         throw Error("Missing editor");
@@ -24,14 +24,20 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
     function PolygonEditor(target, property, value, options){
         Editor.apply(this, arguments);
         
-        // array of objects with x, y and unit for each vertex
+        // array of objects with x, y, xUnit, yUnit for each vertex
         this.vertices = [];
         
-        // Raphael polygon path
+        // Snap polygon path
         this.shape = null;
         
-        // Raphael paper for shape overlay.
+        // Snap instance reference; setup in Editor.js
+        this.snap = null
+        
+        // Snap paper for shape overaly; setup in Editor.js
         this.paper = null;
+        
+        // Snap group of SVG obj references for rendered vertices
+        this.points = null
         
         // TODO: extend with 'options'
         this.config = _defaults;
@@ -42,19 +48,22 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
         // Index of vertex being dragged
         this.activeVertexIndex = null;
         
-        // collection of SVG obj references for drawn vertices
-        this.points = []
-        
-        // TODO: get default units
         this.setup();
         this.applyOffsets();
         this.draw();
+        this.toggleFreeTransform()
     }
     
     PolygonEditor.prototype = Object.create(Editor.prototype);
     PolygonEditor.prototype.constructor = PolygonEditor;
     
     PolygonEditor.prototype.setup = function(){
+        /*  
+            Sets up: this.holder, this.paper, this.snap, this.offsets
+            Called manually so you have the option to implement a different drawing surface
+        */ 
+        Editor.prototype.setup.call(this);
+        
         this.vertices = this.parseShape(this.value, this.target);
         
         if (!this.vertices.length){
@@ -63,11 +72,10 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
         
         this.polygonFillRule = this.vertices.polygonFillRule || 'nonzero'
         
-        // Raphael paper onto which to draw TODO: move to Editor.js?
-        this.paper = Raphael(this.holder, '100%', '100%');
+        this.points = this.paper.g()
         
         // polygon path to visualize the shape
-        this.shape = this.paper.path().attr(this.config.path);
+        this.shape = this.paper.path().attr(this.config.path).attr('fill','none');
         
         // TODO: throttle sensibly
         window.addEventListener('resize', this.refresh.bind(this));
@@ -231,7 +239,7 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
     PolygonEditor.prototype.onMouseDown = function(e){
         var edge,
             // need target as a Raphael obj reference; e.target won't suffice.
-            target = this.paper.getElementByPoint(e.x, e.y);
+            target = Snap.getElementByPoint(e.x, e.y);
         
         // prevent vertex editing while transform editor is on
         if (this.transformEditor){
@@ -261,7 +269,7 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
                 
                 this.draw();
                 
-                this.activeVertex = this.paper.getElementByPoint(e.x, e.y);
+                this.activeVertex = Snap.getElementByPoint(e.x, e.y);
                 this.activeVertexIndex = edge.index1;
             }
         } 
@@ -359,30 +367,24 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
             points = this.points,
             commands = [];
             
-        this.points.forEach(function(p){
-            p.remove()
-        })
-        
-        // TODO: add group for points and clear that. Will obsolete this.activeVertexIndex
-        // this.paper.clear()
+        this.points.clear()
         
         this.vertices.forEach(function(v, i) {
             
             if (!doNotDrawVertices){
-                // TODO: add to fragment, then to page
                 var point = paper.circle(v.x, v.y, config.point.radius)
                 point.attr(config.point)
                 point.data('vertex-index', i)
-                points.push(point)
+                points.add(point)
             }
             
             if (i === 0){
                 // Move cursor to first vertex, then prepare drawing lines
-                ['M', v.x, v.y].forEach(function(cmd) {
+                ['M' + v.x, v.y].forEach(function(cmd) {
                     commands.push(cmd)
                 });
             } else {
-                commands.push('L', v.x, v.y);
+                commands.push('L' + v.x, v.y);
             }
         });
         
@@ -402,9 +404,9 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
         
         function _transformPoints(){
             
-            var matrix = this.shapeClone.matrix,
+            var matrix = this.shapeClone.transform().localMatrix,
                 vertices = this.vertices;
-            
+                
             verticesClone.forEach(function(v, i){
                 vertices[i].x = matrix.x(v.x,v.y);
                 vertices[i].y = matrix.y(v.x,v.y);
@@ -426,7 +428,7 @@ define(['Editor', 'CSSUtils', 'raphael', 'freeTransform'], function(Editor, CSSU
         // using the same path would result in double transformations for the shape
         this.shapeClone = this.shape.clone().attr('stroke', 'none')
         
-        this.transformEditor = this.paper.freeTransform(this.shapeClone, {
+        this.transformEditor = Snap.freeTransform(this.shapeClone, {
             draw: ['bbox'],
             keepRatio: ['bboxCorners'],
             rotate: ['axisX'],

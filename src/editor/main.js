@@ -3,8 +3,9 @@ require.config({
     paths: {
         app: '../app',
         'eve': 'third-party/eve/eve',
-        'raphael': 'third-party/raphael/raphael-min',
-        'freeTransform': 'third-party/raphael.free_transform/raphael.free_transform'
+        'snap': 'third-party/snap/snap.svg-min',
+        'snap.plugins': 'third-party/snap.plugins/snap.plugins',
+        'snap.freeTransform': 'third-party/snap.freetransform/snap.freetransform'
     }
 });
 

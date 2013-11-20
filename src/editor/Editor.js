@@ -4,11 +4,6 @@
 define(['eve', 'CSSUtils'], function(eve, CSSUtils){
     "use strict";
     
-    function Holder(){
-        var body = document.body
-        return
-    }
-    
     function Editor(target, property, value){
         
         if (!target || !target.parentNode){
@@ -27,25 +22,18 @@ define(['eve', 'CSSUtils'], function(eve, CSSUtils){
             top: 0
         }
         
-        this.init()
+        // this.init()
     }
     
     Editor.prototype = {
-        init: function(){
+        setup: function(){
             this.setupEditorHolder();
+            this.setupDrawingSurface();
             this.setupOffsets();
             
             window.setTimeout(function(){
                 this.trigger('ready')
             }.bind(this)) 
-        },
-        
-        setupOffsets: function() {
-            var rect = this.target.getBoundingClientRect(),
-                box = CSSUtils.getContentBoxOf(this.target);
-                
-            this.offsets.left = rect.left + window.scrollX + box.left;
-            this.offsets.top = rect.top + window.scrollY + box.top;
         },
         
         setupEditorHolder: function() {
@@ -78,10 +66,24 @@ define(['eve', 'CSSUtils'], function(eve, CSSUtils){
             this.holder.setAttribute('data-role', 'shape-editor')
             
             // add this layer to the document
-            document.documentElement.appendChild(this.holder)
+            document.body.appendChild(this.holder)
             
             // resize tricks
             this.setupEditorHolder();
+        },
+        
+        setupDrawingSurface: function(){
+            this.snap = Snap('100%','100%');
+            this.holder.appendChild(this.snap.node)
+            this.paper = this.snap.paper
+        },
+        
+        setupOffsets: function() {
+            var rect = this.target.getBoundingClientRect(),
+                box = CSSUtils.getContentBoxOf(this.target);
+                
+            this.offsets.left = rect.left + window.scrollX + box.left;
+            this.offsets.top = rect.top + window.scrollY + box.top;
         },
         
         remove: function() {
