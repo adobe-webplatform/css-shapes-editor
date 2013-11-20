@@ -14,7 +14,8 @@ require.config({
 require([
     'text',
     'spec/CSSShapesEditorSpec',
-    'spec/PolygonEditorSpec'
+    'spec/PolygonEditorSpec',
+    'spec/CircleEditorSpec'
     ], function(){
     var env = jasmine.getEnv();
     env.addReporter(new jasmine.HtmlReporter);
