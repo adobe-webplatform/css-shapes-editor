@@ -186,5 +186,29 @@ function($, markup, PolygonEditor){
             expect(editor.vertices[0].y).toEqual(firstVertex.y + moveBy);
         });
         
+        it('should turn on the transforms editor', function(){
+            var inValue = '';
+            
+            editor = new PolygonEditor(target, property, inValue);
+            editor.turnOnFreeTransform()
+            
+            expect(editor.transformEditor).toBeDefined()
+            expect(editor.transformEditor.bbox).toBeDefined()
+        });
+
+        it('should turn off the transforms editor', function(){
+            var inValue = '';
+            
+            editor = new PolygonEditor(target, property, inValue);
+            
+            // turn it on
+            editor.turnOnFreeTransform()
+            expect(editor.transformEditor).toBeDefined()
+            
+            // now turn it off
+            editor.turnOffFreeTransform()
+            expect(editor.transformEditor).not.toBeDefined()
+        });
+        
     });
 });

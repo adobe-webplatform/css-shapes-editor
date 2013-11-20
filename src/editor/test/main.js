@@ -5,7 +5,9 @@ require.config({
         'jquery': 'third-party/jquery/jquery.min',
         'text': 'third-party/requirejs/text',
         'eve': 'third-party/eve/eve',
-        'Raphael': 'third-party/raphael/raphael-min',
+        'snap': 'third-party/snap/snap.svg-min',
+        'snap.plugins': 'third-party/snap.plugins/snap.plugins',
+        'snap.freeTransform': 'third-party/snap.freetransform/snap.freetransform',
         'spec': 'test/spec'
     }
 });
