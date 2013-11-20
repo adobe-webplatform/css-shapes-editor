@@ -190,10 +190,10 @@ function($, markup, PolygonEditor){
             var inValue = '';
             
             editor = new PolygonEditor(target, property, inValue);
-            editor.turnOnFreeTransform()
+            editor.turnOnFreeTransform();
             
-            expect(editor.transformEditor).toBeDefined()
-            expect(editor.transformEditor.bbox).toBeDefined()
+            expect(editor.transformEditor).toBeDefined();
+            expect(editor.transformEditor.bbox).toBeDefined();
         });
 
         it('should turn off the transforms editor', function(){
@@ -202,12 +202,54 @@ function($, markup, PolygonEditor){
             editor = new PolygonEditor(target, property, inValue);
             
             // turn it on
-            editor.turnOnFreeTransform()
-            expect(editor.transformEditor).toBeDefined()
+            editor.turnOnFreeTransform();
+            expect(editor.transformEditor).toBeDefined();
             
             // now turn it off
-            editor.turnOffFreeTransform()
-            expect(editor.transformEditor).not.toBeDefined()
+            editor.turnOffFreeTransform();
+            expect(editor.transformEditor).not.toBeDefined();
+        });
+        
+        it('should not add new vertex when transform editor is on', function(){
+            var inValue = '',
+                box = target.getBoundingClientRect(),
+                mockEvent = {
+                    x: target.offsetLeft,
+                    // mid-way on the left edge
+                    y: target.offsetTop + box.height / 2
+                },
+                expectedVerticesLength;
+            
+            editor = new PolygonEditor(target, property, inValue);
+            // expect vertices count to be the same
+            expectedVerticesLength = editor.vertices.length;
+            
+            editor.turnOnFreeTransform();
+            
+            // dispatch mock 'mousedown' event
+            editor.onMouseDown.call(editor, mockEvent);
+            
+            expect(editor.vertices.length).toEqual(expectedVerticesLength);
+        });
+        
+        it('should not remove vertex when transform editor is on', function(){
+            var inValue = '',
+                mockEvent = {
+                    x: target.offsetLeft,
+                    y: target.offsetTop
+                },
+                expectedVerticesLength;
+            
+            editor = new PolygonEditor(target, property, inValue);
+            // expect vertices count to be the same
+            expectedVerticesLength = editor.vertices.length;
+            
+            editor.turnOnFreeTransform();
+            
+            // dispatch mock 'mousedown' event
+            editor.onDblClick.call(editor, mockEvent);
+            
+            expect(editor.vertices.length).toEqual(expectedVerticesLength);
         });
         
     });
