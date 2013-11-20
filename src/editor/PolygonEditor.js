@@ -21,7 +21,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         yUnit: 'px'
     } 
     
-    function PolygonEditor(target, property, value, options){
+    function PolygonEditor(target, value, options){
         Editor.apply(this, arguments);
         
         // array of objects with x, y, xUnit, yUnit for each vertex

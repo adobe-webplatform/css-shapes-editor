@@ -39,7 +39,7 @@ function($, markup, PolygonEditor){
         });
 
         it('should be defined', function(){
-            editor = new PolygonEditor(target, property, value);
+            editor = new PolygonEditor(target, value);
             expect(editor).toBeDefined();
         });
         
@@ -47,7 +47,7 @@ function($, markup, PolygonEditor){
             var inValue = 'polygon(nonzero, 0px 0px, 100px 0px, 100px 100px)',
                 outValue;
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             outValue = editor.getCSSValue();
             
             expect(outValue).toEqual(inValue);
@@ -58,7 +58,7 @@ function($, markup, PolygonEditor){
                 expectedValue = _getPolygonFromBox(target),
                 outValue;
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             outValue = editor.getCSSValue();
             
             expect(outValue).toEqual(expectedValue);
@@ -69,7 +69,7 @@ function($, markup, PolygonEditor){
                 expectedValue = _getPolygonFromBox(target),
                 outValue;
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             outValue = editor.getCSSValue();
             
             expect(outValue).toEqual(expectedValue);
@@ -85,7 +85,7 @@ function($, markup, PolygonEditor){
                 },
                 expectedVerticesLength;
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             // expect to add one more vertex
             expectedVerticesLength = editor.vertices.length + 1;
             
@@ -104,7 +104,7 @@ function($, markup, PolygonEditor){
                     y: target.offsetTop + box.height / 2
                 };
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             spyOn(editor, 'trigger');
             
             // dispatch mock 'mousedown' event
@@ -122,7 +122,7 @@ function($, markup, PolygonEditor){
                 },
                 expectedVerticesLength;
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             // expect to remove a vertex
             expectedVerticesLength = editor.vertices.length - 1;
             
@@ -139,7 +139,7 @@ function($, markup, PolygonEditor){
                     y: target.offsetTop
                 };
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             spyOn(editor, 'trigger')
             
             // dispatch mock 'mousedown' event
@@ -162,7 +162,7 @@ function($, markup, PolygonEditor){
                 },
                 firstVertex = {};
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             
             // cache the first vertex coordinates
             firstVertex.x = editor.vertices[0].x;
@@ -189,7 +189,7 @@ function($, markup, PolygonEditor){
         it('should turn on the transforms editor', function(){
             var inValue = '';
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             editor.turnOnFreeTransform();
             
             expect(editor.transformEditor).toBeDefined();
@@ -199,7 +199,7 @@ function($, markup, PolygonEditor){
         it('should turn off the transforms editor', function(){
             var inValue = '';
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             
             // turn it on
             editor.turnOnFreeTransform();
@@ -220,7 +220,7 @@ function($, markup, PolygonEditor){
                 },
                 expectedVerticesLength;
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             // expect vertices count to be the same
             expectedVerticesLength = editor.vertices.length;
             
@@ -240,7 +240,7 @@ function($, markup, PolygonEditor){
                 },
                 expectedVerticesLength;
             
-            editor = new PolygonEditor(target, property, inValue);
+            editor = new PolygonEditor(target, inValue);
             // expect vertices count to be the same
             expectedVerticesLength = editor.vertices.length;
             

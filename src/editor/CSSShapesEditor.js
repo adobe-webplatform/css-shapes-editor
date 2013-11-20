@@ -3,7 +3,7 @@
 
 define(['PolygonEditor', 'CircleEditor'], function(PolygonEditor, CircleEditor){
     
-    function CSSShapesEditor(target, property, value, options){
+    function CSSShapesEditor(target, value, options){
         
         if (value.indexOf('(') < 0) {
             throw TypeError('Value does not contain a shape function')
@@ -34,7 +34,7 @@ define(['PolygonEditor', 'CircleEditor'], function(PolygonEditor, CircleEditor){
             break;
         }
         
-        return new factory(target, property, value, options)
+        return new factory(target, value, options)
     }
     
     return CSSShapesEditor

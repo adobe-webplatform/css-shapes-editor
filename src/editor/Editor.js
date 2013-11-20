@@ -4,14 +4,13 @@
 define(['eve', 'CSSUtils'], function(eve, CSSUtils){
     "use strict";
     
-    function Editor(target, property, value){
+    function Editor(target, value){
         
         if (!target || !target.parentNode){
             throw TypeError('Target expected as DOM object, but was: ' + typeof target)
         }
         
         this.target = target;
-        this.property = property;
         this.value = value;
         this.holder = null; // setup by setupEditorHolder()
         
