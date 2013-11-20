@@ -437,6 +437,24 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         }, _transformPoints.bind(this));
     };
     
+    PolygonEditor.prototype.turnOnFreeTransform = function(){
+        if (this.transformEditor){
+            // aready turned on
+            return
+        }
+        
+        this.toggleFreeTransform();
+    };
+    
+    PolygonEditor.prototype.turnOffFreeTransform = function(){
+        if (!this.transformEditor){
+            // already turned off
+            return
+        }
+        
+        this.toggleFreeTransform();
+    };
+    
     /*
         Calculate min distance between a point and a line,
         @see http://paulbourke.net/geometry/pointlineplane/
