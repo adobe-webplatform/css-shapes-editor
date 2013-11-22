@@ -115,7 +115,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             args;
 
         // superficial check for ellipse declaration
-        if (!/^ellipse\(.*?\)/i.test(shape.trim())){
+        if (typeof shape != 'string' || !/^ellipse\(.*?\)/i.test(shape.trim())){
 
             // remove editor DOM saffolding
             this.remove();
