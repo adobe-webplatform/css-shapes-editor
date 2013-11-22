@@ -20,7 +20,6 @@ module.exports = function (grunt) {
         // configurable paths
         yeoman: {
             src: 'src',
-            editor: 'src/editor',
             dist: 'dist'
         },
         
@@ -30,7 +29,7 @@ module.exports = function (grunt) {
                     .replace(/@DATE/, grunt.template.today("yyyy-mm-dd")) + "\n",
         
         watch: {
-            files: ['<%= yeoman.editor %>/{,*/}*.js'],
+            files: ['<%= yeoman.src %>/{,*/}*.js'],
             // tasks: ['jshint']
         },
         
@@ -40,7 +39,7 @@ module.exports = function (grunt) {
             },
             all: [
                 // 'Gruntfile.js',
-                '<%= yeoman.src %>/editor/Editor.js',
+                '<%= yeoman.src %>/Editor.js',
                 // 'test/spec/{,*/}*.js'
             ]
         },
@@ -48,16 +47,16 @@ module.exports = function (grunt) {
         requirejs: {
           compile: {
             options: {
-              baseUrl: '<%= yeoman.editor %>',
-              mainConfigFile: '<%= yeoman.editor %>/main.js',
+              baseUrl: '<%= yeoman.src %>',
+              mainConfigFile: '<%= yeoman.src %>/main.js',
               out: '<%= yeoman.dist %>/' + pkg.name + '.js',
               name: 'main',
               include: ['third-party/almond/almond'],
               wrap: {         
                   // TODO: figure out why banner crashes build
                   // startFile: ['<%= banner %>','<%= yeoman.editor %>/fragments/start.frag'],
-                  startFile: '<%= yeoman.editor %>/fragments/start.frag',
-                  endFile: '<%= yeoman.editor %>/fragments/end.frag'
+                  startFile: '<%= yeoman.src %>/fragments/start.frag',
+                  endFile: '<%= yeoman.src %>/fragments/end.frag'
               },
               optimize: 'none'
             }
