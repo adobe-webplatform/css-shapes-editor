@@ -1,6 +1,0 @@
-{               
-    "launch_in_dev" : [
-        "chrome"
-    ],
-    "test_page" : "test/index.html"
-}
