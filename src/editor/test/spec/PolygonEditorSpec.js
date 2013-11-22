@@ -43,6 +43,33 @@ function($, markup, PolygonEditor){
             expect(editor).toBeDefined();
         });
         
+        it('should throw error when css value missing polygon declaration', function(){
+            function setupWithEmtpy(){
+                var value = '';
+                editor = new PolygonEditor(target, value);
+            };
+            
+            function setupWithNull(){
+                var value = null;
+                editor = new PolygonEditor(target, value);
+            };
+            
+            function setupWithFake(){
+                var value = 'fake()';
+                editor = new PolygonEditor(target, value);
+            };
+            
+            function setupWithFalsePositive(){
+                var value = 'fake-polygon()';
+                editor = new PolygonEditor(target, value);
+            };
+            
+            expect(setupWithEmtpy).toThrow();
+            expect(setupWithNull).toThrow();
+            expect(setupWithFake).toThrow();
+            expect(setupWithFalsePositive).toThrow();
+        });
+        
         it('should return polygon css shape value', function(){
             var inValue = 'polygon(nonzero, 0px 0px, 100px 0px, 100px 100px)',
                 outValue;
@@ -53,11 +80,13 @@ function($, markup, PolygonEditor){
             expect(outValue).toEqual(inValue);
         });
         
-        it('should infer polygon from element when no value', function(){
-            var inValue = '',
+        it('should infer polygon from element when value contains empty polygon', function(){
+            // empty polygon declaration tells the editor to automatically infer the shape
+            // should not throw error.
+            var inValue = 'polygon()',
                 expectedValue = _getPolygonFromBox(target),
                 outValue;
-            
+                
             editor = new PolygonEditor(target, inValue);
             outValue = editor.getCSSValue();
             
@@ -76,7 +105,7 @@ function($, markup, PolygonEditor){
         }); 
 
         it('should add new vertex when edge is clicked', function(){
-            var inValue = '',
+            var inValue = 'polygon()',
                 box = target.getBoundingClientRect(),
                 mockEvent = {
                     x: target.offsetLeft,
@@ -96,7 +125,7 @@ function($, markup, PolygonEditor){
         });
         
         it('should trigger "shapechange" event when new vertex is added', function(){
-            var inValue = '',
+            var inValue = 'polygon()',
                 box = target.getBoundingClientRect(),
                 mockEvent = {
                     x: target.offsetLeft,
@@ -115,7 +144,7 @@ function($, markup, PolygonEditor){
         });
 
         it('should remove vertex when double clicked', function(){
-            var inValue = '',
+            var inValue = 'polygon()',
                 mockEvent = {
                     x: target.offsetLeft,
                     y: target.offsetTop
@@ -133,7 +162,7 @@ function($, markup, PolygonEditor){
         });
         
         it('should trigger "shapechange" event when vertex is removed', function(){
-            var inValue = '',
+            var inValue = 'polygon()',
                 mockEvent = {
                     x: target.offsetLeft,
                     y: target.offsetTop
@@ -150,7 +179,7 @@ function($, markup, PolygonEditor){
         });
         
         it('should trigger "shapechange" event when vertex is moved', function(){
-            var inValue = '',
+            var inValue = 'polygon()',
                 moveBy = 100,
                 mockMouseDownEvent = {
                     x: target.offsetLeft,
@@ -187,9 +216,7 @@ function($, markup, PolygonEditor){
         });
         
         it('should turn on the transforms editor', function(){
-            var inValue = '';
-            
-            editor = new PolygonEditor(target, inValue);
+            editor = new PolygonEditor(target, value);
             editor.turnOnFreeTransform();
             
             expect(editor.transformEditor).toBeDefined();
@@ -197,9 +224,7 @@ function($, markup, PolygonEditor){
         });
 
         it('should turn off the transforms editor', function(){
-            var inValue = '';
-            
-            editor = new PolygonEditor(target, inValue);
+            editor = new PolygonEditor(target, value);
             
             // turn it on
             editor.turnOnFreeTransform();
@@ -211,7 +236,7 @@ function($, markup, PolygonEditor){
         });
         
         it('should not add new vertex when transform editor is on', function(){
-            var inValue = '',
+            var inValue = 'polygon()',
                 box = target.getBoundingClientRect(),
                 mockEvent = {
                     x: target.offsetLeft,
@@ -233,7 +258,7 @@ function($, markup, PolygonEditor){
         });
         
         it('should not remove vertex when transform editor is on', function(){
-            var inValue = '',
+            var inValue = 'polygon()',
                 mockEvent = {
                     x: target.offsetLeft,
                     y: target.offsetTop

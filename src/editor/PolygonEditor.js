@@ -96,16 +96,26 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         
         @example: [{x: 0, y: 0, xUnit: px, yUnit: px}, ...]
         
-        @param {String} polygon CSS polygon function shape
+        @param {String} shape CSS polygon function shape
         @param {HTMLElement} element Reference for content box used when converting units to pixels (e.g. % to px). Usually the element onto which the shape is defined.
         
         @return {Array}
     */
-    PolygonEditor.prototype.parseShape = function(polygon, element){
+    PolygonEditor.prototype.parseShape = function(shape, element){
         var coords = [],
             infos = null;
         
-        if (infos = /polygon\s*\(([a-z]*),\s*(([-+0-9.]+[a-z%]*|calc\([^)]*\)|\s|\,)*)\)?(\s*)/i.exec(polygon)) {
+        // superficial check for shape declaration
+        if (typeof shape != 'string' || !/^polygon\(.*?\)/i.test(shape.trim())){
+            
+            // remove editor DOM saffolding
+            this.remove();
+            
+            throw Error('No polygon() function definition in provided value');
+            return
+        }
+        
+        if (infos = /polygon\s*\(([a-z]*),\s*(([-+0-9.]+[a-z%]*|calc\([^)]*\)|\s|\,)*)\)?(\s*)/i.exec(shape.trim())) {
             coords = (
                 infos[2]
                 .replace(/\s+/g, ' ')
