@@ -1,6 +1,6 @@
 # CSS Shapes Editor
 
-JavaScript library for on-screen editor of CSS Shapes. Live editing of polygon(), circle(), ellipse(), rectangle() shapes on elements in the page.
+JavaScript component for editing CSS Shapes like polygon(), circle(), ellipse() and rectangle() right in the browser.
 
 ## Usage
 
