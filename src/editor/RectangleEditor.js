@@ -211,17 +211,25 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
     };
     
     RectangleEditor.prototype.getCSSValue = function(){
-        var cx = this.coords.cx - this.offsets.left,
-            cy = this.coords.cy - this.offsets.top,
+        var x = this.coords.x - this.offsets.left,
+            y = this.coords.y - this.offsets.top,
+            w = this.coords.w,
+            h = this.coords.h,
             rx = this.coords.rx,
-            ry = this.coords.ry;
+            ry = this.coords.ry,
+            args = [];
             
-        cx = CSSUtils.convertFromPixels(cx, this.coords.cxUnit, this.target, false);
-        cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, false);
-        rx = CSSUtils.convertFromPixels(rx, this.coords.rxUnit, this.target, true);
-        ry = CSSUtils.convertFromPixels(ry, this.coords.ryUnit, this.target, true);
+        x = CSSUtils.convertFromPixels(x, this.coords.xUnit, this.target, false);
+        y = CSSUtils.convertFromPixels(y, this.coords.yUnit, this.target, false);
+        w = CSSUtils.convertFromPixels(w, this.coords.wUnit, this.target, true);
+        h = CSSUtils.convertFromPixels(h, this.coords.hUnit, this.target, true);
         
-        return 'ellipse(' + [cx, cy, rx, ry].join(', ') + ')'
+        args = [x, y, w, h];
+        
+        rx ? args.push( [rx, this.coords.rxUnit].join('') ) : null;
+        ry ? args.push( [ry, this.coords.ryUnit].join('') ) : null;
+        
+        return 'rectangle(' + args.join(', ') + ')'
     };
     
     RectangleEditor.prototype.toggleFreeTransform = function(){
