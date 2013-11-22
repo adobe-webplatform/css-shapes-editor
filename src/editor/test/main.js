@@ -16,7 +16,8 @@ require([
     'spec/CSSShapesEditorSpec',
     'spec/PolygonEditorSpec',
     'spec/CircleEditorSpec',
-    'spec/EllipseEditorSpec'
+    'spec/EllipseEditorSpec',
+    'spec/RectangleEditorSpec'
     ], function(){
     var env = jasmine.getEnv();
     env.addReporter(new jasmine.HtmlReporter);
