@@ -4,10 +4,6 @@
 define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], function(Editor, CSSUtils, Snap, freeTransform){
     "use strict";
     
-    if (!Editor){
-        throw Error("Missing editor");
-    }
-    
     var _defaults = {
         path: {
             stroke: 'black'

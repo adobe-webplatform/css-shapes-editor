@@ -1,7 +1,6 @@
 require.config({
     // baseUrl: './', // infered from data-main on <script>
     paths: {
-        app: '../app',
         'eve': 'third-party/eve/eve',
         'snap': 'third-party/snap/snap.svg-min',
         'snap.plugins': 'third-party/snap.plugins/snap.plugins',
@@ -10,6 +9,5 @@ require.config({
 });
 
 define('main', ['CSSShapesEditor'], function(editor){
-    
     return editor
 })

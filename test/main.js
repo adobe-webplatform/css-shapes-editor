@@ -1,6 +1,6 @@
 require.config({
-    // set baseUrl to src/editor/
-    baseUrl: '../',
+    // set baseUrl to src/
+    baseUrl: '../src/',
     paths: {
         'jquery': 'third-party/jquery/jquery.min',
         'text': 'third-party/requirejs/text',
@@ -8,7 +8,7 @@ require.config({
         'snap': 'third-party/snap/snap.svg-min',
         'snap.plugins': 'third-party/snap.plugins/snap.plugins',
         'snap.freeTransform': 'third-party/snap.freetransform/snap.freetransform',
-        'spec': 'test/spec'
+        'spec': '../test/spec'
     }
 });
 require([
