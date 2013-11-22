@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['PolygonEditor', 'CircleEditor', 'EllipseEditor'], function(PolygonEditor, CircleEditor, EllipseEditor){
+define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor'], function(PolygonEditor, CircleEditor, EllipseEditor, RectangleEditor){
     
     function CSSShapesEditor(target, value, options){
         
@@ -26,7 +26,7 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor'], function(PolygonEdito
             break;
             
             case 'rectangle':
-                // return new RectangleEditor(arguments)
+                factory = RectangleEditor;
             break;
             
             default:
