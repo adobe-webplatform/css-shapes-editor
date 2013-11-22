@@ -118,7 +118,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             infos,
             args;
 
-        // superficial check for ellipse declaration
+        // superficial check for rectangle declaration
         if (typeof shape != 'string' || !/^rectangle\(.*?\)/i.test(shape.trim())){
 
             // remove editor DOM saffolding
@@ -211,24 +211,20 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
     };
     
     RectangleEditor.prototype.getCSSValue = function(){
-        var x = this.coords.x - this.offsets.left,
-            y = this.coords.y - this.offsets.top,
-            w = this.coords.w,
-            h = this.coords.h,
-            rx = this.coords.rx,
-            ry = this.coords.ry,
-            args = [];
-            
-        x = CSSUtils.convertFromPixels(x, this.coords.xUnit, this.target, false);
-        y = CSSUtils.convertFromPixels(y, this.coords.yUnit, this.target, false);
-        w = CSSUtils.convertFromPixels(w, this.coords.wUnit, this.target, true);
-        h = CSSUtils.convertFromPixels(h, this.coords.hUnit, this.target, true);
-        
+        var c = this.coords,
+            x, y, w, h, args;
+
+        x = CSSUtils.convertFromPixels(c.x - this.offsets.left, c.xUnit, this.target, false);
+        y = CSSUtils.convertFromPixels(c.y - this.offsets.top, c.yUnit, this.target, false);
+        w = CSSUtils.convertFromPixels(c.w, c.wUnit, this.target, true);
+        h = CSSUtils.convertFromPixels(c.h, c.hUnit, this.target, true);
+        // TODO: figure out how to convert border-radius
+
         args = [x, y, w, h];
-        
-        rx ? args.push( [rx, this.coords.rxUnit].join('') ) : null;
-        ry ? args.push( [ry, this.coords.ryUnit].join('') ) : null;
-        
+
+        c.rx ? args.push( [c.rx, c.rxUnit].join('') ) : null;
+        c.ry ? args.push( [c.ry, c.ryUnit].join('') ) : null;
+
         return 'rectangle(' + args.join(', ') + ')'
     };
     
@@ -240,10 +236,10 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         function _transformPoints(){
             var matrix = this.shapeClone.transform().localMatrix;
             
-            this.coords.cx = matrix.x(coordsClone.cx, coordsClone.cy);
-            this.coords.cy = matrix.y(coordsClone.cx, coordsClone.cy);
-            this.coords.rx = this.transformEditor.attrs.scale.x * coordsClone.rx;
-            this.coords.ry = this.transformEditor.attrs.scale.y * coordsClone.ry;
+            this.coords.x = matrix.x(coordsClone.x, coordsClone.y);
+            this.coords.y = matrix.y(coordsClone.x, coordsClone.y);
+            this.coords.w = this.transformEditor.attrs.scale.x * coordsClone.w;
+            this.coords.h = this.transformEditor.attrs.scale.y * coordsClone.h;
             
             this.draw()
         }
@@ -264,12 +260,11 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             draw: ['bbox'],
             drag: ['self','center'],
             keepRatio: ['bboxCorners'],
-            rotate: [], // ellipses do not rotate
+            rotate: [], // rectangles do not rotate, polygons do.
             scale: ['bboxCorners','bboxSides'],
             distance: '0.6'
         }, _transformPoints.bind(this));
     };
-    
     
     RectangleEditor.prototype.draw = function(){
         
