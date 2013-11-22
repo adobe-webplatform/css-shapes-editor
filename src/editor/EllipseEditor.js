@@ -113,7 +113,17 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             coords,
             infos,
             args;
-            
+
+        // superficial check for ellipse declaration
+        if (!/^ellipse\(.*?\)/i.test(shape.trim())){
+
+            // remove editor DOM saffolding
+            this.remove();
+
+            throw Error('No ellipse() function definition in provided value');
+            return
+        }
+        
         if (infos = /ellipse\s*\(((\s*[-+0-9.]+[a-z%]*\s*,*\s*){4})\s*\)/i.exec(shape.trim())){
             if (!infos[1]){
                 return
