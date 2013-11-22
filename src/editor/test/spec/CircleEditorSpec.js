@@ -101,8 +101,67 @@ function($, markup, CircleEditor){
             expect(editor.coords).toEqual(expectedCoords);
         });
         
+        it('should throw error value does not contain circle function', function(){
+            
+            function setupWithEmpty(){
+                var value = '';
+                editor = new CircleEditor(target, value);
+            }
+            
+            function setupWithFake(){
+                var value = 'fake()';
+                editor = new CircleEditor(target, value);
+            }
+            
+            function setupWithFalsePositive(){
+                var value = 'fake-circle()';
+                editor = new CircleEditor(target, value);
+            }
+            
+            function setupWithNull(){
+                var value = null;
+                editor = new CircleEditor(target, value);
+            }
+            
+            function setupWithUndefined(){
+                var value = undefined;
+                editor = new CircleEditor(target, value);
+            }
+
+            function setupWithDate(){
+                var value = new Date();
+                editor = new CircleEditor(target, value);
+            }
+            
+            expect(setupWithEmpty).toThrow();
+            expect(setupWithFake).toThrow();
+            expect(setupWithFalsePositive).toThrow();
+            expect(setupWithNull).toThrow();
+            expect(setupWithUndefined).toThrow();
+            expect(setupWithDate).toThrow();
+        });
+        
+        it('should not throw error value contains empty circle function', function(){
+            
+            // empty circle declaration signals the editor to automatically infer the shape.
+            // should not throw error.
+            function setupWithCorrect(){
+                var value = 'circle()';
+                editor = new CircleEditor(target, value);
+            }
+            
+            // value must be trimmed before parsing. 
+            function setupWithWhitespacedCorrect(){
+                editor.remove();
+                var value = '   circle()';
+                editor = new CircleEditor(target, value);
+            }
+            
+            expect(setupWithCorrect).not.toThrow();
+            expect(setupWithWhitespacedCorrect).not.toThrow();
+        });
+        
         // TODO: test with percentages, match the circle.html target box
-        // TODO: test with invalid string
         // TODO: test with negative values
         // TODO: test with new notation
     });

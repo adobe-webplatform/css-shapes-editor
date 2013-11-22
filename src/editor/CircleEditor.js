@@ -111,6 +111,17 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             infos,
             args;
             
+        // superficial check for shape declaration
+        if (typeof shape != 'string' || !/^circle\(.*?\)/i.test(shape.trim())){
+            
+            // remove editor DOM saffolding
+            this.remove();
+            
+            throw Error('No circle() function definition in provided value');
+            return
+        }
+            
+            
         if (infos = /circle\s*\(((\s*[-+0-9.]+[a-z%]*\s*,*\s*){3})\s*\)/i.exec(shape.trim())){
             if (!infos[1]){
                 return
