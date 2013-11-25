@@ -83,7 +83,6 @@ input:checked + label{
       var el = document.querySelector('#content');
       var property = 'shape-inside';
       var editor = null;
-      // var db = window.localStorage['shape-editor'] || {}
       
       function db(key, value){
         if (key && !value){
@@ -98,8 +97,6 @@ input:checked + label{
           return db(key)
         }
       }
-      
-      nav.addEventListener('click', setupValue)
       
       function setupValue(e){
         if (e.target && e.target.value){
@@ -135,6 +132,13 @@ input:checked + label{
       else{
         setupValue.call(this, { target: { value: document.querySelector('input:checked').value }})
       }
+      
+      nav.addEventListener('click', setupValue);
+      document.addEventListener('keypress', function(e){
+        if (editor && e.keyCode == 116){
+          editor.toggleFreeTransform()
+        }
+      })
       
     })
     </script>
