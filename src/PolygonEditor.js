@@ -6,7 +6,8 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
     
     var _defaults = {
         path: {
-            stroke: 'black'
+            stroke: 'black',
+            fill: 'rgba(0,0,0,0)' // tricks transform editor to accept self-drag
         },
         point: {
             radius: 5,
@@ -431,10 +432,11 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         
         // using a phantom shape because we already redraw the path by the transformed coordinates.
         // using the same path would result in double transformations for the shape
-        this.shapeClone = this.shape.clone().attr('stroke', 'none')
+        this.shapeClone = this.shape.clone().attr({ stroke: 'none', fill: this.config.path.fill})
         
         this.transformEditor = Snap.freeTransform(this.shapeClone, {
             draw: ['bbox'],
+            drag: ['self','center'],
             keepRatio: ['bboxCorners'],
             rotate: ['axisX'],
             scale: ['bboxCorners','bboxSides'],
