@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['Editor','CSSUtils'], function(Editor, CSSUtils){
+define(['Editor','CSSUtils', 'snap'], function(Editor, CSSUtils, Snap){
     "use strict";
     
     var _defaults = {
@@ -12,26 +12,26 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         cxUnit: 'px',
         cyUnit: 'px',
         rUnit: 'px'
-    }
+    };
     
     function CircleEditor(target, value, options){
         Editor.apply(this, arguments);
         
         // coordinates for circle: cx, cy, radius and corresponding units
-        this.coords = null
+        this.coords = null;
         
         // TODO: extend with options
         this.config = _defaults;
         
         this.setup();
         this.applyOffsets();
-        this.draw()
+        this.draw();
         
-        this.toggleFreeTransform()
+        this.toggleFreeTransform();
     }
     
     CircleEditor.prototype = Object.create(Editor.prototype);
-    CircleEditor.prototype.constructor = CircleEditor
+    CircleEditor.prototype.constructor = CircleEditor;
 
     CircleEditor.prototype.setup = function(){
         // Sets up: this.holder, this.paper, this.snap, this.offsets
@@ -40,7 +40,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         this.coords = this.parseShape(this.value);
         
         if (!this.coords){
-            this.coords = this.inferShapeFromElement(this.target)
+            this.coords = this.inferShapeFromElement(this.target);
         }
         
         this.shape = this.paper.circle().attr(this.config.path);
@@ -112,35 +112,35 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             args;
             
         // superficial check for shape declaration
-        if (typeof shape != 'string' || !/^circle\(.*?\)/i.test(shape.trim())){
+        if (typeof shape !== 'string' || !/^circle\(.*?\)/i.test(shape.trim())){
             
             // remove editor DOM saffolding
             this.remove();
             
-            throw Error('No circle() function definition in provided value');
-            return
+            throw new Error('No circle() function definition in provided value');
         }
+        
+        infos = /circle\s*\(((\s*[-+0-9.]+[a-z%]*\s*,*\s*){3})\s*\)/i.exec(shape.trim());
             
-            
-        if (infos = /circle\s*\(((\s*[-+0-9.]+[a-z%]*\s*,*\s*){3})\s*\)/i.exec(shape.trim())){
+        if (infos){
             if (!infos[1]){
-                return
+                return;
             }
             
             args = infos[1].replace(/\s+/g, '').split(',');
             
             // incomplete circle definition
             if (args.length < 3){
-                return
+                return;
             }
             
             args = args.map(function(arg, i){
                 
                 // third argument is the radius. special case for circle & ellipse
-                var isHeightRelated = !!(i%2);
+                var isHeightRelated = (i === 0) ? 0 : 1; // TODO: figure this out from Francois
                 
                 return CSSUtils.convertToPixels(arg, element, isHeightRelated);
-            })
+            });
             
             coords = {
                 cx: args[0].value,
@@ -149,10 +149,10 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
                 cyUnit: args[1].unit,
                 r: args[2].value,
                 rUnit: args[2].unit
-            }
+            };
         } 
         
-        return coords
+        return coords;
     };
     
     /*
@@ -166,13 +166,13 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
     */
     CircleEditor.prototype.inferShapeFromElement = function(element){
         if (!(element instanceof HTMLElement)){
-            throw TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element)
+            throw new TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element);
         }
         
         var box = CSSUtils.getContentBoxOf(element);
 
         if (!box.height || !box.width){
-            throw Error('inferShapeFromElement() \n Cannot infer shape from element because it has no width or height')
+            throw new Error('inferShapeFromElement() \n Cannot infer shape from element because it has no width or height');
         }
         
         // TODO: also infer unit values
@@ -184,7 +184,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             // pick radius in relation to closest-edge
             r: Math.min(box.height, box.width) / 2,
             rUnit: this.config.rUnit
-        }
+        };
     };
     
     CircleEditor.prototype.getCSSValue = function(){
@@ -196,35 +196,36 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, false);
         r = CSSUtils.convertFromPixels(r, this.coords.rUnit, this.target, true);
         
-        return 'circle(' + [cx, cy, r].join(', ') + ')'
+        return 'circle(' + [cx, cy, r].join(', ') + ')';
     };
     
     CircleEditor.prototype.toggleFreeTransform = function(){
         
         // make a clone to avoid compound tranforms
         var coordsClone = (JSON.parse(JSON.stringify(this.coords)));
+        var scope = this;
         
         function _transformPoints(){
-            var matrix = this.shapeClone.transform().localMatrix;
+            var matrix = scope.shapeClone.transform().localMatrix;
             
-            this.coords.cx = matrix.x(coordsClone.cx, coordsClone.cy);
-            this.coords.cy = matrix.y(coordsClone.cx, coordsClone.cy);
-            this.coords.r = this.transformEditor.attrs.scale.x * coordsClone.r;
+            scope.coords.cx = matrix.x(coordsClone.cx, coordsClone.cy);
+            scope.coords.cy = matrix.y(coordsClone.cx, coordsClone.cy);
+            scope.coords.r = scope.transformEditor.attrs.scale.x * coordsClone.r;
             
-            this.draw()
+            scope.draw();
         }
         
         if (this.transformEditor){
             this.shapeClone.remove();
             this.transformEditor.unplug();
-            delete this.transformEditor
+            delete this.transformEditor;
             
             return;
         }
         
         // using a phantom shape because we already redraw the path by the transformed coordinates.
         // using the same path would result in double transformations for the shape
-        this.shapeClone = this.shape.clone().attr('stroke', 'none')
+        this.shapeClone = this.shape.clone().attr('stroke', 'none');
         
         this.transformEditor = Snap.freeTransform(this.shapeClone, {
             draw: ['bbox'],
@@ -233,7 +234,8 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             rotate: [],
             scale: ['bboxCorners'],
             distance: '0.6'
-        }, _transformPoints.bind(this));
+        }, 
+        _transformPoints);
     };
     
     
@@ -244,5 +246,5 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         this.trigger('shapechange', this);
     };
     
-    return CircleEditor
-})
+    return CircleEditor;
+});

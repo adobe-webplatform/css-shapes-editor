@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define, eve */
 
-define(['eve', 'CSSUtils'], function(eve, CSSUtils){
+define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
     "use strict";
     
     function Editor(target, value){
@@ -19,7 +19,7 @@ define(['eve', 'CSSUtils'], function(eve, CSSUtils){
         this.offsets = {
             left: 0,
             top: 0
-        }
+        };
     }
     
     Editor.prototype = {
@@ -29,8 +29,8 @@ define(['eve', 'CSSUtils'], function(eve, CSSUtils){
             this.setupOffsets();
             
             window.setTimeout(function(){
-                this.trigger('ready')
-            }.bind(this)) 
+                this.trigger('ready');
+            }.bind(this));
         },
         
         setupEditorHolder: function() {
@@ -55,24 +55,25 @@ define(['eve', 'CSSUtils'], function(eve, CSSUtils){
             this.holder.style.right = 0;
             this.holder.style.bottom = 0;
             
+            // make sure editor is the top-most thing on the page
             // see http://softwareas.com/whats-the-maximum-z-index
             this.holder.style.zIndex = 2147483647; 
             
             // other styling stuff
             this.holder.style.background = "rgba(0, 194, 255, 0.2)";
-            this.holder.setAttribute('data-role', 'shape-editor')
+            this.holder.setAttribute('data-role', 'shape-editor');
             
             // add this layer to the document
-            document.body.appendChild(this.holder)
+            document.body.appendChild(this.holder);
             
             // resize tricks
             this.setupEditorHolder();
         },
         
         setupDrawingSurface: function(){
-            this.snap = Snap('100%','100%');
-            this.holder.appendChild(this.snap.node)
-            this.paper = this.snap.paper
+            this.snap = new Snap('100%','100%');
+            this.holder.appendChild(this.snap.node);
+            this.paper = this.snap.paper;
         },
         
         setupOffsets: function() {
@@ -87,10 +88,10 @@ define(['eve', 'CSSUtils'], function(eve, CSSUtils){
             var holder = this.holder;
             
             if (holder && holder.parentElement){
-                holder.parentNode.removeChild(holder)
+                holder.parentNode.removeChild(holder);
             }
             
-            this.trigger('removed', {})
+            this.trigger('removed', {});
         },
         
         on: eve.on,
@@ -99,4 +100,4 @@ define(['eve', 'CSSUtils'], function(eve, CSSUtils){
     };   
     
     return Editor;
-})
+});

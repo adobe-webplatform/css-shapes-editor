@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['Editor','CSSUtils'], function(Editor, CSSUtils){
+define(['Editor','CSSUtils', 'snap'], function(Editor, CSSUtils, Snap){
     "use strict";
     
     var _defaults = {
@@ -13,26 +13,26 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         cyUnit: 'px',
         rxUnit: 'px',
         ryUnit: 'px'
-    }
+    };
     
     function EllipseEditor(target, value, options){
         Editor.apply(this, arguments);
         
         // coordinates for circle: cx, cy, x and y radii and corresponding units
-        this.coords = null
+        this.coords = null;
         
         // TODO: extend with options
         this.config = _defaults;
         
         this.setup();
         this.applyOffsets();
-        this.draw()
+        this.draw();
         
-        this.toggleFreeTransform()
+        this.toggleFreeTransform();
     }
     
     EllipseEditor.prototype = Object.create(Editor.prototype);
-    EllipseEditor.prototype.constructor = EllipseEditor
+    EllipseEditor.prototype.constructor = EllipseEditor;
 
     EllipseEditor.prototype.setup = function(){
         // Sets up: this.holder, this.paper, this.snap, this.offsets
@@ -41,7 +41,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         this.coords = this.parseShape(this.value);
         
         if (!this.coords){
-            this.coords = this.inferShapeFromElement(this.target)
+            this.coords = this.inferShapeFromElement(this.target);
         }
         
         this.shape = this.paper.ellipse().attr(this.config.path);
@@ -115,34 +115,35 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             args;
 
         // superficial check for ellipse declaration
-        if (typeof shape != 'string' || !/^ellipse\(.*?\)/i.test(shape.trim())){
+        if (typeof shape !== 'string' || !/^ellipse\(.*?\)/i.test(shape.trim())){
 
             // remove editor DOM saffolding
             this.remove();
 
-            throw Error('No ellipse() function definition in provided value');
-            return
+            throw new Error('No ellipse() function definition in provided value');
         }
         
-        if (infos = /ellipse\s*\(((\s*[-+0-9.]+[a-z%]*\s*,*\s*){4})\s*\)/i.exec(shape.trim())){
+        infos = /ellipse\s*\(((\s*[-+0-9.]+[a-z%]*\s*,*\s*){4})\s*\)/i.exec(shape.trim());
+        
+        if (infos){
             if (!infos[1]){
-                return
+                return;
             }
             
             args = infos[1].replace(/\s+/g, '').split(',');
             
             // incomplete ellipse definition
             if (args.length < 4){
-                return
+                return;
             }
             
             args = args.map(function(arg, i){
                 
                 // third argument is the radius. special case for circle & ellipse
-                var isHeightRelated = !!(i%2);
+                var isHeightRelated = (i === 0) ? 0 : 1; // TODO: figure this out from Francois
                 
                 return CSSUtils.convertToPixels(arg, element, isHeightRelated);
-            })
+            });
             
             coords = {
                 cx: args[0].value,
@@ -153,10 +154,10 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
                 rxUnit: args[2].unit,
                 ry: args[3].value,
                 ryUnit: args[3].unit
-            }
+            };
         } 
         
-        return coords
+        return coords;
     };
     
     /*
@@ -171,13 +172,13 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
     */
     EllipseEditor.prototype.inferShapeFromElement = function(element){
         if (!(element instanceof HTMLElement)){
-            throw TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element)
+            throw new TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element);
         }
         
         var box = CSSUtils.getContentBoxOf(element);
 
         if (!box.height || !box.width){
-            throw Error('inferShapeFromElement() \n Cannot infer shape from element because it has no width or height')
+            throw new Error('inferShapeFromElement() \n Cannot infer shape from element because it has no width or height');
         }
         
         // TODO: also infer unit values
@@ -190,7 +191,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             rxUnit: this.config.rxUnit,
             ry: box.height / 2,
             ryUnit: this.config.ryUnit
-        }
+        };
     };
     
     EllipseEditor.prototype.getCSSValue = function(){
@@ -204,36 +205,37 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         rx = CSSUtils.convertFromPixels(rx, this.coords.rxUnit, this.target, true);
         ry = CSSUtils.convertFromPixels(ry, this.coords.ryUnit, this.target, true);
         
-        return 'ellipse(' + [cx, cy, rx, ry].join(', ') + ')'
+        return 'ellipse(' + [cx, cy, rx, ry].join(', ') + ')';
     };
     
     EllipseEditor.prototype.toggleFreeTransform = function(){
         
         // make a clone to avoid compound tranforms
-        var coordsClone = (JSON.parse(JSON.stringify(this.coords)));
+        var coordsClone = (JSON.parse(JSON.stringify(this.coords))),
+            scope = this;
         
         function _transformPoints(){
-            var matrix = this.shapeClone.transform().localMatrix;
+            var matrix = scope.shapeClone.transform().localMatrix;
             
-            this.coords.cx = matrix.x(coordsClone.cx, coordsClone.cy);
-            this.coords.cy = matrix.y(coordsClone.cx, coordsClone.cy);
-            this.coords.rx = this.transformEditor.attrs.scale.x * coordsClone.rx;
-            this.coords.ry = this.transformEditor.attrs.scale.y * coordsClone.ry;
+            scope.coords.cx = matrix.x(coordsClone.cx, coordsClone.cy);
+            scope.coords.cy = matrix.y(coordsClone.cx, coordsClone.cy);
+            scope.coords.rx = scope.transformEditor.attrs.scale.x * coordsClone.rx;
+            scope.coords.ry = scope.transformEditor.attrs.scale.y * coordsClone.ry;
             
-            this.draw()
+            scope.draw();
         }
         
         if (this.transformEditor){
             this.shapeClone.remove();
             this.transformEditor.unplug();
-            delete this.transformEditor
+            delete this.transformEditor;
             
             return;
         }
         
         // using a phantom shape because we already redraw the path by the transformed coordinates.
         // using the same path would result in double transformations for the shape
-        this.shapeClone = this.shape.clone().attr('stroke', 'none')
+        this.shapeClone = this.shape.clone().attr('stroke', 'none');
         
         this.transformEditor = Snap.freeTransform(this.shapeClone, {
             draw: ['bbox'],
@@ -242,7 +244,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             rotate: [], // ellipses do not rotate
             scale: ['bboxCorners','bboxSides'],
             distance: '0.6'
-        }, _transformPoints.bind(this));
+        }, _transformPoints);
     };
     
     
@@ -253,5 +255,5 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         this.trigger('shapechange', this);
     };
     
-    return EllipseEditor
-})
+    return EllipseEditor;
+});

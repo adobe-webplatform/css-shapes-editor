@@ -3,39 +3,45 @@
 
 define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor'], function(PolygonEditor, CircleEditor, EllipseEditor, RectangleEditor){
     
+    'use strict';
+    
     function CSSShapesEditor(target, value, options){
         
+        // ensure omitting 'new' is harmless
+        if (!(this instanceof CSSShapesEditor)){
+            return new CSSShapesEditor(target, value, options);
+        }
+        
         if (value.indexOf('(') < 0) {
-            throw TypeError('Value does not contain a shape function')
+            throw new TypeError('Value does not contain a shape function');
         }
         
         var shape = value.split('(')[0].trim(),
-            factory = function(){ };
+            Factory;
         
         switch (shape) {
-            case 'polygon':
-                factory = PolygonEditor;
+        case 'polygon':
+            Factory = PolygonEditor;
             break;
             
-            case 'circle':
-                factory = CircleEditor;
+        case 'circle':
+            Factory = CircleEditor;
             break;
             
-            case 'ellipse':
-                factory = EllipseEditor;
+        case 'ellipse':
+            Factory = EllipseEditor;
             break;
             
-            case 'rectangle':
-                factory = RectangleEditor;
+        case 'rectangle':
+            Factory = RectangleEditor;
             break;
             
-            default:
-                throw TypeError('Value does not contain a valid shape function')
-            break;
+        default:
+            throw new TypeError('Value does not contain a valid shape function');
         }
         
-        return new factory(target, value, options)
+        return new Factory(target, value, options);
     }
     
-    return CSSShapesEditor
-})
+    return CSSShapesEditor;
+});

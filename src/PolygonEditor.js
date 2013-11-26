@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], function(Editor, CSSUtils, Snap, freeTransform){
+define(['Editor', 'CSSUtils', 'snap', 'snap.freeTransform', 'snap.plugins'], function(Editor, CSSUtils, Snap, freeTransform){
     "use strict";
     
     var _defaults = {
@@ -16,7 +16,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         },
         xUnit: 'px',
         yUnit: 'px'
-    } 
+    };
     
     function PolygonEditor(target, value, options){
         Editor.apply(this, arguments);
@@ -28,13 +28,13 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         this.shape = null;
         
         // Snap instance reference; setup in Editor.js
-        this.snap = null
+        this.snap = null;
         
         // Snap paper for shape overaly; setup in Editor.js
         this.paper = null;
         
         // Snap group of SVG obj references for rendered vertices
-        this.points = null
+        this.points = null;
         
         // TODO: extend with 'options'
         this.config = _defaults;
@@ -48,7 +48,6 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         this.setup();
         this.applyOffsets();
         this.draw();
-        // this.toggleFreeTransform()
     }
     
     PolygonEditor.prototype = Object.create(Editor.prototype);
@@ -64,12 +63,12 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         this.vertices = this.parseShape(this.value, this.target);
         
         if (!this.vertices.length){
-            this.vertices = this.inferShapeFromElement(this.target)
+            this.vertices = this.inferShapeFromElement(this.target);
         }
         
-        this.polygonFillRule = this.vertices.polygonFillRule || 'nonzero'
+        this.polygonFillRule = this.vertices.polygonFillRule || 'nonzero';
         
-        this.points = this.paper.g()
+        this.points = this.paper.g();
         
         // polygon path to visualize the shape
         this.shape = this.paper.path().attr(this.config.path).attr('fill','none');
@@ -100,19 +99,20 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
     */
     PolygonEditor.prototype.parseShape = function(shape, element){
         var coords = [],
-            infos = null;
+            infos;
         
         // superficial check for shape declaration
-        if (typeof shape != 'string' || !/^polygon\(.*?\)/i.test(shape.trim())){
+        if (typeof shape !== 'string' || !/^polygon\(.*?\)/i.test(shape.trim())){
             
             // remove editor DOM saffolding
             this.remove();
             
-            throw Error('No polygon() function definition in provided value');
-            return
+            throw new Error('No polygon() function definition in provided value');
         }
         
-        if (infos = /polygon\s*\(([a-z]*),\s*(([-+0-9.]+[a-z%]*|calc\([^)]*\)|\s|\,)*)\)?(\s*)/i.exec(shape.trim())) {
+        infos = /polygon\s*\(([a-z]*),\s*(([-+0-9.]+[a-z%]*|calc\([^)]*\)|\s|\,)*)\)?(\s*)/i.exec(shape.trim());
+        
+        if (infos){
             coords = (
                 infos[2]
                 .replace(/\s+/g, ' ')
@@ -123,13 +123,13 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
                     var points = pair.split(' ').map(function(pointString, i) {
                         
                         // TODO: what about calc(...)?
-                        var isHeightRelated = (!!i);
+                        var isHeightRelated = true;
                         
-                        return CSSUtils.convertToPixels(pointString, element, isHeightRelated)
-                    })
+                        return CSSUtils.convertToPixels(pointString, element, isHeightRelated);
+                    });
                     
-                    if( !points[0] ) { points[0] = { value: 0 } }
-                    if( !points[1] ) { points[1] = { value: 0 } }
+                    if( !points[0] ) { points[0] = { value: 0 }; }
+                    if( !points[1] ) { points[1] = { value: 0 }; }
                     
                     return {
                         x: points[0].value,
@@ -144,7 +144,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
             coords.polygonFillRule = infos[1] || null;
         }
         
-        return coords
+        return coords;
     };
     
     /*
@@ -157,10 +157,10 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
     
     PolygonEditor.prototype.inferShapeFromElement = function(element) {
         if (!(element instanceof HTMLElement)){
-            throw TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element)
+            throw new TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element);
         }
         
-        var box = CSSUtils.getContentBoxOf(element)
+        var box = CSSUtils.getContentBoxOf(element);
         
         // TODO: also infer unit values
         var coords = [
@@ -172,7 +172,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         
         coords.polygonFillRule = 'nonzero';
         
-        return coords
+        return coords;
     };
     
     /*
@@ -197,14 +197,14 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
             y = Math.ceil(vertex.y - offsetTop);
 
             // turn px value into original units
-            xCoord = CSSUtils.convertFromPixels(x, vertex.xUnit, element, false)
-            yCoord = CSSUtils.convertFromPixels(y, vertex.yUnit, element, false)
+            xCoord = CSSUtils.convertFromPixels(x, vertex.xUnit, element, false);
+            yCoord = CSSUtils.convertFromPixels(y, vertex.yUnit, element, false);
             
             // return space-separted pair
-            return [xCoord, yCoord].join(' ')
-        }) 
+            return [xCoord, yCoord].join(' ');
+        });
         
-        return 'polygon(' + [fillRule, path.join(', ')].join(', ') + ')'
+        return 'polygon(' + [fillRule, path.join(', ')].join(', ') + ')';
     };
     
     /*
@@ -220,7 +220,8 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         this.vertices.forEach(function(v){
             v.x = v.x + this.offsets.left;
             v.y = v.y + this.offsets.top;
-        }.bind(this))
+        }.bind(this)
+        );
     };
     
     /*
@@ -232,7 +233,8 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         this.vertices.forEach(function(v){
             v.x = v.x - this.offsets.left;
             v.y = v.y - this.offsets.top;
-        }.bind(this))
+        }.bind(this)
+        );
     };
     
     /*
@@ -250,11 +252,11 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         
         // prevent vertex editing while transform editor is on
         if (this.transformEditor){
-            return
+            return;
         }
         
         // check if target is a vertex representation i.e. draggable point
-        if (target && target.data && typeof target.data('vertex-index') == 'number'){
+        if (target && target.data && typeof target.data('vertex-index') === 'number'){
             
             this.activeVertex = target;
             this.activeVertexIndex = target.data('vertex-index');
@@ -282,17 +284,17 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         } 
         
         if (!this.activeVertex || typeof this.activeVertexIndex !== 'number'){
-            return
+            return;
         }
         
         // attaches mousemove and mouseup
-        this.handleDragging()
+        this.handleDragging();
     };
     
     PolygonEditor.prototype.handleDragging = function(){
-        var self = this;
+        var scope = this;
         var _mouseMove = function(e){
-            return self.onMouseMove.call(self, e);
+            return scope.onMouseMove.call(scope, e);
         };
         
         var _mouseUp = function(){
@@ -300,7 +302,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
                 this.activeVertex = null;
                 this.activeVertexIndex = null;
                 this.holder.removeEventListener('mousemove', _mouseMove);
-            }.call(self);
+            }.call(scope);
         };
         
         this.holder.addEventListener('mousemove', _mouseMove);
@@ -313,12 +315,12 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
     */
     PolygonEditor.prototype.onMouseMove = function(e){
         // 'this' is the PolygonEditor instance
-        var vertex = this.vertices[this.activeVertexIndex]
+        var vertex = this.vertices[this.activeVertexIndex];
         vertex.x = e.x;
         vertex.y = e.y;
         
         this.draw();
-    }
+    };
     
     /*
         Given a point with x, y coordinates, attempt to find the polygon edge to which it belongs.
@@ -343,7 +345,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
             if (_distanceToEdgeSquared(v0, v1, p) < thresholdDistance){
                 edge = {index0: i, index1: (i + 1) % vertices.length};
             }
-        }) 
+        });
         
         return edge;
     };
@@ -359,7 +361,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         var target = Snap.getElementByPoint(e.x, e.y);
         
         // check if target is a vertex representation i.e. draggable point
-        if (target && target.data && typeof target.data('vertex-index') == 'number'){
+        if (target && target.data && typeof target.data('vertex-index') === 'number'){
             
             // remove the vertex
             this.vertices.splice(target.data('vertex-index'), 1);
@@ -370,25 +372,24 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
     PolygonEditor.prototype.draw = function(){
         var paper = this.paper,
             config = this.config,
-            doNotDrawVertices = (this.transformEditor != null),
+            drawVertices = this.transformEditor ? false : true,
             points = this.points,
             commands = [];
             
-        this.points.clear()
+        this.points.clear();
         
         this.vertices.forEach(function(v, i) {
-            
-            if (!doNotDrawVertices){
-                var point = paper.circle(v.x, v.y, config.point.radius)
-                point.attr(config.point)
-                point.data('vertex-index', i)
-                points.add(point)
+            if (drawVertices){
+                var point = paper.circle(v.x, v.y, config.point.radius);
+                point.attr(config.point);
+                point.data('vertex-index', i);
+                points.add(point);
             }
             
             if (i === 0){
                 // Move cursor to first vertex, then prepare drawing lines
                 ['M' + v.x, v.y].forEach(function(cmd) {
-                    commands.push(cmd)
+                    commands.push(cmd);
                 });
             } else {
                 commands.push('L' + v.x, v.y);
@@ -401,25 +402,26 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         // draw the polygon shape
         this.shape.attr('path', commands).toBack();
         
-        this.trigger('shapechange', this)
+        this.trigger('shapechange', this);
     };
     
     PolygonEditor.prototype.toggleFreeTransform = function(){
         
         // make a clone of the vertices to avoid compound tranforms
-        var verticesClone = (JSON.parse(JSON.stringify(this.vertices)));
+        var verticesClone = (JSON.parse(JSON.stringify(this.vertices))),
+            scope = this;
         
         function _transformPoints(){
             
-            var matrix = this.shapeClone.transform().localMatrix,
-                vertices = this.vertices;
+            var matrix = scope.shapeClone.transform().localMatrix,
+                vertices = scope.vertices;
                 
             verticesClone.forEach(function(v, i){
                 vertices[i].x = matrix.x(v.x,v.y);
                 vertices[i].y = matrix.y(v.x,v.y);
-            }) 
+            });
             
-            this.draw()
+            scope.draw();
         }
         
         if (this.transformEditor){
@@ -435,7 +437,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         
         // using a phantom shape because we already redraw the path by the transformed coordinates.
         // using the same path would result in double transformations for the shape
-        this.shapeClone = this.shape.clone().attr({ stroke: 'none', fill: this.config.path.fill})
+        this.shapeClone = this.shape.clone().attr({ stroke: 'none', fill: this.config.path.fill});
         
         this.transformEditor = Snap.freeTransform(this.shapeClone, {
             draw: ['bbox'],
@@ -444,13 +446,13 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
             rotate: ['axisX'],
             scale: ['bboxCorners','bboxSides'],
             distance: '0.6'
-        }, _transformPoints.bind(this));
+        }, _transformPoints);
     };
     
     PolygonEditor.prototype.turnOnFreeTransform = function(){
         if (this.transformEditor){
             // aready turned on
-            return
+            return;
         }
         
         this.toggleFreeTransform();
@@ -459,7 +461,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
     PolygonEditor.prototype.turnOffFreeTransform = function(){
         if (!this.transformEditor){
             // already turned off
-            return
+            return;
         }
         
         this.toggleFreeTransform();
@@ -482,7 +484,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         var dx = p2.x - p1.x;
         var dy = p2.y - p1.y;
         
-        if (dx == 0 && dy == 0){
+        if (dx === 0 && dy === 0){
             return Number.POSITIVE_INFNITY;
         }
         
@@ -496,7 +498,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         var y = p1.y + u * dy;
         
         return Math.pow(p3.x - x, 2) + Math.pow(p3.y - y, 2);
-    };
+    }
     
-    return PolygonEditor
-})
+    return PolygonEditor;
+});

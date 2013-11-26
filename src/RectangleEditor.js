@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['Editor','CSSUtils'], function(Editor, CSSUtils){
+define(['Editor','CSSUtils', 'snap'], function(Editor, CSSUtils, Snap){
     "use strict";
     
     var _defaults = {
@@ -15,26 +15,26 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         hUnit: 'px',
         rxUnit: 'px',
         ryUnit: 'px'
-    }
+    };
     
     function RectangleEditor(target, value, options){
         Editor.apply(this, arguments);
         
         // coordinates for rectangle: x,y for origin, with, height and units
-        this.coords = null
+        this.coords = null;
         
         // TODO: extend with options
         this.config = _defaults;
         
         this.setup();
         this.applyOffsets();
-        this.draw()
+        this.draw();
         
-        this.toggleFreeTransform()
+        this.toggleFreeTransform();
     }
     
     RectangleEditor.prototype = Object.create(Editor.prototype);
-    RectangleEditor.prototype.constructor = RectangleEditor
+    RectangleEditor.prototype.constructor = RectangleEditor;
 
     RectangleEditor.prototype.setup = function(){
         // Sets up: this.holder, this.paper, this.snap, this.offsets
@@ -43,7 +43,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         this.coords = this.parseShape(this.value);
         
         if (!this.coords){
-            this.coords = this.inferShapeFromElement(this.target)
+            this.coords = this.inferShapeFromElement(this.target);
         }
         
         this.shape = this.paper.rect().attr(this.config.path);
@@ -119,31 +119,32 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             args;
 
         // superficial check for rectangle declaration
-        if (typeof shape != 'string' || !/^rectangle\(.*?\)/i.test(shape.trim())){
+        if (typeof shape !== 'string' || !/^rectangle\(.*?\)/i.test(shape.trim())){
 
             // remove editor DOM saffolding
             this.remove();
 
-            throw Error('No rectangle() function definition in provided value');
-            return
+            throw new Error('No rectangle() function definition in provided value');
         }
         
-        if (infos = /rectangle\s*\(((\s*[-+0-9.]+[a-z%]*\s*,*\s*){4,6})\s*\)/i.exec(shape.trim())){
+        infos = /rectangle\s*\(((\s*[-+0-9.]+[a-z%]*\s*,*\s*){4,6})\s*\)/i.exec(shape.trim());
+        
+        if (infos){
             if (!infos[1]){
-                return
+                return;
             }
             
             args = infos[1].replace(/\s+/g, '').split(',');
             
             // incomplete rectangle definition
             if (args.length < 4){
-                return
+                return;
             }
             
             args = args.map(function(arg, i){
-                var isHeightRelated = !!(i%2);
+                var isHeightRelated = (i === 0) ? 0 : 1;
                 return CSSUtils.convertToPixels(arg, element, isHeightRelated);
-            })
+            });
             
             coords = {
                 x: args[0].value,
@@ -154,7 +155,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
                 wUnit: args[2].unit,
                 h: args[3].value,
                 hUnit: args[3].unit
-            }
+            };
             
             if (args[4]){
                 coords.rx = args[4].value;
@@ -173,7 +174,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             }
         } 
         
-        return coords
+        return coords;
     };
     
     /*
@@ -188,13 +189,13 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
     */
     RectangleEditor.prototype.inferShapeFromElement = function(element){
         if (!(element instanceof HTMLElement)){
-            throw TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element)
+            throw new TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element);
         }
         
         var box = CSSUtils.getContentBoxOf(element);
 
         if (!box.height || !box.width){
-            throw Error('inferShapeFromElement() \n Cannot infer shape from element because it has no width or height')
+            throw new Error('inferShapeFromElement() \n Cannot infer shape from element because it has no width or height');
         }
         
         // TODO: also infer unit values
@@ -207,7 +208,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             wUnit: this.config.wUnit,
             h: box.height,
             hUnit: this.config.hUnit
-        }
+        };
     };
     
     RectangleEditor.prototype.getCSSValue = function(){
@@ -221,40 +222,46 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         // TODO: figure out how to convert border-radius
 
         args = [x, y, w, h];
-
-        c.rx ? args.push( [c.rx, c.rxUnit].join('') ) : null;
-        c.ry ? args.push( [c.ry, c.ryUnit].join('') ) : null;
-
-        return 'rectangle(' + args.join(', ') + ')'
+        
+        if (c.rx){
+            args.push( [c.rx, c.rxUnit].join('') );
+        }
+        
+        if (c.ry){
+            args.push( [c.ry, c.ryUnit].join('') );
+        }
+        
+        return 'rectangle(' + args.join(', ') + ')';
     };
     
     RectangleEditor.prototype.toggleFreeTransform = function(){
         
         // make a clone to avoid compound tranforms
-        var coordsClone = (JSON.parse(JSON.stringify(this.coords)));
+        var coordsClone = (JSON.parse(JSON.stringify(this.coords))),
+            scope = this;
         
         function _transformPoints(){
-            var matrix = this.shapeClone.transform().localMatrix;
+            var matrix = scope.shapeClone.transform().localMatrix;
             
-            this.coords.x = matrix.x(coordsClone.x, coordsClone.y);
-            this.coords.y = matrix.y(coordsClone.x, coordsClone.y);
-            this.coords.w = this.transformEditor.attrs.scale.x * coordsClone.w;
-            this.coords.h = this.transformEditor.attrs.scale.y * coordsClone.h;
+            scope.coords.x = matrix.x(coordsClone.x, coordsClone.y);
+            scope.coords.y = matrix.y(coordsClone.x, coordsClone.y);
+            scope.coords.w = scope.transformEditor.attrs.scale.x * coordsClone.w;
+            scope.coords.h = scope.transformEditor.attrs.scale.y * coordsClone.h;
             
-            this.draw()
+            scope.draw();
         }
         
         if (this.transformEditor){
             this.shapeClone.remove();
             this.transformEditor.unplug();
-            delete this.transformEditor
+            delete this.transformEditor;
             
             return;
         }
         
         // using a phantom shape because we already redraw the path by the transformed coordinates.
         // using the same path would result in double transformations for the shape
-        this.shapeClone = this.shape.clone().attr('stroke', 'none')
+        this.shapeClone = this.shape.clone().attr('stroke', 'none');
         
         this.transformEditor = Snap.freeTransform(this.shapeClone, {
             draw: ['bbox'],
@@ -263,7 +270,7 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
             rotate: [], // rectangles do not rotate, polygons do.
             scale: ['bboxCorners','bboxSides'],
             distance: '0.6'
-        }, _transformPoints.bind(this));
+        }, _transformPoints);
     };
     
     RectangleEditor.prototype.draw = function(){
@@ -281,5 +288,5 @@ define(['Editor','CSSUtils'], function(Editor, CSSUtils){
         this.trigger('shapechange', this);
     };
     
-    return RectangleEditor
-})
+    return RectangleEditor;
+});

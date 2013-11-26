@@ -52,7 +52,7 @@ define(function(){
             };
             
             // special case of a circle radius:
-            if(h==2) { return x*100/Math.sqrt(box.height*box.height+box.width*box.width); }
+            if(h===2) { return x*100/Math.sqrt(box.height*box.height+box.width*box.width); }
             
             // otherwise, we use the width or height
             if(h) { return x*100/box.height; }
@@ -125,22 +125,22 @@ define(function(){
             width: width - leftBorder - leftPadding - rightPadding - rightBorder,
             height: height - topBorder - topPadding - bottomPadding - topBorder
 
-        }
+        };
 
     }
     
     function Utils(){
         
         if (!(this instanceof Utils)){
-            return new Utils
+            return new Utils();
         }
         
         return {
             'convertToPixels': convertToPixels,
             'convertFromPixels': convertFromPixels,
             'getContentBoxOf': getContentBoxOf
-        }
+        };
     }
     
-    return new Utils;
-})
+    return new Utils();
+});

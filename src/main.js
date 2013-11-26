@@ -1,3 +1,6 @@
+/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
+/*global define, require */
+
 require.config({
     // baseUrl: './', // infered from data-main on <script>
     paths: {
@@ -9,5 +12,8 @@ require.config({
 });
 
 define('main', ['CSSShapesEditor'], function(editor){
-    return editor
-})
+    
+    'use strict';
+    
+    return editor;
+});

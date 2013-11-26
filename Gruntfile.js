@@ -38,8 +38,7 @@ module.exports = function (grunt) {
                 jshintrc: '.jshintrc'
             },
             all: [
-                // 'Gruntfile.js',
-                '<%= yeoman.src %>/Editor.js',
+                '<%= yeoman.src %>/*.js',
                 // 'test/spec/{,*/}*.js'
             ]
         },
@@ -64,7 +63,7 @@ module.exports = function (grunt) {
         }
     });
     
-    grunt.registerTask('build', ['requirejs'])
+    grunt.registerTask('build', ['jshint', 'requirejs'])
 
     grunt.registerTask('default', [
         'jshint',
