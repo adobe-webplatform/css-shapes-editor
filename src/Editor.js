@@ -6,8 +6,8 @@ define(['eve', 'CSSUtils'], function(eve, CSSUtils){
     
     function Editor(target, value){
         
-        if (!target || !target.parentNode){
-            throw TypeError('Target expected as DOM object, but was: ' + typeof target)
+        if (!target || !(target instanceof HTMLElement)){
+            throw new TypeError('Target expected as HTMLElement object, but was: ' + typeof target);
         }
         
         this.target = target;
@@ -20,8 +20,6 @@ define(['eve', 'CSSUtils'], function(eve, CSSUtils){
             left: 0,
             top: 0
         }
-        
-        // this.init()
     }
     
     Editor.prototype = {
