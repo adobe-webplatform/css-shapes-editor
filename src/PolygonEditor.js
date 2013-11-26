@@ -425,7 +425,10 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.plugins', 'snap.freeTransform'], fun
         if (this.transformEditor){
             this.shapeClone.remove();
             this.transformEditor.unplug();
-            delete this.transformEditor
+            delete this.transformEditor;
+            
+            // restores vertex editing
+            this.draw();
             
             return;
         }
