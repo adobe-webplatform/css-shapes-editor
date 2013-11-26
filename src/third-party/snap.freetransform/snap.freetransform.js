@@ -762,7 +762,7 @@
 
                         item.el.animate(
                             { transform: [
-                                'r' + rotate, center.x, center.y,
+                                'R' + rotate, center.x, center.y,
                                 'S' + scale.x, scale.y, center.x, center.y,
                                 'T' + translate.x, translate.y
                             ].join(',')},
@@ -776,7 +776,7 @@
                         );
                     } else {
                         item.el.transform([
-                            'r' + rotate, center.x, center.y,
+                            'R' + rotate, center.x, center.y,
                             'S' + scale.x, scale.y, center.x, center.y,
                             'T' + translate.x, translate.y
                         ].join(','));
