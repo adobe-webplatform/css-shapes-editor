@@ -1,6 +1,12 @@
 {
   "name": "CSSShapesEditor",
   "version": "0.0.1",
+  "author": "Adobe Systems Inc.",
+  "contributors": [
+    "Razvan Caliman <rcaliman@adobe.com>",
+    "François REMY <francois.remy.dev@outlook.com>",
+    "Bear Travis <betravis@adobe.com>"
+  ],
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
