@@ -6,13 +6,14 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.freeTransform', 'snap.plugins'], fun
     
     var _defaults = {
         path: {
-            stroke: 'black',
+            stroke: 'rgba(0, 192, 238, 1)',
+            'stroke-dasharray': '4, 4',
             fill: 'rgba(0,0,0,0)' // tricks transform editor to accept self-drag
         },
         point: {
             radius: 5,
-            stroke: 'black',
-            fill: 'gray',
+            stroke: 'rgba(0, 192, 238, 1)',
+            fill: 'rgba(252, 252, 252, 1)',
         },
         xUnit: 'px',
         yUnit: 'px'
