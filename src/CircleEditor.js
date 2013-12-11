@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['Editor','CSSUtils', 'snap'], function(Editor, CSSUtils, Snap){
+define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap, _){
     "use strict";
     
     var _defaults = {
@@ -20,8 +20,7 @@ define(['Editor','CSSUtils', 'snap'], function(Editor, CSSUtils, Snap){
         // coordinates for circle: cx, cy, radius and corresponding units
         this.coords = null;
         
-        // TODO: extend with options
-        this.config = _defaults;
+        this.config = _.extend({}, _defaults, options);
         
         this.setup();
         this.applyOffsets();

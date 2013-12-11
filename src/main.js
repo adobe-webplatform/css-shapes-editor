@@ -5,6 +5,7 @@ require.config({
     // baseUrl: './', // infered from data-main on <script>
     paths: {
         'eve': 'third-party/eve/eve',
+        'lodash': 'third-party/lodash/lodash',
         'snap': 'third-party/snap/snap.svg-min',
         'snap.plugins': 'third-party/snap.plugins/snap.plugins',
         'snap.freeTransform': 'third-party/snap.freetransform/snap.freetransform'

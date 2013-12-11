@@ -1,19 +1,18 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['Editor', 'CSSUtils', 'snap', 'snap.freeTransform', 'snap.plugins'], function(Editor, CSSUtils, Snap, freeTransform){
+define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plugins'], function(Editor, CSSUtils, _, Snap, freeTransform){
     "use strict";
     
     var _defaults = {
         path: {
-            stroke: 'rgba(0, 192, 238, 1)',
-            'stroke-dasharray': '4, 4',
+            stroke: 'black',
             fill: 'rgba(0,0,0,0)' // tricks transform editor to accept self-drag
         },
         point: {
             radius: 5,
-            stroke: 'rgba(0, 192, 238, 1)',
-            fill: 'rgba(252, 252, 252, 1)',
+            stroke: 'black',
+            fill: 'white',
         },
         xUnit: 'px',
         yUnit: 'px'
@@ -37,8 +36,7 @@ define(['Editor', 'CSSUtils', 'snap', 'snap.freeTransform', 'snap.plugins'], fun
         // Snap group of SVG obj references for rendered vertices
         this.points = null;
         
-        // TODO: extend with 'options'
-        this.config = _defaults;
+        this.config = _.extend({}, _defaults, options);
         
         // SVG object reference of vertex being dragged
         this.activeVertex = null;

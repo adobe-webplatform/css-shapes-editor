@@ -188,7 +188,7 @@
                         .path([[ 'M', ft.attrs.center.x, ft.attrs.center.y ]])
                         .attr({
                             stroke: ft.opts.attrs.stroke,
-                            'stroke-dasharray': '5, 5',
+                            'stroke-dasharray': '4, 4',
                             opacity: .5
                         });
 
@@ -203,7 +203,7 @@
                         .attr({
                             fill: 'none',
                             stroke: ft.opts.attrs.stroke,
-                            'stroke-dasharray': '5, 5',
+                            'stroke-dasharray': '4, 4',
                             opacity: .5
                         });
 

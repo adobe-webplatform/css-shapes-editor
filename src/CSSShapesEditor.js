@@ -1,11 +1,26 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor'], function(PolygonEditor, CircleEditor, EllipseEditor, RectangleEditor){
+define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lodash'], function(PolygonEditor, CircleEditor, EllipseEditor, RectangleEditor, _){
     
     'use strict';
     
     function CSSShapesEditor(target, value, options){
+        
+        var _defaults = {
+            path: {
+                stroke: 'rgba(0, 192, 238, 1)',
+                'stroke-dasharray': '4, 4',
+                fill: 'rgba(0,0,0,0)' // required; tricks transform editor to accept self-drag
+            },
+            point: {
+                radius: 4,
+                stroke: 'rgba(0, 192, 238, 1)',
+                fill: 'rgba(252, 252, 252, 1)',
+            }
+        }
+        
+        options = _.extend({}, _defaults, options)
         
         // ensure omitting 'new' is harmless
         if (!(this instanceof CSSShapesEditor)){
