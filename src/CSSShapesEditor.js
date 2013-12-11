@@ -18,9 +18,9 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
                 stroke: 'rgba(0, 192, 238, 1)',
                 fill: 'rgba(252, 252, 252, 1)',
             }
-        }
+        };
         
-        options = _.extend({}, _defaults, options)
+        options = _.extend({}, _defaults, options);
         
         // ensure omitting 'new' is harmless
         if (!(this instanceof CSSShapesEditor)){
