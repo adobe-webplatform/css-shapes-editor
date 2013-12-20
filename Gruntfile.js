@@ -11,8 +11,10 @@ module.exports = function (grunt) {
   
     'use strict';
   
-    require('load-grunt-tasks')(grunt);
-    
+    require('load-grunt-tasks')(grunt, {
+        pattern: ['grunt-*', '!grunt-template-jasmine-requirejs']
+    });
+   
     var pkg = grunt.file.readJSON("package.json");
 
     grunt.initConfig({
@@ -20,7 +22,8 @@ module.exports = function (grunt) {
         // configurable paths
         yeoman: {
             src: 'src',
-            dist: 'dist'
+            dist: 'dist',
+            test: 'test'
         },
         
         banner: grunt.file.read('./COPYRIGHT')
@@ -41,6 +44,20 @@ module.exports = function (grunt) {
                 '<%= yeoman.src %>/*.js',
                 // 'test/spec/{,*/}*.js'
             ]
+        },
+        
+        jasmine: {
+            src: '<%= yeoman.src %>/*.js',
+            options: {
+                specs: '<%= yeoman.test %>/spec/*Spec.js',
+                template: require('grunt-template-jasmine-requirejs'),
+                templateOptions: {
+                    requireConfigFile: '<%= yeoman.test %>/main.js',
+                    requireConfig: {
+                        baseUrl: '<%= yeoman.src %>'
+                    }
+                }
+            }
         },
         
         requirejs: {
@@ -64,6 +81,8 @@ module.exports = function (grunt) {
     });
     
     grunt.registerTask('build', ['jshint', 'requirejs'])
+    
+    grunt.registerTask('test', ['jasmine'])
 
     grunt.registerTask('default', [
         'jshint',

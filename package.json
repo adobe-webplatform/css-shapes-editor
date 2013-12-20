@@ -1,5 +1,5 @@
 {
-  "name": "CSSShapesEditor",
+  "name": "css-shapes-editor",
   "version": "0.0.1",
   "author": "Adobe Systems Inc.",
   "contributors": [
@@ -15,8 +15,9 @@
     "grunt-contrib-watch": "~0.5.2",
     "jasmine-node": "1.11.0",
     "grunt-jasmine-node": "0.1.0",
-    "load-grunt-tasks": "~0.1.0",
-    "grunt-contrib-jasmine": "0.4.2"
+    "load-grunt-tasks": "~0.2.1",
+    "grunt-contrib-jasmine": "~0.5.2",
+    "grunt-template-jasmine-requirejs": "~0.1.8"
   },
   "engines": {
     "node": ">=0.8.0"
