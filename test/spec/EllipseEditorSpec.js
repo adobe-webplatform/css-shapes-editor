@@ -5,6 +5,18 @@
 define(['jquery', 'text!spec/test-files/markup.html', 'EllipseEditor'],
 function($, markup, EllipseEditor){
     
+    function _getEllipseFromBox(element){
+        var box = element.getBoundingClientRect();
+        return 'ellipse('+
+        [
+            box.width / 2 + 'px',
+            box.height / 2 + 'px',
+            box.width / 2 + 'px',
+            box.height / 2 + 'px'
+        ].join(', ')
+        +')';
+    }
+    
     describe('EllipseEditor', function(){
         var editor, 
             target, 
@@ -156,5 +168,66 @@ function($, markup, EllipseEditor){
         // TODO: test with percentages, match the circle.html target box
         // TODO: test with negative values
         // TODO: test with new notation
+        
+        it('should have update method', function(){
+            var value = 'ellipse(0, 0, 100px, 100px)';
+                
+            editor = new EllipseEditor(target, value);
+            expect(editor.update).toBeDefined();
+        });
+        
+        it('should update with new ellipse() css value', function(){
+            var value = 'ellipse(0, 0, 100px, 100px)',
+                newValue = 'ellipse(0px, 0px, 99px, 99px)';
+                
+            editor = new EllipseEditor(target, value);
+            editor.update(newValue);
+            expect(editor.getCSSValue()).toEqual(newValue);
+        });
+
+        it('should update with new infered shape value when given empty ellipse()', function(){
+            var value = 'ellipse(0, 0, 100px, 100px)',
+                newValue = 'ellipse()',
+                expectedValue = _getEllipseFromBox(target);
+                
+            editor = new EllipseEditor(target, value);
+            editor.update(newValue);
+            expect(editor.getCSSValue()).toEqual(expectedValue);
+        });
+        
+        it('should throw error when updating with invalid css value', function(){
+            
+            function updateWithEmpty(){
+                editor = new EllipseEditor(target, value);
+                editor.update('');
+            }
+            
+            function updateWithFake(){
+                editor = new EllipseEditor(target, value);
+                editor.update('fake');
+            }
+            
+            function updateWithNull(){
+                editor = new EllipseEditor(target, value);
+                editor.update(null);
+            };
+            
+            function updateWithFalsePositive(){
+                editor = new EllipseEditor(target, value);
+                editor.update('fake-ellipse()');
+            };
+            
+            function updateWithPolygon(){
+                editor = new EllipseEditor(target, value);
+                editor.update('polygon()');
+            };
+            
+            expect(updateWithEmpty).toThrow();
+            expect(updateWithFake).toThrow();
+            expect(updateWithNull).toThrow();
+            expect(updateWithFalsePositive).toThrow();
+            // EllipseEditor does not mutate to PolygonEditor
+            expect(updateWithPolygon).toThrow();
+        });
     });
 });
