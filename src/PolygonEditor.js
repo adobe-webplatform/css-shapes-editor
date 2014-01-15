@@ -80,7 +80,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         }
         
         this.polygonFillRule = this.vertices.polygonFillRule || 'nonzero';
-    }
+    };
     
     PolygonEditor.prototype.update = function(value){
         this.value = value;

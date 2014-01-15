@@ -44,30 +44,30 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
             @return {Object} shape editor class
         */
         function _getFactory(shape){
-            var Factory;
+            var factory;
             
             switch (shape) {
             case 'polygon':
-                Factory = PolygonEditor;
+                factory = PolygonEditor;
                 break;
 
             case 'circle':
-                Factory = CircleEditor;
+                factory = CircleEditor;
                 break;
 
             case 'ellipse':
-                Factory = EllipseEditor;
+                factory = EllipseEditor;
                 break;
 
             case 'rectangle':
-                Factory = RectangleEditor;
+                factory = RectangleEditor;
                 break;
 
             default:
                 throw new TypeError('Value does not contain a valid shape function');
             }
             
-            return Factory;
+            return factory;
         }
         
         // ensure omitting 'new' is harmless
@@ -76,9 +76,9 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
         }
         
         var _shape = _getShape(value),
-            _factory = _getFactory(_shape),
-            _old_update = _factory.prototype.update,
-            _editor = new _factory(target, value, options);;
+            Factory = _getFactory(_shape),
+            _old_update = Factory.prototype.update,
+            _editor = new Factory(target, value, options);
         
         /* 
             Hijack the update method to check if shape editor needs 
@@ -86,23 +86,23 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
             
             @example 'polygon()' -> 'circle()', editor becomes CircleEditor instance
         */
-        _factory.prototype.update = function(value){
+        Factory.prototype.update = function(value){
             
             var newShape = _getShape(value);
             
             // updating to a different shape type, replace the editor.
             if (newShape !== _shape){
                 
-                _factory = _getFactory(newShape)
+                Factory = _getFactory(newShape);
                 
                 // clean-up old editor
                 _editor.remove();
                 
-                // replace editor
-                _editor = new _factory(target, value, options);
-                
                 // cache current shape type
                 _shape = newShape;
+                
+                // replace editor
+                _editor = new Factory(target, value, options);
                 
                 return;
             }
@@ -110,7 +110,7 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
             else{
                 _old_update.call(_editor, value);
             }
-        }
+        };
         
         return _editor;
     }
