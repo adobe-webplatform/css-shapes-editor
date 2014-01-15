@@ -50,11 +50,12 @@ module.exports = function (grunt) {
             src: '<%= yeoman.src %>/*.js',
             options: {
                 specs: '<%= yeoman.test %>/spec/*Spec.js',
+                helpers: '<%= yeoman.test %>/*Helper.js',
                 template: require('grunt-template-jasmine-requirejs'),
                 templateOptions: {
                     requireConfigFile: '<%= yeoman.test %>/main.js',
                     requireConfig: {
-                        baseUrl: '<%= yeoman.src %>'
+                        baseUrl: '<%= yeoman.src %>',
                     }
                 }
             }

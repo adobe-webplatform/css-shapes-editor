@@ -5,12 +5,14 @@
 define(['jquery', 'text!spec/test-files/markup.html', 'CSSShapesEditor', 'PolygonEditor', 'CircleEditor'],
 function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
     
+    // create fixture placeholder for other suites
+    $('body').append($('<div id="test-fixture"></div>'))
+    
     describe('CSSShapesEditor', function(){
         var editor, 
             target, 
             value = 'polygon(nonzero, 0 0, 100px 0, 100px 100px)',
             $fixture = $('#test-fixture').html(markup);
-            // target = $('#test-shape')[0]
             
         beforeEach(function(){
             // inject markup for test
