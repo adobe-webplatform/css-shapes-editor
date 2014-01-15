@@ -5,6 +5,18 @@
 define(['jquery', 'text!spec/test-files/markup.html', 'RectangleEditor'],
 function($, markup, RectangleEditor){
     
+    function _getRectangleFromBox(element){
+        var box = element.getBoundingClientRect();
+        return 'rectangle('+
+        [
+            0 + 'px',
+            0 + 'px',
+            box.width + 'px',
+            box.height + 'px'
+        ].join(', ')
+        +')';
+    }
+    
     describe('RectangleEditor', function(){
         var editor, 
             target, 
@@ -14,6 +26,7 @@ function($, markup, RectangleEditor){
         beforeEach(function(){
             // inject markup for test
             $fixture.html(markup);
+            value = 'rectangle(0, 0, 400px, 200px)';
             target = $('#test-shape')[0];
         });
         
@@ -176,5 +189,66 @@ function($, markup, RectangleEditor){
         
         // TODO: test with negative values
         // TODO: test with new notation
+        
+        it('should have update method', function(){
+            var value = 'rectangle(0, 0, 400px, 200px)';
+                
+            editor = new RectangleEditor(target, value);
+            expect(editor.update).toBeDefined();
+        });
+        
+        it('should update with new rectangle() css value', function(){
+            var value = 'rectangle(0, 0, 400px, 200px)',
+                newValue = 'rectangle(0px, 0px, 399px, 199px)';
+                
+            editor = new RectangleEditor(target, value);
+            editor.update(newValue);
+            expect(editor.getCSSValue()).toEqual(newValue);
+        });
+
+        it('should update with new infered shape value when given empty rectangle()', function(){
+            var value = 'rectangle(0, 0, 400px, 200px)',
+                newValue = 'rectangle()',
+                expectedValue = _getRectangleFromBox(target);
+                
+            editor = new RectangleEditor(target, value);
+            editor.update(newValue);
+            expect(editor.getCSSValue()).toEqual(expectedValue);
+        });
+        
+        it('should throw error when updating with invalid css value', function(){
+            
+            function updateWithEmpty(){
+                editor = new RectangleEditor(target, value);
+                editor.update('');
+            }
+            
+            function updateWithFake(){
+                editor = new RectangleEditor(target, value);
+                editor.update('fake');
+            }
+            
+            function updateWithNull(){
+                editor = new RectangleEditor(target, value);
+                editor.update(null);
+            };
+            
+            function updateWithFalsePositive(){
+                editor = new RectangleEditor(target, value);
+                editor.update('fake-rectangle()');
+            };
+            
+            function updateWithPolygon(){
+                editor = new RectangleEditor(target, value);
+                editor.update('polygon()');
+            };
+            
+            expect(updateWithEmpty).toThrow();
+            expect(updateWithFake).toThrow();
+            expect(updateWithNull).toThrow();
+            expect(updateWithFalsePositive).toThrow();
+            // RectangleEditor does not mutate to PolygonEditor
+            expect(updateWithPolygon).toThrow();
+        });
     });
 });
