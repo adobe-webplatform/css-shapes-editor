@@ -22,40 +22,97 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
         
         options = _.extend({}, _defaults, options);
         
+        /*
+            Get shape type from provided string.
+            
+            @param {String} string with function-like notation such as:
+                            polygon(...), circle(), ellipse() or rectangle()
+            @throws {TypeError} if input does not contain function-like notation
+            @return {String} name of shape
+        */
+        function _getShape(string){
+            if (string.indexOf('(') < 0) {
+                throw new TypeError('Value does not contain a shape function');
+            }
+            return string.split('(')[0].trim();
+        }
+        /*
+            Get shape editor class appropriate for given shape.
+            
+            @param {String} shape Any of: polygon, circle, ellipse, rectangle
+            @throws {TypeError} if shape is not recognized
+            @return {Object} shape editor class
+        */
+        function _getFactory(shape){
+            var Factory;
+            
+            switch (shape) {
+            case 'polygon':
+                Factory = PolygonEditor;
+                break;
+
+            case 'circle':
+                Factory = CircleEditor;
+                break;
+
+            case 'ellipse':
+                Factory = EllipseEditor;
+                break;
+
+            case 'rectangle':
+                Factory = RectangleEditor;
+                break;
+
+            default:
+                throw new TypeError('Value does not contain a valid shape function');
+            }
+            
+            return Factory;
+        }
+        
         // ensure omitting 'new' is harmless
         if (!(this instanceof CSSShapesEditor)){
             return new CSSShapesEditor(target, value, options);
         }
         
-        if (value.indexOf('(') < 0) {
-            throw new TypeError('Value does not contain a shape function');
+        var _shape = _getShape(value),
+            _factory = _getFactory(_shape),
+            _old_update = _factory.prototype.update,
+            _editor = new _factory(target, value, options);;
+        
+        /* 
+            Hijack the update method to check if shape editor needs 
+            to mutate when the update string contains a different shape type.
+            
+            @example 'polygon()' -> 'circle()', editor becomes CircleEditor instance
+        */
+        _factory.prototype.update = function(value){
+            
+            var newShape = _getShape(value);
+            
+            // updating to a different shape type, replace the editor.
+            if (newShape !== _shape){
+                
+                _factory = _getFactory(newShape)
+                
+                // clean-up old editor
+                _editor.remove();
+                
+                // replace editor
+                _editor = new _factory(target, value, options);
+                
+                // cache current shape type
+                _shape = newShape;
+                
+                return;
+            }
+            // updating same shape type; business as usual
+            else{
+                _old_update.call(_editor, value);
+            }
         }
         
-        var shape = value.split('(')[0].trim(),
-            Factory;
-        
-        switch (shape) {
-        case 'polygon':
-            Factory = PolygonEditor;
-            break;
-            
-        case 'circle':
-            Factory = CircleEditor;
-            break;
-            
-        case 'ellipse':
-            Factory = EllipseEditor;
-            break;
-            
-        case 'rectangle':
-            Factory = RectangleEditor;
-            break;
-            
-        default:
-            throw new TypeError('Value does not contain a valid shape function');
-        }
-        
-        return new Factory(target, value, options);
+        return _editor;
     }
     
     return CSSShapesEditor;
