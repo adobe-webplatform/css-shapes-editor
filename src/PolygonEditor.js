@@ -59,13 +59,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         */ 
         Editor.prototype.setup.call(this);
         
-        this.vertices = this.parseShape(this.value, this.target);
-        
-        if (!this.vertices.length){
-            this.vertices = this.inferShapeFromElement(this.target);
-        }
-        
-        this.polygonFillRule = this.vertices.polygonFillRule || 'nonzero';
+        this.setupCoordinates();
         
         this.points = this.paper.g();
         
@@ -78,9 +72,28 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         this.holder.addEventListener('dblclick', this.onDblClick.bind(this));
     };
     
+    PolygonEditor.prototype.setupCoordinates = function(){
+        this.vertices = this.parseShape(this.value, this.target);
+        
+        if (!this.vertices.length){
+            this.vertices = this.inferShapeFromElement(this.target);
+        }
+        
+        this.polygonFillRule = this.vertices.polygonFillRule || 'nonzero';
+    }
+    
+    PolygonEditor.prototype.update = function(value){
+        this.value = value;
+        
+        this.removeOffsets();
+        this.setupCoordinates();
+        this.applyOffsets();
+        this.draw();
+    };
+    
     PolygonEditor.prototype.refresh = function(){
         this.removeOffsets();
-        this.setupOffsets();
+        Editor.prototype.setupOffsets.call(this);
         this.applyOffsets();
         this.draw();
     };
@@ -98,20 +111,20 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
     */
     PolygonEditor.prototype.parseShape = function(shape, element){
         var coords = [],
-            infos;
-        
+            infos; 
+            
         // superficial check for shape declaration
         if (typeof shape !== 'string' || !/^polygon\(.*?\)/i.test(shape.trim())){
             
-            // remove editor DOM saffolding
+            // remove editor DOM scaffolding
             this.remove();
             
             throw new Error('No polygon() function definition in provided value');
         }
         
-        infos = /polygon\s*\(([a-z]*),\s*(([-+0-9.]+[a-z%]*|calc\([^)]*\)|\s|\,)*)\)?(\s*)/i.exec(shape.trim());
+        infos = /polygon\s*\((?:([a-z]*),)?\s*((?:[-+0-9.]+[a-z%]*|\s|\,)*)\)?\s*/i.exec(shape.trim());
         
-        if (infos){
+        if (infos && infos[2].length > 0){
             coords = (
                 infos[2]
                 .replace(/\s+/g, ' ')
@@ -142,6 +155,9 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             
             coords.polygonFillRule = infos[1] || null;
         }
+        
+        // polygons need at least 3 coords; bail out and let editor infer from element's shape
+        coords = (coords.length > 2) ? coords : [];
         
         return coords;
     };

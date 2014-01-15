@@ -94,7 +94,7 @@ function($, markup, PolygonEditor){
         }); 
         
         it('should infer polygon from element when value is incomplete', function(){
-            var inValue = 'polygon(0,0, 100px, 0)',
+            var inValue = 'polygon(0 0, 100px 0)',
                 expectedValue = _getPolygonFromBox(target),
                 outValue;
             
@@ -275,6 +275,70 @@ function($, markup, PolygonEditor){
             editor.onDblClick.call(editor, mockEvent);
             
             expect(editor.vertices.length).toEqual(expectedVerticesLength);
+        });
+        
+        it('should have an update function', function(){
+            var inValue = 'polygon(nonzero, 0px 0px, 100px 0px, 100px 100px)',
+                outValue;
+                
+            expect(editor.update).toBeDefined();
+        });
+        
+        it('should update with new polygon css shape value', function(){
+            var inValue = 'polygon(nonzero, 0px 0px, 100px 0px, 100px 100px)',
+                newValue = 'polygon(nonzero, 0px 0px, 99px 0px, 99px 99px)';
+            
+            editor = new PolygonEditor(target, inValue);
+            editor.update(newValue);
+            
+            expect(editor.getCSSValue()).toEqual(newValue);
+        });
+        
+        it('should update with inferred shaped when target value is empty polygon()', function(){
+            var inValue = 'polygon(nonzero, 0px 0px, 100px 0px, 100px 100px)',
+                newValue = 'polygon()',
+                expectedValue = _getPolygonFromBox(target);
+            
+            editor = new PolygonEditor(target, inValue);
+            expect(editor.getCSSValue()).toEqual(inValue);
+            
+            editor.update(newValue);
+            expect(editor.getCSSValue()).toEqual(expectedValue);
+        });
+        
+        it('should throw error when updating with invalid css value', function(){
+            
+            function updateWithEmpty(){
+                editor = new PolygonEditor(target, value);
+                editor.update('');
+            }
+            
+            function updateWithFake(){
+                editor = new PolygonEditor(target, value);
+                editor.update('fake');
+            }
+            
+            function updateWithNull(){
+                editor = new PolygonEditor(target, value);
+                editor.update(null);
+            };
+            
+            function updateWithFalsePositive(){
+                editor = new PolygonEditor(target, value);
+                editor.update('fake-polygon()');
+            };
+            
+            function updateWithCircle(){
+                editor = new PolygonEditor(target, value);
+                editor.update('circle()');
+            };
+            
+            expect(updateWithEmpty).toThrow();
+            expect(updateWithFake).toThrow();
+            expect(updateWithNull).toThrow();
+            expect(updateWithFalsePositive).toThrow();
+            // PolygonEditor does not mutate to CircleEditor
+            expect(updateWithCircle).toThrow();
         });
         
     });
