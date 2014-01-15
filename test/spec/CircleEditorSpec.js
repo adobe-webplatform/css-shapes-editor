@@ -2,8 +2,19 @@
 /*global define, describe, it, expect, beforeEach, afterEach, waits, waitsFor, runs, $, waitsForDone, spyOn */
 
 // see main.js for path mapping config
-define(['jquery', 'text!spec/test-files/circle.html', 'CircleEditor'],
+define(['jquery', 'text!spec/test-files/markup.html', 'CircleEditor'],
 function($, markup, CircleEditor){
+    
+    function _getCircleFromBox(element){
+        var box = element.getBoundingClientRect();
+        return 'circle('+
+        [
+            box.width / 2 + 'px',
+            box.height / 2 + 'px',
+            Math.min(box.height, box.width) / 2 + 'px'
+        ].join(', ')
+        +')';
+    }
     
     describe('CircleEditor', function(){
         var editor, 
@@ -164,5 +175,67 @@ function($, markup, CircleEditor){
         // TODO: test with percentages, match the circle.html target box
         // TODO: test with negative values
         // TODO: test with new notation
+        
+        it('should have update method', function(){
+            var value = 'circle(0, 0, 100px)';
+                
+            editor = new CircleEditor(target, value);
+            expect(editor.update).toBeDefined();
+        });
+        
+        it('should update with new circle() css value', function(){
+            var value = 'circle(0, 0, 100px)',
+                newValue = 'circle(0px, 0px, 99px)';
+                
+            editor = new CircleEditor(target, value);
+            editor.update(newValue);
+            expect(editor.getCSSValue()).toEqual(newValue);
+        });
+
+        it('should update with new infered shape value when given empty circle()', function(){
+            var value = 'circle(0, 0, 100px)',
+                newValue = 'circle()',
+                expectedValue = _getCircleFromBox(target);
+                
+            editor = new CircleEditor(target, value);
+            editor.update(newValue);
+            expect(editor.getCSSValue()).toEqual(expectedValue);
+        });
+        
+        it('should throw error when updating with invalid css value', function(){
+            
+            function updateWithEmpty(){
+                editor = new CircleEditor(target, value);
+                editor.update('');
+            }
+            
+            function updateWithFake(){
+                editor = new CircleEditor(target, value);
+                editor.update('fake');
+            }
+            
+            function updateWithNull(){
+                editor = new CircleEditor(target, value);
+                editor.update(null);
+            };
+            
+            function updateWithFalsePositive(){
+                editor = new CircleEditor(target, value);
+                editor.update('fake-circle()');
+            };
+            
+            function updateWithPolygon(){
+                editor = new CircleEditor(target, value);
+                editor.update('polygon()');
+            };
+            
+            expect(updateWithEmpty).toThrow();
+            expect(updateWithFake).toThrow();
+            expect(updateWithNull).toThrow();
+            expect(updateWithFalsePositive).toThrow();
+            // CircleEditor does not mutate to PolygonEditor
+            expect(updateWithPolygon).toThrow();
+        });
+        
     });
 });

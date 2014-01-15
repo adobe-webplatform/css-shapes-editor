@@ -36,11 +36,7 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         // Sets up: this.holder, this.paper, this.snap, this.offsets
         Editor.prototype.setup.call(this);
         
-        this.coords = this.parseShape(this.value);
-        
-        if (!this.coords){
-            this.coords = this.inferShapeFromElement(this.target);
-        }
+        this.setupCoordinates();
         
         this.shape = this.paper.circle().attr(this.config.path);
         
@@ -48,9 +44,26 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         window.addEventListener('resize', this.refresh.bind(this));
     };
     
+    CircleEditor.prototype.setupCoordinates = function(){
+        this.coords = this.parseShape(this.value);
+        
+        if (!this.coords){
+            this.coords = this.inferShapeFromElement(this.target);
+        }
+    };
+    
+    CircleEditor.prototype.update = function(value){
+        this.value = value;
+        
+        this.removeOffsets();
+        this.setupCoordinates();
+        this.applyOffsets();
+        this.draw();
+    };
+    
     CircleEditor.prototype.refresh = function(){
         this.removeOffsets();
-        this.setupOffsets();
+        Editor.prototype.setupOffsets.call(this);
         this.applyOffsets();
         this.draw();
     };
