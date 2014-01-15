@@ -2,7 +2,7 @@
 /*global define, describe, it, expect, beforeEach, afterEach, waits, waitsFor, runs, $, waitsForDone, spyOn */
 
 // see main.js for path mapping config
-define(['jquery', 'text!spec/test-files/ellipse.html', 'EllipseEditor'],
+define(['jquery', 'text!spec/test-files/markup.html', 'EllipseEditor'],
 function($, markup, EllipseEditor){
     
     describe('EllipseEditor', function(){

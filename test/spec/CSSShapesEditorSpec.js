@@ -2,7 +2,7 @@
 /*global define, describe, it, expect, beforeEach, afterEach, waits, waitsFor, runs, $, waitsForDone, spyOn */
 
 // see main.js for path mapping config
-define(['jquery', 'text!spec/test-files/polygon.html', 'CSSShapesEditor', 'PolygonEditor', 'CircleEditor'],
+define(['jquery', 'text!spec/test-files/markup.html', 'CSSShapesEditor', 'PolygonEditor', 'CircleEditor'],
 function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
     
     describe('CSSShapesEditor', function(){

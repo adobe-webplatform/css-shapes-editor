@@ -2,7 +2,7 @@
 /*global define, describe, it, expect, beforeEach, afterEach, waits, waitsFor, runs, $, waitsForDone, spyOn */
 
 // see main.js for path mapping config
-define(['jquery', 'text!spec/test-files/polygon.html', 'PolygonEditor'],
+define(['jquery', 'text!spec/test-files/markup.html', 'PolygonEditor'],
 function($, markup, PolygonEditor){
     
     function _getPolygonFromBox(element){
