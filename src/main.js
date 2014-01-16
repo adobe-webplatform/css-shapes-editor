@@ -13,8 +13,6 @@ require.config({
 });
 
 define('main', ['CSSShapesEditor'], function(editor){
-    
     'use strict';
-    
     return editor;
 });

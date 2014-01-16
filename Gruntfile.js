@@ -28,8 +28,9 @@ module.exports = function (grunt) {
         
         banner: grunt.file.read('./COPYRIGHT')
                     .replace(/@NAME/, pkg.name)
+                    .replace(/@DESCRIPTION/, pkg.description)
                     .replace(/@VERSION/, pkg.version)
-                    .replace(/@DATE/, grunt.template.today("yyyy-mm-dd")) + "\n",
+                    .replace(/@DATE/, grunt.template.today("yyyy-mm-dd")),
         
         watch: {
             files: ['<%= yeoman.src %>/{,*/}*.js'],
@@ -66,22 +67,32 @@ module.exports = function (grunt) {
             options: {
               baseUrl: '<%= yeoman.src %>',
               mainConfigFile: '<%= yeoman.src %>/main.js',
-              out: '<%= yeoman.dist %>/' + pkg.name + '.js',
+              out: pkg.main,
               name: 'main',
               include: ['third-party/almond/almond'],
               wrap: {         
-                  // TODO: figure out why banner crashes build
-                  // startFile: ['<%= banner %>','<%= yeoman.editor %>/fragments/start.frag'],
                   startFile: '<%= yeoman.src %>/fragments/start.frag',
                   endFile: '<%= yeoman.src %>/fragments/end.frag'
               },
               optimize: 'none'
             }
           }
+        },
+        
+        usebanner: {
+            dist: {
+              options: {
+                position: 'top',
+                banner: '<%= banner %>'
+              },
+              files: {
+                src: [ pkg.main ]
+              }
+            }
         }
     });
     
-    grunt.registerTask('build', ['jshint', 'requirejs'])
+    grunt.registerTask('build', ['jshint', 'requirejs', 'usebanner'])
     
     grunt.registerTask('test', ['jasmine'])
 

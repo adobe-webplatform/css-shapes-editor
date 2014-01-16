@@ -3,6 +3,5 @@
     //module value for 'main' here and return it as the
     //value to use for the public API for the built file.
     
-    // intentional implicit global var to expose API
-    CSSShapesEditor = require('main');
+    return require('main');
 }));
