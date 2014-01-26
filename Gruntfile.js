@@ -41,10 +41,11 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            all: [
+            src: [
                 '<%= yeoman.src %>/*.js',
                 // 'test/spec/{,*/}*.js'
-            ]
+            ],
+            dist: ['<%= yeoman.dist %>/*.js']
         },
         
         jasmine: {
@@ -92,12 +93,14 @@ module.exports = function (grunt) {
         }
     });
     
-    grunt.registerTask('build', ['jshint', 'requirejs', 'usebanner'])
+    grunt.registerTask('build', ['jshint:src', 'requirejs', 'usebanner'])
     
     grunt.registerTask('test', ['jasmine'])
+    
+    grunt.registerTask('lint', ['jshint'])
 
     grunt.registerTask('default', [
-        'jshint',
+        'jshint:src',
         // 'test',
         // 'build'
     ]); 
