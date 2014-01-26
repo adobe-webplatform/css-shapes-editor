@@ -85,6 +85,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
     PolygonEditor.prototype.update = function(value){
         this.value = value;
         
+        // TODO: check if transformEditor is on; reset it after update
         this.removeOffsets();
         this.setupCoordinates();
         this.applyOffsets();
