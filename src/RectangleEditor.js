@@ -58,10 +58,12 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     RectangleEditor.prototype.update = function(value){
         this.value = value;
         
+        this.turnOffFreeTransform();
         this.removeOffsets();
         this.setupCoordinates();
         this.applyOffsets();
         this.draw();
+        this.turnOnFreeTransform();
     };
     
     RectangleEditor.prototype.refresh = function(){

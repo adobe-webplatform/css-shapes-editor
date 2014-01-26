@@ -229,5 +229,30 @@ function($, markup, EllipseEditor){
             // EllipseEditor does not mutate to PolygonEditor
             expect(updateWithPolygon).toThrow();
         });
+        
+        it('should have transforms editor turned on after setup', function(){
+            var value = 'ellipse(0, 0, 100px, 100px)';
+            editor = new EllipseEditor(target, value);
+            
+            expect(editor.transformEditor).toBeDefined();
+            expect(editor.transformEditor.bbox).toBeDefined();
+        });
+        
+        it('should reset the transforms editor on update', function(){
+            var value = 'ellipse(0, 0, 100px, 100px)';
+            editor = new EllipseEditor(target, value);
+            
+            spyOn(editor, 'turnOffFreeTransform');
+            spyOn(editor, 'turnOnFreeTransform');
+            
+            editor.update('ellipse(0px, 0px, 99px, 99px)');
+            
+            expect(editor.turnOffFreeTransform).toHaveBeenCalled();
+            expect(editor.turnOnFreeTransform).toHaveBeenCalled();
+            
+            expect(editor.transformEditor).toBeDefined();
+            expect(editor.transformEditor.bbox).toBeDefined();
+        });
+        
     });
 });

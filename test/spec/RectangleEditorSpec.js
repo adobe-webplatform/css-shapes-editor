@@ -250,5 +250,30 @@ function($, markup, RectangleEditor){
             // RectangleEditor does not mutate to PolygonEditor
             expect(updateWithPolygon).toThrow();
         });
+        
+        it('should have transforms editor turned on after setup', function(){
+            var value = 'rectangle(0, 0, 400px, 200px)';
+            editor = new RectangleEditor(target, value);
+            
+            expect(editor.transformEditor).toBeDefined();
+            expect(editor.transformEditor.bbox).toBeDefined();
+        });
+        
+        it('should reset the transforms editor on update', function(){
+            var value = 'rectangle(0, 0, 400px, 200px)';
+            editor = new RectangleEditor(target, value);
+            
+            spyOn(editor, 'turnOffFreeTransform');
+            spyOn(editor, 'turnOnFreeTransform');
+            
+            editor.update('rectangle(0px, 0px, 399px, 199px)');
+            
+            expect(editor.turnOffFreeTransform).toHaveBeenCalled();
+            expect(editor.turnOnFreeTransform).toHaveBeenCalled();
+            
+            expect(editor.transformEditor).toBeDefined();
+            expect(editor.transformEditor.bbox).toBeDefined();
+        });
+        
     });
 });

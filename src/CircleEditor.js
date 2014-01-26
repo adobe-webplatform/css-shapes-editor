@@ -55,10 +55,12 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     CircleEditor.prototype.update = function(value){
         this.value = value;
         
+        this.turnOffFreeTransform();
         this.removeOffsets();
         this.setupCoordinates();
         this.applyOffsets();
         this.draw();
+        this.turnOnFreeTransform();
     };
     
     CircleEditor.prototype.refresh = function(){
@@ -249,7 +251,6 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         }, 
         _transformPoints);
     };
-    
     
     CircleEditor.prototype.draw = function(){
         // draw the circle shape

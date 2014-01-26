@@ -94,6 +94,28 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
             this.trigger('removed', {});
         },
         
+        toggleFreeTransform: function(){
+            // to be implemented by specialized editors, higher in the prototype chain
+        },
+        
+        turnOnFreeTransform: function(){
+            if (this.transformEditor){
+                // aready turned on
+                return;
+            }
+
+            this.toggleFreeTransform();
+        },
+
+        turnOffFreeTransform: function(){
+            if (!this.transformEditor){
+                // already turned off
+                return;
+            }
+
+            this.toggleFreeTransform();
+        },
+        
         on: eve.on,
         off: eve.off,
         trigger: eve

@@ -237,5 +237,29 @@ function($, markup, CircleEditor){
             expect(updateWithPolygon).toThrow();
         });
         
+        it('should have transforms editor turned on after setup', function(){
+            var value = 'circle(0, 0, 100px)';
+            editor = new CircleEditor(target, value);
+            
+            expect(editor.transformEditor).toBeDefined();
+            expect(editor.transformEditor.bbox).toBeDefined();
+        });
+        
+        it('should reset the transforms editor on update', function(){
+            var value = 'circle(0, 0, 100px)';
+            editor = new CircleEditor(target, value);
+            
+            spyOn(editor, 'turnOffFreeTransform');
+            spyOn(editor, 'turnOnFreeTransform');
+            
+            editor.update('circle(0px, 0px, 99px)');
+            
+            expect(editor.turnOffFreeTransform).toHaveBeenCalled();
+            expect(editor.turnOnFreeTransform).toHaveBeenCalled();
+            
+            expect(editor.transformEditor).toBeDefined();
+            expect(editor.transformEditor.bbox).toBeDefined();
+        });
+        
     });
 });
