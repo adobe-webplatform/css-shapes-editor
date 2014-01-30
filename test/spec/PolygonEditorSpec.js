@@ -43,6 +43,11 @@ function($, markup, PolygonEditor){
             expect(editor).toBeDefined();
         });
         
+        it('should be of type polygon', function(){
+            editor = new PolygonEditor(target, value);
+            expect(editor.type).toBe('polygon');
+        });
+        
         it('should throw error when css value missing polygon declaration', function(){
             function setupWithEmtpy(){
                 var value = '';

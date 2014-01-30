@@ -37,6 +37,14 @@ function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
             expect(editor instanceof PolygonEditor).toBe(true);
         });
 
+        it('should return instance of polygon editor with type polygon', function(){
+            var value = 'polygon(nonzero, 0 0, 100px 0, 100px 100px)';
+            
+            editor = new CSSShapesEditor(target, value);
+            expect(editor instanceof PolygonEditor).toBe(true);
+            expect(editor.type).toBe('polygon');
+        });
+
         it('should return instance of circle editor', function(){
             var value = 'circle(50%, 50%, 50%)';
             

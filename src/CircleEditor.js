@@ -17,6 +17,8 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     function CircleEditor(target, value, options){
         Editor.apply(this, arguments);
         
+        this.type = 'circle';
+        
         // coordinates for circle: cx, cy, radius and corresponding units
         this.coords = null;
         

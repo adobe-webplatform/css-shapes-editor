@@ -20,6 +20,8 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     function RectangleEditor(target, value, options){
         Editor.apply(this, arguments);
         
+        this.type = 'rectangle';
+        
         // coordinates for rectangle: x,y for origin, with, height and units
         this.coords = null;
         

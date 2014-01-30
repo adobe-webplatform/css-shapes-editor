@@ -18,6 +18,8 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     function EllipseEditor(target, value, options){
         Editor.apply(this, arguments);
         
+        this.type = 'ellipse';
+        
         // coordinates for circle: cx, cy, x and y radii and corresponding units
         this.coords = null;
         

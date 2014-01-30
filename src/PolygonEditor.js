@@ -21,6 +21,8 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
     function PolygonEditor(target, value, options){
         Editor.apply(this, arguments);
         
+        this.type = 'polygon';
+        
         // array of objects with x, y, xUnit, yUnit for each vertex
         this.vertices = [];
         
