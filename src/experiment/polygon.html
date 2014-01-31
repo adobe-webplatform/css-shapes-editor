@@ -49,6 +49,15 @@
         console.log(ed.target.style[property] = this.getCSSValue())
       })
       
+      // toggle free transform
+      document.addEventListener('keypress', function(e){
+        
+        // 'T' key
+        if (e.keyCode === 116){
+          ed.toggleFreeTransform()
+        }
+      })
+      
       // programmatic update
       // ed.update('polygon(0 0, 400px 200px, 0 200px)')
     })
