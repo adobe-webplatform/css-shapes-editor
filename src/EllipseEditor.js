@@ -67,10 +67,12 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     };
     
     EllipseEditor.prototype.refresh = function(){
+        this.turnOffFreeTransform();
         this.removeOffsets();
         Editor.prototype.setupOffsets.call(this);
         this.applyOffsets();
         this.draw();
+        this.turnOnFreeTransform();
     };
     
     /*

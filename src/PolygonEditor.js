@@ -85,20 +85,33 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
     };
     
     PolygonEditor.prototype.update = function(value){
+        var hadEditor = (this.transformEditor !== undefined);
+        
         this.value = value;
         
-        // TODO: check if transformEditor is on; reset it after update
         this.removeOffsets();
         this.setupCoordinates();
         this.applyOffsets();
         this.draw();
+        
+        if (hadEditor){
+            this.turnOffFreeTransform();
+            this.turnOnFreeTransform();
+        }
     };
     
     PolygonEditor.prototype.refresh = function(){
+        var hadEditor = (this.transformEditor !== undefined);
+        
         this.removeOffsets();
         Editor.prototype.setupOffsets.call(this);
         this.applyOffsets();
         this.draw();
+        
+        if (hadEditor){
+            this.turnOffFreeTransform();
+            this.turnOnFreeTransform();
+        }
     };
     
     /*

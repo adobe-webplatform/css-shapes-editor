@@ -46,7 +46,7 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         this.shape = this.paper.rect().attr(this.config.path);
         
         // TODO: throttle sensibly
-        window.addEventListener('resize', this.refresh.bind(this));
+        window.addEventListener('resize', _.throttle(this.refresh.bind(this), 40));
     };
     
     RectangleEditor.prototype.setupCoordinates = function(){
@@ -69,10 +69,12 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     };
     
     RectangleEditor.prototype.refresh = function(){
+        this.turnOffFreeTransform();
         this.removeOffsets();
         Editor.prototype.setupOffsets.call(this);
         this.applyOffsets();
         this.draw();
+        this.turnOnFreeTransform();
     };
     
     /*
@@ -251,7 +253,6 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     };
     
     RectangleEditor.prototype.toggleFreeTransform = function(){
-        
         // make a clone to avoid compound tranforms
         var coordsClone = (JSON.parse(JSON.stringify(this.coords))),
             scope = this;
