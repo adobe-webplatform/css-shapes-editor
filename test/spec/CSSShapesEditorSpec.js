@@ -29,6 +29,19 @@ function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
             editor = new CSSShapesEditor(target, value);
             expect(editor).toBeDefined();
         });
+        
+        it('should return throw error when setup with undefined value', function(){
+            function setupWithUndefined(){
+                editor = new CSSShapesEditor(undefined, undefined);
+            }
+            
+            function setupWithNull(){
+                editor = new CSSShapesEditor(null, null);
+            }
+            
+            expect(setupWithUndefined).toThrow();
+            expect(setupWithNull).toThrow();
+        });
 
         it('should return instance of polygon editor', function(){
             var value = 'polygon(nonzero, 0 0, 100px 0, 100px 100px)';

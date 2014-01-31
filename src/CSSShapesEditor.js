@@ -75,6 +75,14 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
             return new CSSShapesEditor(target, value, options);
         }
         
+        if (!(target instanceof HTMLElement)){
+            throw new TypeError('Target is not instance of HTMLElement');
+        }
+        
+        if (!value || typeof value !== 'string'){
+            throw new TypeError('Value is not string');
+        }
+        
         var _shape = _getShape(value),
             Factory = _getFactory(_shape),
             _old_update = Factory.prototype.update,
