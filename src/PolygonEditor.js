@@ -448,8 +448,8 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
                 vertices = scope.vertices;
                 
             verticesClone.forEach(function(v, i){
-                vertices[i].x = matrix.x(v.x,v.y);
-                vertices[i].y = matrix.y(v.x,v.y);
+                vertices[i].x = matrix.x(v.x,v.y).toFixed();
+                vertices[i].y = matrix.y(v.x,v.y).toFixed();
             });
             
             scope.draw();

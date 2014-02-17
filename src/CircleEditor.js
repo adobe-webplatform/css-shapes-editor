@@ -85,7 +85,7 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     CircleEditor.prototype.applyOffsets = function(){
         var cx = this.coords.cx + this.offsets.left,
             cy = this.coords.cy + this.offsets.top;
-        
+            
         this.coords.cx = cx;
         this.coords.cy = cy;
     };
@@ -226,9 +226,9 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         function _transformPoints(){
             var matrix = scope.shapeClone.transform().localMatrix;
             
-            scope.coords.cx = matrix.x(coordsClone.cx, coordsClone.cy);
-            scope.coords.cy = matrix.y(coordsClone.cx, coordsClone.cy);
-            scope.coords.r = scope.transformEditor.attrs.scale.x * coordsClone.r;
+            scope.coords.cx = matrix.x(coordsClone.cx, coordsClone.cy).toFixed();
+            scope.coords.cy = matrix.y(coordsClone.cx, coordsClone.cy).toFixed();
+            scope.coords.r = (scope.transformEditor.attrs.scale.x * coordsClone.r).toFixed();
             
             scope.draw();
         }

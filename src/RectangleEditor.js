@@ -254,16 +254,16 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     
     RectangleEditor.prototype.toggleFreeTransform = function(){
         // make a clone to avoid compound tranforms
-        var coordsClone = (JSON.parse(JSON.stringify(this.coords))),
-            scope = this;
-        
+        var coordsClone = (JSON.parse(JSON.stringify(this.coords)));
+        var scope = this;
+            
         function _transformPoints(){
             var matrix = scope.shapeClone.transform().localMatrix;
             
-            scope.coords.x = matrix.x(coordsClone.x, coordsClone.y);
-            scope.coords.y = matrix.y(coordsClone.x, coordsClone.y);
-            scope.coords.w = scope.transformEditor.attrs.scale.x * coordsClone.w;
-            scope.coords.h = scope.transformEditor.attrs.scale.y * coordsClone.h;
+            scope.coords.x = matrix.x(coordsClone.x, coordsClone.y).toFixed();
+            scope.coords.y = matrix.y(coordsClone.x, coordsClone.y).toFixed();
+            scope.coords.w = (scope.transformEditor.attrs.scale.x * coordsClone.w).toFixed();
+            scope.coords.h = (scope.transformEditor.attrs.scale.y * coordsClone.h).toFixed();
             
             scope.draw();
         }

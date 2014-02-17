@@ -235,10 +235,10 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         function _transformPoints(){
             var matrix = scope.shapeClone.transform().localMatrix;
             
-            scope.coords.cx = matrix.x(coordsClone.cx, coordsClone.cy);
-            scope.coords.cy = matrix.y(coordsClone.cx, coordsClone.cy);
-            scope.coords.rx = scope.transformEditor.attrs.scale.x * coordsClone.rx;
-            scope.coords.ry = scope.transformEditor.attrs.scale.y * coordsClone.ry;
+            scope.coords.cx = matrix.x(coordsClone.cx, coordsClone.cy).toFixed();
+            scope.coords.cy = matrix.y(coordsClone.cx, coordsClone.cy).toFixed();
+            scope.coords.rx = (scope.transformEditor.attrs.scale.x * coordsClone.rx).toFixed();
+            scope.coords.ry = (scope.transformEditor.attrs.scale.y * coordsClone.ry).toFixed();
             
             scope.draw();
         }
