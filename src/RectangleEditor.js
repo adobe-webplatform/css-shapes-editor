@@ -64,23 +64,33 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     };
     
     RectangleEditor.prototype.update = function(value){
+        var hadEditor = (this.transformEditor !== undefined);
+        
         this.value = value;
         
-        this.turnOffFreeTransform();
         this.removeOffsets();
         this.setupCoordinates();
         this.applyOffsets();
         this.draw();
-        this.turnOnFreeTransform();
+        
+        if (hadEditor){
+            this.turnOffFreeTransform();
+            this.turnOnFreeTransform();
+        }
     };
     
     RectangleEditor.prototype.refresh = function(){
-        this.turnOffFreeTransform();
+        var hadEditor = (this.transformEditor !== undefined);
+        
         this.removeOffsets();
         Editor.prototype.setupOffsets.call(this);
         this.applyOffsets();
         this.draw();
-        this.turnOnFreeTransform();
+        
+        if (hadEditor){ 
+            this.turnOffFreeTransform();
+            this.turnOnFreeTransform();
+        }
     };
     
     /*
