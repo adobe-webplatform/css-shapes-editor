@@ -50,6 +50,9 @@
                 opts: {
                     animate: false,
                     attrs: { fill: '#fff', stroke: '#000' },
+                    bboxAttrs: { fill: 'none', stroke: '#000', 'stroke-dasharray': '4, 4', opacity: 0.5},
+                    axesAttrs: { fill: '#fff', stroke: '#000', 'stroke-dasharray': '4, 4', opacity: 0.5},
+                    discAttrs: { fill: '#fff', stroke: '#000' },
                     boundary: { x: paper._left || 0, y: paper._top || 0, width: null, height: null },
                     distance: 1.3,
                     drag: true,
@@ -186,11 +189,7 @@
                     ft.handles[axis] = {};
                     ft.handles[axis].line = paper
                         .path([[ 'M', ft.attrs.center.x, ft.attrs.center.y ]])
-                        .attr({
-                            stroke: ft.opts.attrs.stroke,
-                            'stroke-dasharray': '4, 4',
-                            opacity: .5
-                        });
+                        .attr(ft.opts.axesAttrs);
 
                     ft.handles[axis].disc = paper
                         .circle(ft.attrs.center.x, ft.attrs.center.y, ft.opts.size.axes)
@@ -200,12 +199,7 @@
                 if ( ft.opts.draw.indexOf('bbox') >= 0 ) {
                     ft.bbox = paper
                         .path('')
-                        .attr({
-                            fill: 'none',
-                            stroke: ft.opts.attrs.stroke,
-                            'stroke-dasharray': '4, 4',
-                            opacity: .5
-                        });
+                        .attr(ft.opts.bboxAttrs);
 
                     ft.handles.bbox = [];
 
@@ -228,11 +222,7 @@
                 if ( ft.opts.draw.indexOf('circle') !== -1 ) {
                     ft.circle = paper
                         .circle(0, 0, 0)
-                        .attr({
-                            stroke: ft.opts.attrs.stroke,
-                            'stroke-dasharray': '5, 5',
-                            opacity: .3
-                        });
+                        .attr(ft.opts.bboxAttrs);
                 }
 
                 if ( ft.opts.drag.indexOf('center') !== -1 ) {
@@ -326,7 +316,7 @@
                             asyncCallback([ rotate ? 'rotate end'   : null, scale ? 'scale end'   : null ]);
                         }
                     
-                    ft.handles[axis].disc.attr('fill', 'red')    
+                    ft.handles[axis].disc.attr(ft.opts.discAttrs)
                     ft.handles[axis].disc.drag(_dragMove, _dragStart, _dragEnd);
                 });
 
