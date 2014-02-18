@@ -7,8 +7,14 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
     var _defaults = {
         path: {
             stroke: 'black',
-            fill: 'rgba(0,0,0,0)' // tricks transform editor to accept self-drag
+            fill: 'rgba(0, 0, 0, 0)' // tricks transform editor to accept self-drag
         },
+        point: {
+            radius: 5,
+            stroke: 'rgba(0, 0, 0, 1)',
+            fill: 'rgba(252, 252, 252, 1)'
+        },
+        bboxAttrs: {},
         cxUnit: 'px',
         cyUnit: 'px',
         rUnit: 'px'
@@ -251,7 +257,10 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             keepRatio: ['bboxCorners'],
             rotate: [],
             scale: ['bboxCorners'],
-            distance: '0.6'
+            distance: '0.6',
+            attrs: this.config.point,
+            bboxAttrs: this.config.bboxAttrs,
+            size: this.config.point.radius
         }, 
         _transformPoints);
     };

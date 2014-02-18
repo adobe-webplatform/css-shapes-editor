@@ -17,6 +17,12 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
                 radius: 4,
                 stroke: 'rgba(0, 192, 238, 1)',
                 fill: 'rgba(252, 252, 252, 1)',
+            },
+            bboxAttrs: {
+                stroke: 'rgba(0, 192, 238, 1)',
+                fill: 'none',
+                'stroke-dasharray': '0, 0',
+                opacity: 0.8
             }
         };
         
