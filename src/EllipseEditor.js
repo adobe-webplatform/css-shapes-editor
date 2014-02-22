@@ -225,7 +225,7 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             ry = this.coords.ry;
             
         cx = CSSUtils.convertFromPixels(cx, this.coords.cxUnit, this.target, false);
-        cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, false);
+        cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, true);
         rx = CSSUtils.convertFromPixels(rx, this.coords.rxUnit, this.target, true);
         ry = CSSUtils.convertFromPixels(ry, this.coords.ryUnit, this.target, true);
         

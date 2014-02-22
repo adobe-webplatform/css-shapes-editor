@@ -217,8 +217,9 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             r = this.coords.r;
             
         cx = CSSUtils.convertFromPixels(cx, this.coords.cxUnit, this.target, false);
-        cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, false);
+        cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, true);
         r = CSSUtils.convertFromPixels(r, this.coords.rUnit, this.target, true);
+        
         
         return 'circle(' + [cx, cy, r].join(', ') + ')';
     };
