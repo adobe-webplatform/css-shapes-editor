@@ -15,7 +15,7 @@ define(function(){
         'rem': function(x,e) { return x*parseFloat(getComputedStyle(e.ownerDocument.documentElement).fontSize); },
         'vw' : function(x,e) { return x/100*window.innerWidth; },
         'vh' : function(x,e) { return x/100*window.innerHeight; },
-        '%'  : function(x,e,h) {
+        '%'  : function(x,e,h,isRadius) {
             
             var box = e ? getContentBoxOf(e) : {
                 top: 0,
@@ -23,6 +23,13 @@ define(function(){
                 width: 0,
                 height: 0
             };
+            
+            // special case for computing radius for circle()
+            // @see http://www.w3.org/TR/css-shapes/#funcdef-circle
+            if (isRadius){
+                return x/100 * (Math.sqrt(box.height * box.height + box.width * box.width) / Math.sqrt(2));
+            }
+            
             
             if(h) { return x/100*box.height; }
             else  { return x/100*box.width;  }
@@ -41,7 +48,7 @@ define(function(){
         'rem': function(x,e) { return x/parseFloat(getComputedStyle(e.ownerDocument.documentElement).fontSize); },
         'vw' : function(x,e) { return x*100/window.innerWidth; },
         'vh' : function(x,e) { return x*100/window.innerHeight; },
-        '%'  : function(x,e,h) {
+        '%'  : function(x,e,h,isRadius) {
             
             // get the box from which to compute the percentages
             var box = e ? getContentBoxOf(e) : {
@@ -51,8 +58,11 @@ define(function(){
                 height: 0
             };
             
-            // special case of a circle radius:
-            if(h===2) { return x*100/Math.sqrt(box.height*box.height+box.width*box.width); }
+            // special case for computing radius for circle()
+            // @see http://www.w3.org/TR/css-shapes/#funcdef-circle
+            if (isRadius){
+                return x*100/(Math.sqrt(box.height*box.height+box.width*box.width)/Math.sqrt(2));
+            }
             
             // otherwise, we use the width or height
             if(h) { return x*100/box.height; }
@@ -61,7 +71,7 @@ define(function(){
         }
     };
 
-    function convertToPixels(cssLength, element, heightRelative) {
+    function convertToPixels(cssLength, element, heightRelative, isRadius) {
 
         var match = cssLength.match(/^\s*(-?\d+(?:\.\d+)?)(\S*)\s*$/),
             currentLength = match ? parseFloat(match[1]) : 0.0,
@@ -71,7 +81,7 @@ define(function(){
         if (match && converter) {
 
             return {
-                value: Math.round(20*converter.call(null, currentLength, element, heightRelative))/20,
+                value: Math.round(20*converter.call(null, currentLength, element, heightRelative, isRadius))/20,
                 unit: currentUnit
             };
 
@@ -85,12 +95,12 @@ define(function(){
         }
     }
 
-    function convertFromPixels(pixelLength, destinUnit, element, heightRelative) {
+    function convertFromPixels(pixelLength, destinUnit, element, heightRelative, isRadius) {
         
         var converter = unitBackConverters[destinUnit];
         
         if(converter) {
-            return '' + (Math.round(20*converter.call(null, pixelLength, element, heightRelative))/20) + '' + destinUnit;
+            return '' + (Math.round(20*converter.call(null, pixelLength, element, heightRelative, isRadius))/20) + '' + destinUnit;
         } else {
             return '' + pixelLength + 'px';
         }
