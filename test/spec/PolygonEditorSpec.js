@@ -293,7 +293,6 @@ function($, markup, PolygonEditor){
                 expectedVerticesLength;
             
             editor = new PolygonEditor(target, inValue);
-            console.log('before', editor.vertices.length)
             // expect vertices count to be increased by one
             expectedVerticesLength = editor.vertices.length + 1;
             
@@ -303,12 +302,8 @@ function($, markup, PolygonEditor){
             editor.toggleFreeTransform();
             editor.toggleFreeTransform();
             
-            
             // dispatch mock 'mousedown' event
             editor.onMouseDown.call(editor, mockEvent);
-            
-            console.log('after', editor.vertices.length)
-            console.log('after', editor.getCSSValue())
             
             expect(editor.trigger).toHaveBeenCalled();
             expect(editor.trigger).toHaveBeenCalledWith('shapechange', editor);
