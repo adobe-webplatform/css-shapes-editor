@@ -282,6 +282,40 @@ function($, markup, PolygonEditor){
             expect(editor.vertices.length).toEqual(expectedVerticesLength);
         });
         
+        it('should add new vertex after transform editor is turned off', function(){
+            var inValue = 'polygon()',
+                box = target.getBoundingClientRect(),
+                mockEvent = {
+                    x: target.offsetLeft,
+                    // mid-way on the left edge
+                    y: target.offsetTop + box.height / 2
+                },
+                expectedVerticesLength;
+            
+            editor = new PolygonEditor(target, inValue);
+            console.log('before', editor.vertices.length)
+            // expect vertices count to be increased by one
+            expectedVerticesLength = editor.vertices.length + 1;
+            
+            spyOn(editor, 'trigger');
+            
+            // turn transform editor on then off
+            editor.toggleFreeTransform();
+            editor.toggleFreeTransform();
+            
+            
+            // dispatch mock 'mousedown' event
+            editor.onMouseDown.call(editor, mockEvent);
+            
+            console.log('after', editor.vertices.length)
+            console.log('after', editor.getCSSValue())
+            
+            expect(editor.trigger).toHaveBeenCalled();
+            expect(editor.trigger).toHaveBeenCalledWith('shapechange', editor);
+            expect(editor.vertices.length).toEqual(expectedVerticesLength);
+        });
+        
+        
         it('should have an update function', function(){
             var inValue = 'polygon(nonzero, 0px 0px, 100px 0px, 100px 100px)',
                 outValue;

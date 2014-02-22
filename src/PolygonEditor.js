@@ -290,7 +290,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         var edge,
             // need target as a Raphael obj reference; e.target won't suffice.
             target = Snap.getElementByPoint(e.x, e.y);
-        
+
         // prevent vertex editing while transform editor is on
         if (this.transformEditor){
             return;
@@ -378,7 +378,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             vertices = this.vertices,
             radius = this.config.point.radius,
             thresholdDistance = radius * radius;
-        
+
         vertices.forEach(function(v, i){
             var v0 = vertices[i],
                 v1 = vertices[(i + 1) % vertices.length];
@@ -458,8 +458,8 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
                 vertices = scope.vertices;
                 
             verticesClone.forEach(function(v, i){
-                vertices[i].x = matrix.x(v.x,v.y).toFixed();
-                vertices[i].y = matrix.y(v.x,v.y).toFixed();
+                vertices[i].x = matrix.x(v.x,v.y);
+                vertices[i].y = matrix.y(v.x,v.y);
             });
             
             scope.draw();
@@ -468,7 +468,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         if (this.transformEditor){
             this.shapeClone.remove();
             this.transformEditor.unplug();
-            delete this.transformEditor;
+            this.transformEditor = undefined;
             
             // restores vertex editing
             this.draw();
