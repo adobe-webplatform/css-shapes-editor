@@ -160,8 +160,11 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             
             args = args.map(function(arg, i){
                 
-                // third argument is the radius. special case for circle & ellipse
-                var isHeightRelated = (i === 0) ? 0 : 1; // TODO: figure this out from Francois
+                // isHeightRelated is only checked for truthy-ness
+                // 0 = cx
+                // 1 = cy
+                // 2 = radius
+                var isHeightRelated = i
                 
                 return CSSUtils.convertToPixels(arg, element, isHeightRelated);
             });
