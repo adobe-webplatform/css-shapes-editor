@@ -63,11 +63,15 @@
                     scale: true,
                     snap: { rotate: 0, scale: 0, drag: 0 },
                     snapDist: { rotate: 0, scale: 0, drag: 7 },
-                    size: 5
+                    size: 5,
+                    bodyCursor: 'auto',
+                    cornerCursors: ['nwse-resize', 'nesw-resize', 'nwse-resize', 'nesw-resize'],
+                    sideCursors: ['ns-resize', 'ew-resize', 'ns-resize', 'ew-resize']
+                    
                 },
-                subject: subject
+                subject: subject,
             };
-
+            
             /**
              * Update handles based on the element's transformations
              */
@@ -203,17 +207,20 @@
 
                     ft.handles.bbox = [];
 
-                    var i, handle;
+                    var i, handle, cursor;
 
                     for ( i = ( ft.opts.scale.indexOf('bboxCorners') >= 0 ? 0 : 4 ); i < ( ft.opts.scale.indexOf('bboxSides') === -1 ? 4 : 8 ); i ++ ) {
                         handle = {};
 
                         handle.axis     = i % 2 ? 'x' : 'y';
                         handle.isCorner = i < 4;
-
+                        
+                        cursor = (handle.isCorner) ? ft.opts.cornerCursors[i] : ft.opts.sideCursors[i - 4];
+                        
                         handle.element = paper
                             .rect(ft.attrs.center.x, ft.attrs.center.y, ft.opts.size[handle.isCorner ? 'bboxCorners' : 'bboxSides' ] * 2, ft.opts.size[handle.isCorner ? 'bboxCorners' : 'bboxSides' ] * 2)
-                            .attr(ft.opts.attrs);
+                            .attr(ft.opts.attrs)
+                            .attr('cursor', cursor);
 
                         ft.handles.bbox[i] = handle;
                     }
@@ -322,6 +329,9 @@
 
                 // Drag bbox handles
                 if ( ft.opts.draw.indexOf('bbox') >= 0 && ( ft.opts.scale.indexOf('bboxCorners') !== -1 || ft.opts.scale.indexOf('bboxSides') !== -1 ) ) {
+                    
+                    // document.body.style.cursor = cursor || 'auto'
+                    
                     ft.handles.bbox.map(function(handle) {
                         
                         var _dragMove = function(dx, dy) {
@@ -439,10 +449,20 @@
                                     y: paper._viewBox[3] / getPaperSize().y
                                 };
                             }
-
+                            
+                            // store current body cursor; @see _dragEnd()
+                            ft.opts.bodyCursor = window.getComputedStyle(document.body).cursor;
+                            
+                            // make body inherit cursor in case pointer strays while dragging
+                            document.body.style.cursor = handle.element.attr('cursor');
+                            
                             asyncCallback([ 'scale start' ]);
                         }
                         var _dragEnd = function() {
+
+                            // restore initial body cursor
+                            document.body.style.cursor = ft.opts.bodyCursor;
+
                             asyncCallback([ 'scale end' ]);
                         }
                         
@@ -455,10 +475,12 @@
 
                 if ( ft.opts.drag.indexOf('self') >= 0 && ft.opts.scale.indexOf('self') === -1 && ft.opts.rotate.indexOf('self') === -1 ) {
                     draggables.push(subject);
+                    subject.attr('cursor', 'move')
                 }
 
                 if ( ft.opts.drag.indexOf('center') >= 0 ) {
                     draggables.push(ft.handles.center.disc);
+                    ft.handles.center.disc.attr('cursor', 'move')
                 }
 
                 draggables.map(function(draggable) {
