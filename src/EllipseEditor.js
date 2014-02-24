@@ -163,8 +163,13 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             
             args = args.map(function(arg, i){
                 
-                // third argument is the radius. special case for circle & ellipse
-                var isHeightRelated = (i === 0) ? 0 : 1; // TODO: figure this out from Francois
+                // 0 = cx
+                // 1 = cy
+                // 2 = rx
+                // 3 = ry
+                
+                // if percentages, cy and ry are calculated from the element's reference box height
+                var isHeightRelated = (i === 1 || i === 3) ? true : false;
                 
                 return CSSUtils.convertToPixels(arg, element, isHeightRelated);
             });
@@ -226,7 +231,7 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             
         cx = CSSUtils.convertFromPixels(cx, this.coords.cxUnit, this.target, false);
         cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, true);
-        rx = CSSUtils.convertFromPixels(rx, this.coords.rxUnit, this.target, true);
+        rx = CSSUtils.convertFromPixels(rx, this.coords.rxUnit, this.target, false);
         ry = CSSUtils.convertFromPixels(ry, this.coords.ryUnit, this.target, true);
         
         return 'ellipse(' + [cx, cy, rx, ry].join(', ') + ')';
