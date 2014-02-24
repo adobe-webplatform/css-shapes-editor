@@ -184,6 +184,12 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
                 ry: args[3].value,
                 ryUnit: args[3].unit
             };
+
+            if (coords.rx < 0 || coords.ry < 0){
+                // remove editor DOM saffolding
+                this.remove();
+                throw new Error('Invalid negative value for ellipse() radius');
+            }
         } 
         
         return coords;

@@ -74,7 +74,66 @@ function($, markup, EllipseEditor){
             editor = new EllipseEditor(target, value);
             expect(editor.parseShape(value)).toEqual(expectedCoords);
         });
-        
+
+        it('should parse ellipse() percentage center and radii', function(){
+            var value = 'ellipse(50%, 50%, 50%, 50%)',
+                box = target.getBoundingClientRect(),
+                expectedCoords = {
+                    cx: box.width / 2,
+                    cxUnit: '%',
+                    cy: box.height / 2,
+                    cyUnit: '%',
+                    rx: box.width / 2,
+                    rxUnit: '%',
+                    ry: box.height / 2,
+                    ryUnit: '%'
+                };
+
+            editor = new EllipseEditor(target, value);
+            expect(editor.parseShape(value)).toEqual(expectedCoords);
+        });
+
+        it('should parse ellipse() percentage center', function(){
+            var value = 'ellipse(50%, 50%, 100px, 100px)',
+                box = target.getBoundingClientRect(),
+                expectedCoords = {
+                    cx: box.width / 2,
+                    cxUnit: '%',
+                    cy: box.height / 2,
+                    cyUnit: '%',
+                    rx: 100,
+                    rxUnit: 'px',
+                    ry: 100,
+                    ryUnit: 'px'
+                };
+
+            editor = new EllipseEditor(target, value);
+            expect(editor.parseShape(value)).toEqual(expectedCoords);
+        });
+
+        it('should throw error for ellipse() with negative radii', function(){
+            function setupWithNegativeCx(){
+                editor = new EllipseEditor(target, 'ellipse(-50%, 50%, 100px, 100px)');
+            }
+            function setupWithNegativeCy(){
+                editor = new EllipseEditor(target, 'ellipse(50%, -50%, 100px, 100px)');
+            }
+            function setupWithNegativeRx(){
+                editor = new EllipseEditor(target, 'ellipse(50%, 50%, -100px, 100px)');
+            }
+            function setupWithNegativeRy(){
+                editor = new EllipseEditor(target, 'ellipse(50%, 50%, 100px, -100px)');
+            }
+            
+            // negative cx and cy are ok
+            expect(setupWithNegativeCx).not.toThrow();
+            expect(setupWithNegativeCy).not.toThrow();
+            
+            // negative radius is frowned upon >:(
+            expect(setupWithNegativeRx).toThrow();
+            expect(setupWithNegativeRy).toThrow();
+        });
+
         // TODO: figure out reason for NaN in test, but correct in production
         // it('should parse legacy circle() with em units', function(){
         //     var value = 'circle(1em, 1em, 1em)',
@@ -164,10 +223,6 @@ function($, markup, EllipseEditor){
             editor.removeOffsets();
             expect(editor.coords).toEqual(expectedCoords);
         });
-        
-        // TODO: test with percentages, match the circle.html target box
-        // TODO: test with negative values
-        // TODO: test with new notation
         
         it('should have update method', function(){
             var value = 'ellipse(0, 0, 100px, 100px)';
