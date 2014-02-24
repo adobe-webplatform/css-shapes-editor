@@ -162,10 +162,10 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
                 // 0 = cx
                 // 1 = cy
                 // 2 = radius
-                var isHeightRelated = i
+                var isHeightRelated = i;
                 
                 // last argument is radius; special case for computing from %
-                var isRadius = (i == args.length - 1) ? true : false;
+                var isRadius = (i === args.length - 1) ? true : false;
                 
                 return CSSUtils.convertToPixels(arg, element, isHeightRelated, isRadius);
             });
