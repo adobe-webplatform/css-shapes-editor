@@ -137,10 +137,8 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             
         // superficial check for shape declaration
         if (typeof shape !== 'string' || !/^circle\(.*?\)/i.test(shape.trim())){
-            
             // remove editor DOM saffolding
             this.remove();
-            
             throw new Error('No circle() function definition in provided value');
         }
         
@@ -180,6 +178,12 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
                 r: args[2].value,
                 rUnit: args[2].unit
             };
+            
+            if (coords.r < 0){
+                // remove editor DOM saffolding
+                this.remove();
+                throw new Error('Invalid negative value for circle() radius: ' + coords.r + coords.rUnit);
+            }
         } 
         
         return coords;

@@ -70,6 +70,97 @@ function($, markup, CircleEditor){
             expect(editor.parseShape(value)).toEqual(expectedCoords);
         });
         
+        it('should parse circle() with percentage center and radius', function(){
+            var value = 'circle(50%, 50%, 50%)',
+                box = target.getBoundingClientRect(),
+                expectedCoords = {
+                    cx: box.width / 2,
+                    cxUnit: '%',
+                    cy: box.height / 2,
+                    cyUnit: '%',
+                    // special case for computing % radius;
+                    // @see http://www.w3.org/TR/css-shapes/#funcdef-circle
+                    r: Math.round(50 / 100 * (Math.sqrt(box.width*box.width + box.height*box.height) / Math.sqrt(2))),
+                    rUnit: '%'
+                };
+                
+            editor = new CircleEditor(target, value);
+            expect(editor.parseShape(value)).toEqual(expectedCoords);
+        });
+
+        it('should parse circle() with unit-less center and percentage radius', function(){
+            var value = 'circle(0, 0, 50%)',
+                box = target.getBoundingClientRect(),
+                expectedCoords = {
+                    cx: 0,
+                    cxUnit: 'px',
+                    cy: 0,
+                    cyUnit: 'px',
+                    // special case for computing % radius;
+                    // @see http://www.w3.org/TR/css-shapes/#funcdef-circle
+                    r: Math.round(50 / 100 * (Math.sqrt(box.width*box.width + box.height*box.height) / Math.sqrt(2))),
+                    rUnit: '%'
+                };
+                
+            editor = new CircleEditor(target, value);
+            expect(editor.parseShape(value)).toEqual(expectedCoords);
+        });
+
+        it('should parse circle() with zero percentage radius', function(){
+            var value = 'circle(400px, 200px, 0%)',
+                box = target.getBoundingClientRect(),
+                expectedCoords = {
+                    cx: 400,
+                    cxUnit: 'px',
+                    cy: 200,
+                    cyUnit: 'px',
+                    r: 0,
+                    rUnit: '%'
+                };
+                
+            editor = new CircleEditor(target, value);
+            expect(editor.parseShape(value)).toEqual(expectedCoords);
+        });
+
+        it('should parse circle() with percentage center and px radius', function(){
+            var value = 'circle(50%, 50%, 200px)',
+                box = target.getBoundingClientRect(),
+                expectedCoords = {
+                    cx: box.width / 2,
+                    cxUnit: '%',
+                    cy: box.height / 2,
+                    cyUnit: '%',
+                    r: 200,
+                    rUnit: 'px'
+                };
+                
+            editor = new CircleEditor(target, value);
+            expect(editor.parseShape(value)).toEqual(expectedCoords);
+        });
+        
+        it('should throw error for circle() with negative radius', function(){
+            function setupWithNegativeCx(){
+                editor = new CircleEditor(target, 'circle(-100px, 100px, 100px)');
+            }
+            
+            function setupWithNegativeCy(){
+                editor = new CircleEditor(target, 'circle(100px, -100px, 100px)');
+            }
+            
+            function setupWithNegativeR(){
+                editor = new CircleEditor(target, 'circle(100px, 100px, -100px)');
+            }
+            
+            // negative cx and cy are ok
+            expect(setupWithNegativeCx).not.toThrow();
+            expect(setupWithNegativeCy).not.toThrow();
+            
+            // negative radius is frowned upon >:(
+            expect(setupWithNegativeR).toThrow();
+        });
+        
+        // TODO: test with new notation
+        
         // TODO: figure out reason for NaN in test, but correct in production
         // it('should parse legacy circle() with em units', function(){
         //     var value = 'circle(1em, 1em, 1em)',
@@ -171,10 +262,6 @@ function($, markup, CircleEditor){
             expect(setupWithCorrect).not.toThrow();
             expect(setupWithWhitespacedCorrect).not.toThrow();
         });
-        
-        // TODO: test with percentages, match the circle.html target box
-        // TODO: test with negative values
-        // TODO: test with new notation
         
         it('should have update method', function(){
             var value = 'circle(0, 0, 100px)';
