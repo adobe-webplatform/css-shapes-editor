@@ -27,7 +27,7 @@ define(function(){
             // special case for computing radius for circle()
             // @see http://www.w3.org/TR/css-shapes/#funcdef-circle
             if (isRadius){
-                return x/100 * (Math.sqrt(box.height * box.height + box.width * box.width) / Math.sqrt(2));
+                return Math.round(x/100 * (Math.sqrt(box.height * box.height + box.width * box.width) / Math.sqrt(2)));
             }
             
             
@@ -61,7 +61,7 @@ define(function(){
             // special case for computing radius for circle()
             // @see http://www.w3.org/TR/css-shapes/#funcdef-circle
             if (isRadius){
-                return x*100/(Math.sqrt(box.height*box.height+box.width*box.width)/Math.sqrt(2));
+                return Math.round(x*100/(Math.sqrt(box.height*box.height+box.width*box.width)/Math.sqrt(2)));
             }
             
             // otherwise, we use the width or height
