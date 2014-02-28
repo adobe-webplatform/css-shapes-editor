@@ -317,16 +317,25 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
                     yUnits: this.config.yUnit,
                 });
                 
-                this.draw();
-                
                 this.activeVertex = Snap.getElementByPoint(e.x, e.y);
                 this.activeVertexIndex = edge.index1;
+                
+                this.draw();
             }
-        } 
+        }
         
         if (!this.activeVertex || typeof this.activeVertexIndex !== 'number'){
             return;
         }
+        
+        // store default cursor, restored later; @see handleDragging() > _mouseUp()
+        this.paper.data('default-cursor', window.getComputedStyle(this.paper.node)['cursor']);
+        
+        // non-webkit browsers will ignore this cursor and keep the default one set in draw()
+        this.activeVertex.attr('cursor', '-webkit-grabbing');
+        
+        // apply cursor on parent paper for consistent UI when user drags quickly
+        this.paper.attr('cursor', '-webkit-grabbing');
         
         // attaches mousemove and mouseup
         this.handleDragging();
@@ -340,9 +349,18 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         
         var _mouseUp = function(){
             return function(){
+                // non-webkit-browsers will have ignored the original setting
+                this.points[this.activeVertexIndex].attr('cursor','-webkit-grab');
+                
                 this.activeVertex = null;
                 this.activeVertexIndex = -1;
                 this.holder.removeEventListener('mousemove', _mouseMove);
+                
+                this.paper.attr('cursor', this.paper.data('default-cursor'));
+
+                this.holder.removeEventListener('mousemove', _mouseMove)
+                this.holder.removeEventListener('mouseup', _mouseUp)
+
             }.call(scope);
         };
         
@@ -415,15 +433,22 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             config = this.config,
             drawVertices = this.transformEditor ? false : true,
             points = this.points,
-            commands = [];
+            commands = [],
+            activeVertexIndex = this.activeVertexIndex;
             
         this.points.clear();
         
         this.vertices.forEach(function(v, i) {
             if (drawVertices){
                 var point = paper.circle(v.x, v.y, config.point.radius);
+
                 point.attr(config.point);
                 point.data('vertex-index', i);
+                point.attr('cursor', 'pointer');
+
+                // non-webkit browsers will ignore '-webkit-grab' and keep 'pointer'
+                point.attr('cursor', (activeVertexIndex === i) ? '-webkit-grabbing' : '-webkit-grab');
+                
                 points.add(point);
             }
             
