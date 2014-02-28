@@ -44,11 +44,14 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         // Sets up: this.holder, this.paper, this.snap, this.offsets
         Editor.prototype.setup.call(this);
         
+        this.shape = this.paper.circle().attr('fill', 'rgba(0, 0, 0, 0)');
+        
+        // Apply decorations for the shape
+        Editor.prototype.setupShapeDecoration.call(this, this.config.path);
+        
         this.setupCoordinates();
+        this.setupShapeDecoration();
         
-        this.shape = this.paper.circle().attr(this.config.path);
-        
-        // TODO: throttle sensibly
         window.addEventListener('resize', this.refresh.bind(this));
     };
     

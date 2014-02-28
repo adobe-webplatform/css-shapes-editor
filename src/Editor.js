@@ -84,6 +84,35 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
             this.offsets.top = rect.top + window.scrollY + box.top;
         },
         
+        /*
+            Visually decorates this.shape
+            
+            Uses stacked `<use>` SVG elements based on the shape,
+            with different styling to achieve complex decoration, such as the two-color dashed outlines
+            
+            @param {Array} path An array with objects with decoration attributes.
+            
+        */
+        setupShapeDecoration: function(path) {
+            if (!path){
+                return
+            }
+            
+            // enforce an array of path attribute objects
+            if (typeof path == 'object' && typeof path.length !== 'number'){
+                path = [path];
+            }
+            
+            var shape = this.shape;
+            var group = this.paper.group();
+            
+            path.forEach(function(pathAttr){
+                group.add(shape.use().attr(pathAttr))
+            })
+            
+            group.toBack();
+        },
+        
         remove: function() {
             var holder = this.holder;
             

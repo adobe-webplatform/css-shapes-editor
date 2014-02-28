@@ -75,10 +75,22 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         
         this.points = this.paper.g();
         
-        // polygon path to visualize the shape
-        this.shape = this.paper.path().attr('fill','none');
+        // polygon path to visualize the shape; transparent fill tricks transform editor to accept self-drag
+        this.shape = this.paper.path().attr('fill', 'rgba(0, 0, 0, 0)');
         
-        this.setupShapeDecoration();
+        /*
+            Using a `<use>` SVG element with a thicker, invisible stroke and crosshair cursor
+            to make it visibly affordable to users that the area immediately around the polygon outline 
+            registers mouse events
+        */
+        this.shape.use().attr({
+           stroke: 'rgba(0, 0, 0, 0)',
+           cursor: 'crosshair',
+           'stroke-width': this.edgeClickThresholdDistance / 2
+        }).toBack();
+        
+        // Apply decorations for the shape
+        Editor.prototype.setupShapeDecoration.call(this, this.config.path);
         
         window.addEventListener('resize', this.refresh.bind(this));
         this.holder.addEventListener('mousedown', this.onMouseDown.bind(this));
@@ -95,31 +107,6 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         this.polygonFillRule = this.vertices.polygonFillRule || 'nonzero';
     };
     
-    /*
-        Using two stacked `<use>` SVG elements based on the polygon <path>,
-        with different styling to achieve the two-color dashed outline decoration.
-        
-        Using a third `<use>` SVG element with a thicker, invisible stroke and crosshair cursor
-        to make it visible that the area immediately around the polygon outline registers events.
-    */
-    PolygonEditor.prototype.setupShapeDecoration = function(){
-        var deco1, deco2, hitArea;
-        
-        deco1 = this.shape.use().attr(this.config.path);
-        
-        deco2 = this.shape.use().attr({
-            'stroke-dasharray': 'none',
-            'stroke': 'rgba(252, 252, 252, 0.5)'
-        });
-        
-        hitArea = this.shape.use().attr({
-           stroke: 'rgba(0, 0, 0, 0)',
-           cursor: 'crosshair',
-           'stroke-width': this.edgeClickThresholdDistance / 2
-        });
-        
-        this.paper.group(deco2, deco1, hitArea).toBack();
-    };
     
     PolygonEditor.prototype.update = function(value){
         var hadEditor = (this.transformEditor !== undefined);

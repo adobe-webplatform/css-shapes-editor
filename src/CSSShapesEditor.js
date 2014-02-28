@@ -8,11 +8,16 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
     function CSSShapesEditor(target, value, options){
         
         var _defaults = {
-            path: {
-                stroke: 'rgba(0, 192, 238, 1)',
-                'stroke-dasharray': '4, 5',
-                fill: 'rgba(0,0,0,0)' // required; tricks transform editor to accept self-drag
-            },
+            // multiple objects with attributes are used into separate <use> objects for the shape path
+            path: [
+                {
+                    stroke: 'rgba(255, 255, 255, 0.5)',
+                },
+                {
+                    stroke: 'rgba(0, 192, 238, 1)',
+                    'stroke-dasharray': '4, 5'
+                }
+            ],
             point: {
                 radius: 4,
                 stroke: 'rgba(0, 192, 238, 1)',
