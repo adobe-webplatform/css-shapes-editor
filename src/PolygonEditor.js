@@ -50,8 +50,8 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         
         this.config = _.extend({}, _defaults, options);
         
-        // SVG object reference of vertex being dragged
-        this.activeVertex = null;
+        // tolerance for clicks close to the polygon edge to register as valid
+        this.edgeClickThresholdDistance = this.config.point.radius * this.config.point.radius;
         
         // Index of vertex being dragged
         this.activeVertexIndex = -1;
@@ -76,9 +76,10 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         this.points = this.paper.g();
         
         // polygon path to visualize the shape
-        this.shape = this.paper.path().attr(this.config.path).attr('fill','none');
+        this.shape = this.paper.path().attr('fill','none');
         
-        // TODO: throttle sensibly
+        this.setupShapeDecoration();
+        
         window.addEventListener('resize', this.refresh.bind(this));
         this.holder.addEventListener('mousedown', this.onMouseDown.bind(this));
         this.holder.addEventListener('dblclick', this.onDblClick.bind(this));
@@ -92,6 +93,32 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         }
         
         this.polygonFillRule = this.vertices.polygonFillRule || 'nonzero';
+    };
+    
+    /*
+        Using two stacked `<use>` SVG elements based on the polygon <path>,
+        with different styling to achieve the two-color dashed outline decoration.
+        
+        Using a third `<use>` SVG element with a thicker, invisible stroke and crosshair cursor
+        to make it visible that the area immediately around the polygon outline registers events.
+    */
+    PolygonEditor.prototype.setupShapeDecoration = function(){
+        var deco1, deco2, hitArea;
+        
+        deco1 = this.shape.use().attr(this.config.path);
+        
+        deco2 = this.shape.use().attr({
+            'stroke-dasharray': 'none',
+            'stroke': 'rgba(252, 252, 252, 0.5)'
+        });
+        
+        hitArea = this.shape.use().attr({
+           stroke: 'rgba(0, 0, 0, 0)',
+           cursor: 'crosshair',
+           'stroke-width': this.edgeClickThresholdDistance / 2
+        });
+        
+        this.paper.group(deco2, deco1, hitArea).toBack();
     };
     
     PolygonEditor.prototype.update = function(value){
@@ -298,8 +325,6 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         
         // check if target is a vertex representation i.e. draggable point
         if (target && target.data && typeof target.data('vertex-index') === 'number'){
-            
-            this.activeVertex = target;
             this.activeVertexIndex = parseInt(target.data('vertex-index'), 10);
             
         } else {
@@ -317,14 +342,13 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
                     yUnits: this.config.yUnit,
                 });
                 
-                this.activeVertex = Snap.getElementByPoint(e.x, e.y);
                 this.activeVertexIndex = edge.index1;
                 
                 this.draw();
             }
         }
         
-        if (!this.activeVertex || typeof this.activeVertexIndex !== 'number'){
+        if (this.activeVertexIndex === -1){
             return;
         }
         
@@ -332,7 +356,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         this.paper.data('default-cursor', window.getComputedStyle(this.paper.node)['cursor']);
         
         // non-webkit browsers will ignore this cursor and keep the default one set in draw()
-        this.activeVertex.attr('cursor', '-webkit-grabbing');
+        this.points[this.activeVertexIndex].attr('cursor', '-webkit-grabbing');
         
         // apply cursor on parent paper for consistent UI when user drags quickly
         this.paper.attr('cursor', '-webkit-grabbing');
@@ -349,17 +373,17 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         
         var _mouseUp = function(){
             return function(){
+                
                 // non-webkit-browsers will have ignored the original setting
-                this.points[this.activeVertexIndex].attr('cursor','-webkit-grab');
+                this.points[this.activeVertexIndex].attr('cursor', '-webkit-grab');
                 
-                this.activeVertex = null;
                 this.activeVertexIndex = -1;
-                this.holder.removeEventListener('mousemove', _mouseMove);
                 
+                // restore cursor
                 this.paper.attr('cursor', this.paper.data('default-cursor'));
 
-                this.holder.removeEventListener('mousemove', _mouseMove)
-                this.holder.removeEventListener('mouseup', _mouseUp)
+                this.holder.removeEventListener('mousemove', _mouseMove);
+                this.holder.removeEventListener('mouseup', _mouseUp);
 
             }.call(scope);
         };
@@ -394,8 +418,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
     PolygonEditor.prototype.polygonEdgeNear = function(p){
         var edge = null,
             vertices = this.vertices,
-            radius = this.config.point.radius,
-            thresholdDistance = radius * radius;
+            thresholdDistance = this.edgeClickThresholdDistance;
 
         vertices.forEach(function(v, i){
             var v0 = vertices[i],

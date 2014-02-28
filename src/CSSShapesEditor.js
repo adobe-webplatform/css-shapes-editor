@@ -10,7 +10,7 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
         var _defaults = {
             path: {
                 stroke: 'rgba(0, 192, 238, 1)',
-                'stroke-dasharray': '4, 3',
+                'stroke-dasharray': '4, 5',
                 fill: 'rgba(0,0,0,0)' // required; tricks transform editor to accept self-drag
             },
             point: {
