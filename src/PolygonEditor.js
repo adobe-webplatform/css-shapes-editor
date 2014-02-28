@@ -84,9 +84,9 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             registers mouse events
         */
         this.shape.use().attr({
-           stroke: 'rgba(0, 0, 0, 0)',
-           cursor: 'crosshair',
-           'stroke-width': this.edgeClickThresholdDistance / 2
+            stroke: 'rgba(0, 0, 0, 0)',
+            cursor: 'crosshair',
+            'stroke-width': this.edgeClickThresholdDistance / 2
         }).toBack();
         
         // Apply decorations for the shape
@@ -340,7 +340,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         }
         
         // store default cursor, restored later; @see handleDragging() > _mouseUp()
-        this.paper.data('default-cursor', window.getComputedStyle(this.paper.node)['cursor']);
+        this.paper.data('default-cursor', window.getComputedStyle(this.paper.node).cursor);
         
         // non-webkit browsers will ignore this cursor and keep the default one set in draw()
         this.points[this.activeVertexIndex].attr('cursor', '-webkit-grabbing');

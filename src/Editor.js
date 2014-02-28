@@ -95,11 +95,11 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
         */
         setupShapeDecoration: function(path) {
             if (!path){
-                return
+                return;
             }
             
             // enforce an array of path attribute objects
-            if (typeof path == 'object' && typeof path.length !== 'number'){
+            if (typeof path === 'object' && typeof path.length !== 'number'){
                 path = [path];
             }
             
@@ -107,8 +107,8 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
             var group = this.paper.group();
             
             path.forEach(function(pathAttr){
-                group.add(shape.use().attr(pathAttr))
-            })
+                group.add(shape.use().attr(pathAttr));
+            });
             
             group.toBack();
         },
