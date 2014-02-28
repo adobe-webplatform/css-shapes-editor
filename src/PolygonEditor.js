@@ -54,7 +54,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         this.activeVertex = null;
         
         // Index of vertex being dragged
-        this.activeVertexIndex = null;
+        this.activeVertexIndex = -1;
         
         this.setup();
         this.applyOffsets();
@@ -300,7 +300,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         if (target && target.data && typeof target.data('vertex-index') === 'number'){
             
             this.activeVertex = target;
-            this.activeVertexIndex = target.data('vertex-index');
+            this.activeVertexIndex = parseInt(target.data('vertex-index'), 10);
             
         } else {
             
@@ -341,7 +341,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         var _mouseUp = function(){
             return function(){
                 this.activeVertex = null;
-                this.activeVertexIndex = null;
+                this.activeVertexIndex = -1;
                 this.holder.removeEventListener('mousemove', _mouseMove);
             }.call(scope);
         };
