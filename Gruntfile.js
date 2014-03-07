@@ -8,35 +8,35 @@
 // 'test/spec/**/*.js'
 
 module.exports = function (grunt) {
-  
+
     'use strict';
-  
+
     require('load-grunt-tasks')(grunt, {
         pattern: ['grunt-*', '!grunt-template-jasmine-requirejs']
     });
-   
+
     var pkg = grunt.file.readJSON("package.json");
 
     grunt.initConfig({
-        
+
         // configurable paths
         yeoman: {
             src: 'src',
             dist: 'dist',
             test: 'test'
         },
-        
+
         banner: grunt.file.read('./COPYRIGHT')
                     .replace(/@NAME/, pkg.name)
                     .replace(/@DESCRIPTION/, pkg.description)
                     .replace(/@VERSION/, pkg.version)
                     .replace(/@DATE/, grunt.template.today("yyyy-mm-dd")),
-        
+
         watch: {
             files: ['<%= yeoman.src %>/{,*/}*.js'],
             // tasks: ['jshint']
         },
-        
+
         jshint: {
             options: {
                 jshintrc: '.jshintrc'
@@ -47,7 +47,7 @@ module.exports = function (grunt) {
             ],
             dist: ['<%= yeoman.dist %>/*.js']
         },
-        
+
         jasmine: {
             src: '<%= yeoman.src %>/*.js',
             options: {
@@ -62,46 +62,46 @@ module.exports = function (grunt) {
                 }
             }
         },
-        
+
         requirejs: {
-          compile: {
-            options: {
-              baseUrl: '<%= yeoman.src %>',
-              mainConfigFile: '<%= yeoman.src %>/main.js',
-              out: pkg.main,
-              name: 'main',
-              include: ['third-party/almond/almond'],
-              wrap: {         
-                  startFile: '<%= yeoman.src %>/fragments/start.frag',
-                  endFile: '<%= yeoman.src %>/fragments/end.frag'
-              },
-              optimize: 'none'
+            compile: {
+                options: {
+                    baseUrl: '<%= yeoman.src %>',
+                    mainConfigFile: '<%= yeoman.src %>/main.js',
+                    out: pkg.main,
+                    name: 'main',
+                    include: ['third-party/almond/almond'],
+                    wrap: {
+                        startFile: '<%= yeoman.src %>/fragments/start.frag',
+                        endFile: '<%= yeoman.src %>/fragments/end.frag'
+                    },
+                    optimize: 'none'
+                }
             }
-          }
         },
-        
+
         usebanner: {
             dist: {
-              options: {
-                position: 'top',
-                banner: '<%= banner %>'
-              },
-              files: {
-                src: [ pkg.main ]
-              }
+                options: {
+                    position: 'top',
+                    banner: '<%= banner %>'
+                },
+                files: {
+                    src: [ pkg.main ]
+                }
             }
         }
     });
-    
-    grunt.registerTask('build', ['jshint:src', 'requirejs', 'usebanner'])
-    
-    grunt.registerTask('test', ['jasmine'])
-    
-    grunt.registerTask('lint', ['jshint:src'])
+
+    grunt.registerTask('build', ['jshint:src', 'requirejs', 'usebanner']);
+
+    grunt.registerTask('test', ['jasmine']);
+
+    grunt.registerTask('lint', ['jshint:src']);
 
     grunt.registerTask('default', [
         'jshint:src',
         // 'test',
         // 'build'
-    ]); 
+    ]);
 };
