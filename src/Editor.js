@@ -12,10 +12,20 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
 
         this.target = target;
         this.value = value;
-        this.holder = null; // setup by setupEditorHolder()
+
+        // container for editor SVG element;
+        // set up by setupEditorHolder()
+        this.holder = null;
+
+        // default reference box for shape coordinate system
+        this.defaultRefBox = 'margin-box';
+
+        // reference box for coordinate system as parsed from shape value
+        // set up by parseShape() higher in the prototype chanin
+        this.refBox = this.defaultRefBox;
 
         // target element offsets with regards to the page
-        // setup by setupOffsets()
+        // set up by setupOffsets() higher in the prototype chain
         this.offsets = {
             left: 0,
             top: 0
@@ -76,7 +86,7 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
 
         setupOffsets: function() {
             var rect = this.target.getBoundingClientRect(),
-                box = CSSUtils.getContentBoxOf(this.target);
+                box = CSSUtils.getBox(this.target, this.refBox);
 
             this.offsets.left = rect.left + window.scrollX + box.left;
             this.offsets.top = rect.top + window.scrollY + box.top;

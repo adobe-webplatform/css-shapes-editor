@@ -1,3 +1,4 @@
+/*global require, jasmine */
 require.config({
     // set baseUrl to src/
     baseUrl: '../src/',
@@ -18,9 +19,11 @@ require([
     'spec/PolygonEditorSpec',
     'spec/CircleEditorSpec',
     'spec/EllipseEditorSpec',
-    'spec/RectangleEditorSpec'
-    ], function(){
+    'spec/RectangleEditorSpec',
+    'spec/CSSUtilsSpec'
+], function(){
+    'use strict';
     var env = jasmine.getEnv();
-    env.addReporter(new jasmine.HtmlReporter);
+    env.addReporter(new jasmine.HtmlReporter());
     env.execute();
 });

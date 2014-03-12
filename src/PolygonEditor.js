@@ -60,21 +60,23 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         this.activeVertexIndex = -1;
 
         this.setup();
-        this.applyOffsets();
-        this.draw();
+        
+        this.update(this.value);
     }
 
     PolygonEditor.prototype = Object.create(Editor.prototype);
     PolygonEditor.prototype.constructor = PolygonEditor;
 
     PolygonEditor.prototype.setup = function(){
+        // parse corods from shape or infer;
+        // needs to happen before Editor.setup() in order to parse the reference box which will be used in setupOffsets()
+        this.setupCoordinates();
+
         /*
             Sets up: this.holder, this.paper, this.snap, this.offsets
             Called manually so you have the option to implement a different drawing surface
         */
         Editor.prototype.setup.call(this);
-
-        this.setupCoordinates();
 
         this.points = this.paper.g();
 
@@ -113,8 +115,15 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
     PolygonEditor.prototype.update = function(value){
         var hadEditor = (this.transformEditor !== undefined);
 
-        this.value = value;
+        if (value === 'none'){
+            // early return for 'none' shape;
+            // remove editor DOM scaffolding
+            this.remove();
 
+            return;
+        }
+
+        this.value = value;
         this.removeOffsets();
         this.setupCoordinates();
         this.applyOffsets();
@@ -153,18 +162,16 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
     */
     PolygonEditor.prototype.parseShape = function(shape, element){
         var coords = [],
+            defaultRefBox = this.defaultRefBox,
             infos;
 
         // superficial check for shape declaration
         if (typeof shape !== 'string' || !/^polygon\(.*?\)/i.test(shape.trim())){
-
-            // remove editor DOM scaffolding
             this.remove();
-
             throw new Error('No polygon() function definition in provided value');
         }
 
-        infos = /polygon\s*\((?:([a-z]*),)?\s*((?:[-+0-9.]+[a-z%]*|\s|\,)*)\)?\s*/i.exec(shape.trim());
+        infos = /polygon\s*\((?:([a-z]*),)?\s*((?:[-+0-9.]+[a-z%]*|\s|\,)*)\)\s*((?:margin|content|border|padding)\-box)?/i.exec(shape.trim());
 
         if (infos && infos[2].length > 0){
             coords = (
@@ -175,11 +182,12 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
                 .map(function(pair) {
 
                     var points = pair.split(' ').map(function(pointString, i) {
+                        var options = {
+                            boxType: infos[3] || defaultRefBox,
+                            isHeightRelated: true
+                        };
 
-                        // TODO: what about calc(...)?
-                        var isHeightRelated = true;
-
-                        return CSSUtils.convertToPixels(pointString, element, isHeightRelated);
+                        return CSSUtils.convertToPixels(pointString, element, options);
                     });
 
                     if( !points[0] ) { points[0] = { value: 0 }; }
@@ -196,6 +204,9 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             );
 
             coords.polygonFillRule = infos[1] || null;
+
+            // expose reference box type
+            this.refBox = infos[3] || this.defaultRefBox;
         }
 
         // polygons need at least 3 coords; bail out and let editor infer from element's shape
@@ -244,6 +255,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             element = this.target,
             // @see http://dev.w3.org/csswg/css-shapes/#typedef-fill-rule
             fillRule = this.polygonFillRule,
+            refBox = this.refBox,
             path;
 
         path = this.vertices.map(function(vertex, i){
@@ -254,8 +266,8 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             y = Math.ceil(vertex.y - offsetTop);
 
             // turn px value into original units
-            xCoord = CSSUtils.convertFromPixels(x, vertex.xUnit, element, false);
-            yCoord = CSSUtils.convertFromPixels(y, vertex.yUnit, element, false);
+            xCoord = CSSUtils.convertFromPixels(x, vertex.xUnit, element, { isHeightRelated: false, boxType: refBox });
+            yCoord = CSSUtils.convertFromPixels(y, vertex.yUnit, element, { isHeightRelated: false, boxType: refBox });
 
             // return space-separted pair
             return [xCoord, yCoord].join(' ');
