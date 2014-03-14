@@ -137,61 +137,94 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             defaultRefBox = this.defaultRefBox,
             coords,
             infos,
-            args;
+            args = [],
+            centerParts,
+            shapeRE;
 
         // superficial check for shape declaration
         if (typeof shape !== 'string' || !/^circle\(.*?\)/i.test(shape.trim())){
             throw new Error('No circle() function definition in provided value');
         }
 
-        infos = /circle\s*\(((?:\s*[-+0-9.]+[a-z%]*\s*,*\s*){3})\s*\)\s*((?:margin|content|border|padding)\-box)?/i.exec(shape.trim());
+        /*
+        Regular expression for matching circle shapes
 
-        if (infos){
-            if (!infos[1]){
-                return;
-            }
+        matches:
+        circle(<radius>? [at (<length>|<pos>){1,2}]?) <reference-box>?
 
-            args = infos[1].replace(/\s+/g, '').split(',');
+        examples:
+        circle()
+        circle(50%)
+        circle(50% at center)
+        circle(50% at center top)
+        circle(50% at 100px)
+        circle(50% at 100px 10rem)
+        circle(50% at 100px 10rem) border-box;
 
-            // incomplete circle definition
-            if (args.length < 3){
-                return;
-            }
+        TODO: handle 'closest-side' and 'farthest-side'
+        */
+        shapeRE = /circle\s*\((\s*[0-9\.]+[a-z%]{0,3})?(?:\s*at((?:\s+(?:top|right|bottom|left|center|-?[0-9\.]+[a-z%]{0,3})){1,2}))?\s*\)\s*((?:margin|content|border|padding)-box)?/i;
 
-            args = args.map(function(arg, i){
-                var options = {};
+        /*
+        infos[1] = radius
+        infos[2] = center coordinates, space separated x and y
+        infos[3] = reference box
+        */
+        infos = shapeRE.exec(shape.trim());
 
-                options.boxType = infos[2] || defaultRefBox;
-
-                // last argument is radius; special case for computing from %
-                options.isRadius = (i === args.length - 1) ? true : false;
-
-                // isHeightRelated = `true` makes the algorithm compute % from the box's height
-                // 0 = cx
-                // 1 = cy
-                // 2 = radius
-                options.isHeightRelated = (i === 0) ? false : true;
-
-                return CSSUtils.convertToPixels(arg, element, options);
-            });
-
-            coords = {
-                cx: args[0].value,
-                cxUnit: args[0].unit,
-                cy: args[1].value,
-                cyUnit: args[1].unit,
-                r: args[2].value,
-                rUnit: args[2].unit
-            };
-
-            if (coords.r < 0){
-                // remove editor DOM saffolding
-                this.remove();
-                throw new Error('Invalid negative value for circle() radius: ' + coords.r + coords.rUnit);
-            }
-
-            this.refBox = infos[2] || this.defaultRefBox;
+        // didn't match a circle shape; bail out and infer everything
+        if (!infos){
+            return;
         }
+
+        // if no radius given, assume 50%
+        args.push(infos[1] || '50%');
+
+        // if no center coords given, assume 50% 50%
+        if (!infos[2]){
+            args.push('50%');
+            args.push('50%');
+        }
+        else{
+            // TODO map out center / top / bottom etc...
+            centerParts = infos[2].trim().split(/\s+/);
+
+            // center X
+            args.push(centerParts[0]);
+
+            // center Y or assume 50%
+            args.push(centerParts[1] || '50%');
+        }
+
+        this.refBox = infos[3] || this.defaultRefBox;
+
+        // args[0] = radius
+        // args[1] = cx
+        // args[2] = cy
+        args = args.map(function(arg, i){
+            var options = {};
+
+            options.boxType = infos[3] || defaultRefBox;
+
+            // last argument is radius; special case for computing from %
+            options.isRadius = (i === 0) ? true : false;
+
+            // `isHeightRelated = true` makes the algorithm compute % from the box's height
+            options.isHeightRelated = (i !== 1) ? true : false;
+
+            return CSSUtils.convertToPixels(arg, element, options);
+        });
+
+        console.log(args);
+
+        coords = {
+            r: args[0].value,
+            rUnit: args[0].unit,
+            cx: args[1].value,
+            cxUnit: args[1].unit,
+            cy: args[2].value,
+            cyUnit: args[2].unit
+        };
 
         return coords;
     };
@@ -236,8 +269,8 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         cx = CSSUtils.convertFromPixels(cx, this.coords.cxUnit, this.target, { isHeightRelated: false, boxType: this.refBox });
         cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, { isHeightRelated: true, boxType: this.refBox });
         r = CSSUtils.convertFromPixels(r, this.coords.rUnit, this.target, { isHeightRelated: true, isRadius: true, boxType: this.refBox });
-        
-        return 'circle(' + [cx, cy, r].join(', ') + ')';
+
+        return 'circle(' + [r, 'at', cx, cy].join(' ') + ')' + this.refBox;
     };
 
     CircleEditor.prototype.toggleFreeTransform = function(){
