@@ -4,22 +4,22 @@
 // see main.js for path mapping config
 define(['jquery', 'text!spec/test-files/markup.html', 'CSSShapesEditor', 'PolygonEditor', 'CircleEditor'],
 function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
-    
+
     // create fixture placeholder for other suites
     $('body').append($('<div id="test-fixture"></div>'))
-    
+
     describe('CSSShapesEditor', function(){
-        var editor, 
-            target, 
+        var editor,
+            target,
             value = 'polygon(nonzero, 0 0, 100px 0, 100px 100px)',
             $fixture = $('#test-fixture').html(markup);
-            
+
         beforeEach(function(){
             // inject markup for test
             $fixture.html(markup)
             target = $('#test-shape')[0]
         })
-        
+
         afterEach(function(){
             editor.remove()
             $fixture.empty()
@@ -29,38 +29,38 @@ function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
             editor = new CSSShapesEditor(target, value);
             expect(editor).toBeDefined();
         });
-        
+
         it('should return throw error when setup with undefined value', function(){
             function setupWithUndefined(){
                 editor = new CSSShapesEditor(undefined, undefined);
             }
-            
+
             function setupWithNull(){
                 editor = new CSSShapesEditor(null, null);
             }
-            
+
             expect(setupWithUndefined).toThrow();
             expect(setupWithNull).toThrow();
         });
 
         it('should return instance of polygon editor', function(){
             var value = 'polygon(nonzero, 0 0, 100px 0, 100px 100px)';
-            
+
             editor = new CSSShapesEditor(target, value);
             expect(editor instanceof PolygonEditor).toBe(true);
         });
 
         it('should return instance of polygon editor with type polygon', function(){
             var value = 'polygon(nonzero, 0 0, 100px 0, 100px 100px)';
-            
+
             editor = new CSSShapesEditor(target, value);
             expect(editor instanceof PolygonEditor).toBe(true);
             expect(editor.type).toBe('polygon');
         });
 
         it('should return instance of circle editor', function(){
-            var value = 'circle(50%, 50%, 50%)';
-            
+            var value = 'circle(50% at 50% 50%)';
+
             editor = new CSSShapesEditor(target, value);
             expect(editor instanceof CircleEditor).toBe(true);
         });
@@ -74,7 +74,7 @@ function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
 
             expect(setup).toThrow();
         });
-        
+
         it('should throw error for invalid value', function(){
             var setupWithUndefined = function() {
                 editor = new CSSShapesEditor(target, undefined);
@@ -96,7 +96,7 @@ function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
             expect(setupWithNull).toThrow();
             expect(setupWithEmpty).toThrow();
             expect(setupWithZero).toThrow();
-        })
+        });
 
         it('should throw error for invalid target', function(){
             var setupWithUndefined = function() {
@@ -113,9 +113,9 @@ function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
 
             var setupWithZero = function() {
                 editor = new CSSShapesEditor(0, value);
-            }; 
-            
-            
+            };
+
+
             expect(setupWithUndefined).toThrow();
             expect(setupWithNull).toThrow();
             expect(setupWithEmpty).toThrow();
@@ -123,4 +123,3 @@ function($, markup, CSSShapesEditor, PolygonEditor, CircleEditor){
         });
     });
 });
-
