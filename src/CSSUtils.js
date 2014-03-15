@@ -213,6 +213,129 @@ define(function(){
         return box;
     }
 
+    /*
+        Decode a position string into x/y coordinates for an origin such as:
+            - circle() / ellipse() center
+            - transform-origin
+            - background-position
+
+        Returns an object with x, y positions for the origin as:
+            - original CSS units, if input is in units
+            - percentages, if input is position keywords like 'center', 'top', 'left', 'bottom'
+
+        @param {String} str String with one or two string-separated position details for x / y
+        @return {Object} with x, y keys and CSS unit string values
+
+        @example "center 50px" -> {x: '50%', y: '50px'}
+    */
+    function getOriginCoords(str){
+        if (!str || typeof str !== 'string'){
+            throw new TypeError('Invalid input, expected string, got ' + str);
+        }
+
+        var xPos = ['left', 'right'],
+            yPos = ['top', 'bottom'],
+            defaultXPos = '50%',
+            defaultYPos = '50%',
+            origin = {},
+            posMap = {
+                'top': '0%',
+                'right': '100%',
+                'left': '0%',
+                'bottom': '100%',
+                'center': '50%'
+            };
+
+        var parts = str.trim().split(/\s+/);
+
+        switch (parts.length){
+            case 1:
+                if (xPos.indexOf(parts[0]) > -1) {
+                    origin.x = posMap[parts[0]];
+                    origin.y = defaultYPos;
+                    break;
+                }
+
+                if (yPos.indexOf(parts[0]) > -1) {
+                    origin.x = defaultXPos;
+                    origin.y = posMap[parts[0]];
+                    break;
+                }
+
+                if (parts[0] === 'center') {
+                    origin.x = defaultXPos;
+                    origin.y = defaultYPos;
+                } else {
+                    // input is assumed css unit, like 100px, 33rem, etc.
+                    origin.x = parts[0];
+                    origin.y = defaultYPos;
+                }
+                break;
+
+            case 2:
+
+                /* Invalid cases:
+                    0 in xPos
+                    1 in xPos
+                    ---
+                    0 in yPos
+                    1 in yPos
+                    ---
+                    0 in yPos
+                    1 is not in xPos or 'center'
+                    ---
+                    0 is not in yPos or 'center'
+                    1 in xPos
+                */
+                if (( xPos.indexOf(parts[0]) > -1 && xPos.indexOf(parts[1]) > -1 ) ||
+                    ( yPos.indexOf(parts[0]) > -1 && yPos.indexOf(parts[1]) > -1 ) ||
+                    ( yPos.indexOf(parts[0]) > -1 && xPos.concat('center').indexOf(parts[1]) < 0)  ||
+                    ( xPos.indexOf(parts[1]) > -1 && yPos.concat('center').indexOf(parts[0]) < 0) ) {
+
+                    throw new Error('Invalid origin string provided: ' + str);
+                }
+
+                if (xPos.indexOf(parts[0]) > -1) {
+                    origin.x = posMap[parts[0]];
+                    // assume y is either keyword or css unit
+                    origin.y = posMap[parts[1]] || parts[1];
+                    break;
+                }
+
+                if (yPos.indexOf(parts[0]) > -1) {
+                    // assume x is either keyword or css unit
+                    origin.x = posMap[parts[1]] || parts[1];
+                    origin.y = posMap[parts[0]];
+                    break;
+                }
+
+                if (yPos.indexOf(parts[1]) > -1) {
+                    // assume x is either keyword or css unit
+                    origin.x = posMap[parts[0]] || parts[0];
+                    origin.y = posMap[parts[1]];
+                    break;
+                }
+
+                if (parts[0] === 'center'){
+                    origin.x = defaultXPos;
+                    origin.y = posMap[parts[1]] || parts[1];
+                    break;
+                }
+
+                if (parts[1] === 'center'){
+                    origin.x = posMap[parts[0]] || parts[0];
+                    origin.y = defaultYPos;
+                    break;
+                }
+
+                origin.x = parts[0];
+                origin.y = parts[1];
+                break;
+        }
+
+        return origin;
+    }
+
     function Utils(){
 
         if (!(this instanceof Utils)){
@@ -223,6 +346,7 @@ define(function(){
             'convertToPixels': convertToPixels,
             'convertFromPixels': convertFromPixels,
             'getContentBoxOf': getContentBoxOf,
+            'getOriginCoords': getOriginCoords,
             'getBox': getBox
         };
     }
