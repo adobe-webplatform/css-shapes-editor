@@ -178,36 +178,36 @@ define(function(){
         };
 
         switch (boxType){
-            case 'content-box':
-                box.top = topBorder + topPadding;
-                box.left = leftBorder + leftPadding;
-                box.width = width - leftBorder - leftPadding - rightPadding - rightBorder;
-                box.height = height - topBorder - topPadding - bottomPadding - bottomBorder;
-                break;
+        case 'content-box':
+            box.top = topBorder + topPadding;
+            box.left = leftBorder + leftPadding;
+            box.width = width - leftBorder - leftPadding - rightPadding - rightBorder;
+            box.height = height - topBorder - topPadding - bottomPadding - bottomBorder;
+            break;
 
-            case 'padding-box':
-                box.top = topPadding;
-                box.left = leftPadding;
-                box.width = width - leftBorder - rightBorder;
-                box.height = height - topBorder - bottomBorder;
-                break;
+        case 'padding-box':
+            box.top = topPadding;
+            box.left = leftPadding;
+            box.width = width - leftBorder - rightBorder;
+            box.height = height - topBorder - bottomBorder;
+            break;
 
-            case 'border-box':
-                box.top = 0;
-                box.left = 0;
-                box.width = width;
-                box.height = height;
-                break;
+        case 'border-box':
+            box.top = 0;
+            box.left = 0;
+            box.width = width;
+            box.height = height;
+            break;
 
-            case 'margin-box':
-                box.top = 0 - topMargin;
-                box.left = 0 - leftMargin;
-                box.width = width + leftMargin + rightMargin;
-                box.height = height + topMargin + bottomMargin;
-                break;
+        case 'margin-box':
+            box.top = 0 - topMargin;
+            box.left = 0 - leftMargin;
+            box.width = width + leftMargin + rightMargin;
+            box.height = height + topMargin + bottomMargin;
+            break;
 
-            default:
-                throw new TypeError('Invalid parameter, boxType: ' + boxType);
+        default:
+            throw new TypeError('Invalid parameter, boxType: ' + boxType);
         }
 
         return box;
@@ -249,88 +249,88 @@ define(function(){
         var parts = str.trim().split(/\s+/);
 
         switch (parts.length){
-            case 1:
-                if (xPos.indexOf(parts[0]) > -1) {
-                    origin.x = posMap[parts[0]];
-                    origin.y = defaultYPos;
-                    break;
-                }
-
-                if (yPos.indexOf(parts[0]) > -1) {
-                    origin.x = defaultXPos;
-                    origin.y = posMap[parts[0]];
-                    break;
-                }
-
-                if (parts[0] === 'center') {
-                    origin.x = defaultXPos;
-                    origin.y = defaultYPos;
-                } else {
-                    // input is assumed css unit, like 100px, 33rem, etc.
-                    origin.x = parts[0];
-                    origin.y = defaultYPos;
-                }
+        case 1:
+            if (xPos.indexOf(parts[0]) > -1) {
+                origin.x = posMap[parts[0]];
+                origin.y = defaultYPos;
                 break;
+            }
 
-            case 2:
+            if (yPos.indexOf(parts[0]) > -1) {
+                origin.x = defaultXPos;
+                origin.y = posMap[parts[0]];
+                break;
+            }
 
-                /* Invalid cases:
-                    0 in xPos
-                    1 in xPos
-                    ---
-                    0 in yPos
-                    1 in yPos
-                    ---
-                    0 in yPos
-                    1 is not in xPos or 'center'
-                    ---
-                    0 is not in yPos or 'center'
-                    1 in xPos
-                */
-                if (( xPos.indexOf(parts[0]) > -1 && xPos.indexOf(parts[1]) > -1 ) ||
-                    ( yPos.indexOf(parts[0]) > -1 && yPos.indexOf(parts[1]) > -1 ) ||
-                    ( yPos.indexOf(parts[0]) > -1 && xPos.concat('center').indexOf(parts[1]) < 0)  ||
-                    ( xPos.indexOf(parts[1]) > -1 && yPos.concat('center').indexOf(parts[0]) < 0) ) {
-
-                    throw new Error('Invalid origin string provided: ' + str);
-                }
-
-                if (xPos.indexOf(parts[0]) > -1) {
-                    origin.x = posMap[parts[0]];
-                    // assume y is either keyword or css unit
-                    origin.y = posMap[parts[1]] || parts[1];
-                    break;
-                }
-
-                if (yPos.indexOf(parts[0]) > -1) {
-                    // assume x is either keyword or css unit
-                    origin.x = posMap[parts[1]] || parts[1];
-                    origin.y = posMap[parts[0]];
-                    break;
-                }
-
-                if (yPos.indexOf(parts[1]) > -1) {
-                    // assume x is either keyword or css unit
-                    origin.x = posMap[parts[0]] || parts[0];
-                    origin.y = posMap[parts[1]];
-                    break;
-                }
-
-                if (parts[0] === 'center'){
-                    origin.x = defaultXPos;
-                    origin.y = posMap[parts[1]] || parts[1];
-                    break;
-                }
-
-                if (parts[1] === 'center'){
-                    origin.x = posMap[parts[0]] || parts[0];
-                    origin.y = defaultYPos;
-                    break;
-                }
-
+            if (parts[0] === 'center') {
+                origin.x = defaultXPos;
+                origin.y = defaultYPos;
+            } else {
+                // input is assumed css unit, like 100px, 33rem, etc.
                 origin.x = parts[0];
-                origin.y = parts[1];
+                origin.y = defaultYPos;
+            }
+            break;
+
+        case 2:
+
+            /* Invalid cases:
+                0 in xPos
+                1 in xPos
+                ---
+                0 in yPos
+                1 in yPos
+                ---
+                0 in yPos
+                1 is not in xPos or 'center'
+                ---
+                0 is not in yPos or 'center'
+                1 in xPos
+            */
+            if (( xPos.indexOf(parts[0]) > -1 && xPos.indexOf(parts[1]) > -1 ) ||
+                ( yPos.indexOf(parts[0]) > -1 && yPos.indexOf(parts[1]) > -1 ) ||
+                ( yPos.indexOf(parts[0]) > -1 && xPos.concat('center').indexOf(parts[1]) < 0)  ||
+                ( xPos.indexOf(parts[1]) > -1 && yPos.concat('center').indexOf(parts[0]) < 0) ) {
+
+                throw new Error('Invalid origin string provided: ' + str);
+            }
+
+            if (xPos.indexOf(parts[0]) > -1) {
+                origin.x = posMap[parts[0]];
+                // assume y is either keyword or css unit
+                origin.y = posMap[parts[1]] || parts[1];
                 break;
+            }
+
+            if (yPos.indexOf(parts[0]) > -1) {
+                // assume x is either keyword or css unit
+                origin.x = posMap[parts[1]] || parts[1];
+                origin.y = posMap[parts[0]];
+                break;
+            }
+
+            if (yPos.indexOf(parts[1]) > -1) {
+                // assume x is either keyword or css unit
+                origin.x = posMap[parts[0]] || parts[0];
+                origin.y = posMap[parts[1]];
+                break;
+            }
+
+            if (parts[0] === 'center'){
+                origin.x = defaultXPos;
+                origin.y = posMap[parts[1]] || parts[1];
+                break;
+            }
+
+            if (parts[1] === 'center'){
+                origin.x = posMap[parts[0]] || parts[0];
+                origin.y = defaultYPos;
+                break;
+            }
+
+            origin.x = parts[0];
+            origin.y = parts[1];
+            break;
         }
 
         return origin;
