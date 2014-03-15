@@ -193,7 +193,8 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
                 throw new Error('Invalid negative value for ellipse() radius');
             }
 
-            this.refBox = infos[2] || this.defaultRefBox;
+            // if reference box is undefined (falsy), default reference box will be used later in the code
+            this.refBox = infos[2];
         }
 
         return coords;
@@ -237,14 +238,23 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         var cx = this.coords.cx - this.offsets.left,
             cy = this.coords.cy - this.offsets.top,
             rx = this.coords.rx,
-            ry = this.coords.ry;
+            ry = this.coords.ry,
+            refBox = this.refBox || this.defaultRefBox,
+            value;
 
-        cx = CSSUtils.convertFromPixels(cx, this.coords.cxUnit, this.target, { isHeightRelated: false, boxType: this.refBox });
-        cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, { isHeightRelated: true, boxType: this.refBox });
-        rx = CSSUtils.convertFromPixels(rx, this.coords.rxUnit, this.target, { isHeightRelated: false, boxType: this.refBox });
-        ry = CSSUtils.convertFromPixels(ry, this.coords.ryUnit, this.target, { isHeightRelated: true, boxType: this.refBox });
+        cx = CSSUtils.convertFromPixels(cx, this.coords.cxUnit, this.target, { isHeightRelated: false, boxType: refBox });
+        cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, { isHeightRelated: true, boxType: refBox });
+        rx = CSSUtils.convertFromPixels(rx, this.coords.rxUnit, this.target, { isHeightRelated: false, boxType: refBox });
+        ry = CSSUtils.convertFromPixels(ry, this.coords.ryUnit, this.target, { isHeightRelated: true, boxType: refBox });
 
-        return 'ellipse(' + [cx, cy, rx, ry].join(', ') + ')';
+        value = 'ellipse(' + [cx, cy, rx, ry].join(', ') + ')';
+
+        // expose reference box keyword only if it was given as input,
+        if (this.refBox){
+            value += ' ' + this.refBox;
+        }
+
+        return value;
     };
 
     EllipseEditor.prototype.toggleFreeTransform = function(){

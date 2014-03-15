@@ -219,7 +219,7 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
                 }
             }
 
-            this.refBox = infos[2] || this.defaultRefBox;
+            this.refBox = infos[2];
         }
 
         return coords;
@@ -261,12 +261,13 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
 
     RectangleEditor.prototype.getCSSValue = function(){
         var c = this.coords,
-            x, y, w, h, args;
+            refBox = this.refBox || this.defaultRefBox,
+            x, y, w, h, args, value;
 
-        x = CSSUtils.convertFromPixels(c.x - this.offsets.left, c.xUnit, this.target, { isHeightRelated: false, boxType: this.refBox });
-        y = CSSUtils.convertFromPixels(c.y - this.offsets.top, c.yUnit, this.target, { isHeightRelated: true, boxType: this.refBox });
-        w = CSSUtils.convertFromPixels(c.w, c.wUnit, this.target, { isHeightRelated: false, boxType: this.refBox });
-        h = CSSUtils.convertFromPixels(c.h, c.hUnit, this.target, { isHeightRelated: true, boxType: this.refBox });
+        x = CSSUtils.convertFromPixels(c.x - this.offsets.left, c.xUnit, this.target, { isHeightRelated: false, boxType: refBox });
+        y = CSSUtils.convertFromPixels(c.y - this.offsets.top, c.yUnit, this.target, { isHeightRelated: true, boxType: refBox });
+        w = CSSUtils.convertFromPixels(c.w, c.wUnit, this.target, { isHeightRelated: false, boxType: refBox });
+        h = CSSUtils.convertFromPixels(c.h, c.hUnit, this.target, { isHeightRelated: true, boxType: refBox });
         // TODO: figure out how to convert border-radius
 
         args = [x, y, w, h];
@@ -279,7 +280,14 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             args.push( [c.ry, c.ryUnit].join('') );
         }
 
-        return 'rectangle(' + args.join(', ') + ')';
+        value = 'rectangle(' + args.join(', ') + ')';
+
+        // expose reference box keyword only if it was given as input,
+        if (this.refBox){
+            value += ' ' + this.refBox;
+        }
+
+        return value;
     };
 
     RectangleEditor.prototype.toggleFreeTransform = function(){

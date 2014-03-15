@@ -60,7 +60,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         this.activeVertexIndex = -1;
 
         this.setup();
-        
+
         this.update(this.value);
     }
 
@@ -205,8 +205,8 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
 
             coords.polygonFillRule = infos[1] || null;
 
-            // expose reference box type
-            this.refBox = infos[3] || this.defaultRefBox;
+            // if reference box is undefined (falsy), default reference box will be used later in the code
+            this.refBox = infos[3];
         }
 
         // polygons need at least 3 coords; bail out and let editor infer from element's shape
@@ -255,8 +255,9 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             element = this.target,
             // @see http://dev.w3.org/csswg/css-shapes/#typedef-fill-rule
             fillRule = this.polygonFillRule,
-            refBox = this.refBox,
-            path;
+            refBox = this.refBox || this.defaultRefBox,
+            path,
+            value;
 
         path = this.vertices.map(function(vertex, i){
             var x, y, xCoord, yCoord;
@@ -273,7 +274,14 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             return [xCoord, yCoord].join(' ');
         });
 
-        return 'polygon(' + [fillRule, path.join(', ')].join(', ') + ')';
+        value = 'polygon(' + [fillRule, path.join(', ')].join(', ') + ')';
+
+        // expose reference box keyword only if it was given as input,
+        if (this.refBox){
+            value += ' ' + this.refBox;
+        }
+
+        return value;
     };
 
     /*

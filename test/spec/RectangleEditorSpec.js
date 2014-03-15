@@ -51,8 +51,8 @@ function($, markup, RectangleEditor){
                 return editor.refBox;
             }
 
-            it('should have default reference box, if none unspecified', function(){
-                expect(_parseRefBox()).toEqual('margin-box');
+            it('should not expose default reference box, if none unspecified', function(){
+                expect(_parseRefBox()).not.toEqual('margin-box');
             });
 
             it('should parse margin-box', function(){
