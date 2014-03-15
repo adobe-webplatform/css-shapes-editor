@@ -58,10 +58,6 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
 
     EllipseEditor.prototype.setupCoordinates = function(){
         this.coords = this.parseShape(this.value);
-
-        if (!this.coords){
-            this.coords = this.inferShapeFromElement(this.target);
-        }
     };
 
     EllipseEditor.prototype.update = function(value){
@@ -115,9 +111,7 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
 
     /*
         Parse ellipse string into object with coordinates for center, radii and units.
-        Returns undefined if cannot parse shape.
-
-        TODO: account for upcoming notation: http://dev.w3.org/csswg/css-shapes/#funcdef-ellipse
+        Infers shape from element if empty ellipse function given.
 
         @example:
         {
@@ -131,107 +125,122 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             ryUnit: '%'
         }
 
-        @param {String} shape CSS ellipse function shape
-
-        @return {Object | undefined}
+        @throws {Error} if input shape is not valid ellipse shape function
+        @param {String} shape CSS ellipse shape function
+        @return {Object}
     */
     EllipseEditor.prototype.parseShape = function(shape){
         var element = this.target,
             defaultRefBox = this.defaultRefBox,
             coords,
+            center,
+            radii,
+            box,
             infos,
-            args;
+            args = [],
+            shapeRE;
 
         // superficial check for ellipse declaration
         if (typeof shape !== 'string' || !/^ellipse\(.*?\)/i.test(shape.trim())){
             throw new Error('No ellipse() function definition in provided value');
         }
 
-        infos = /ellipse\s*\(((?:\s*[-+0-9.]+[a-z%]*\s*,*\s*){4})\s*\)\s*((?:margin|content|border|padding)\-box)?/i.exec(shape.trim());
+        /*
+        Regular expression for matching ellipse shapes
 
-        if (infos){
-            if (!infos[1]){
-                return;
-            }
+        matches:
+        ellipse(<radius>{1,2}? [at (<length>|<pos>){1,2}]?) <reference-box>?
 
-            args = infos[1].replace(/\s+/g, '').split(',');
+        examples:
+        ellipse()
+        ellipse(50%)
+        ellipse(50% closest-side)
+        ellipse(50% closest-side at center)
+        ellipse(50% closest-side at center top)
+        ellipse(50% closest-side at 100px)
+        ellipse(50% closest-side at 100px 10rem)
+        ellipse(50% closest-side at 100px 10rem) border-box
+        */
+        shapeRE = /ellipse\s*\(\s*((?:\b(?:farthest-side|closest-side|[0-9\.]+[a-z%]{0,3})\s*){1,2})?(?:\bat((?:\s+(?:top|right|bottom|left|center|-?[0-9\.]+[a-z%]{0,3})){1,2}))?\s*\)\s*((?:margin|content|border|padding)-box)?/i;
 
-            // incomplete ellipse definition
-            if (args.length < 4){
-                return;
-            }
+        /*
+        infos[1] = radii coordinates, space separated rx and ry
+        infos[2] = center coordinates, space separated x and y
+        infos[3] = reference box
+        */
+        infos = shapeRE.exec(shape.trim());
 
-            args = args.map(function(arg, i){
-                var options = {};
-
-                options.boxType = infos[2] || defaultRefBox;
-
-                // 0 = cx
-                // 1 = cy
-                // 2 = rx
-                // 3 = ry
-                // if percentages, cy and ry are calculated from the element's reference box height
-                options.isHeightRelated = (i === 1 || i === 3) ? true : false;
-
-                return CSSUtils.convertToPixels(arg, element, options);
-            });
-
-            coords = {
-                cx: args[0].value,
-                cxUnit: args[0].unit,
-                cy: args[1].value,
-                cyUnit: args[1].unit,
-                rx: args[2].value,
-                rxUnit: args[2].unit,
-                ry: args[3].value,
-                ryUnit: args[3].unit
-            };
-
-            if (coords.rx < 0 || coords.ry < 0){
-                // remove editor DOM saffolding
-                this.remove();
-                throw new Error('Invalid negative value for ellipse() radius');
-            }
-
-            // if reference box is undefined (falsy), default reference box will be used later in the code
-            this.refBox = infos[2];
+        if (!infos){
+            throw new Error('Invalid shape provided: ' + shape);
         }
+
+        // no radii given, assume closest-side like the browser default
+        if (!infos[1]){
+            args.push('closest-side');                // rx
+            args.push('closest-side');                // ry
+        } else {
+            radii = infos[1].split(/\s+/);
+            args.push(radii[0]);                      // rx
+            args.push(radii[1] || 'closest-side');    // ry
+        }
+
+        // TODO move decoding closest-side/ farthest-side to CSSUtils
+        // TODO consider actual given center, do not assume 50% 50%
+        var keywords = ['closest-side', 'farthest-side'];
+
+        if (keywords.indexOf(args[0]) > -1){
+            // naively assume center is 50% 50%
+            // TODO: improve by considering actual center
+            box = CSSUtils.getBox(element, infos[3] || defaultRefBox);
+            args[0] = box.width / 2 + 'px';
+        }
+
+        if (keywords.indexOf(args[1]) > -1){
+            box = CSSUtils.getBox(element, infos[3] || defaultRefBox);
+            // naively assume center is 50% 50%
+            args[1] = box.height / 2 + 'px';
+        }
+
+        // if no center coords given, assume 50% 50%
+        if (!infos[2]){
+            args.push('50%');
+            args.push('50%');
+        } else {
+            center = CSSUtils.getOriginCoords(infos[2]);
+            args.push(center.x);
+            args.push(center.y);
+        }
+
+        // if reference box is undefined (falsy), default reference box will be used later in the code
+        this.refBox = infos[3];
+
+        args = args.map(function(arg, i){
+            var options = {};
+
+            options.boxType = infos[3] || defaultRefBox;
+
+            // 0 = rx
+            // 1 = ry
+            // 2 = cx
+            // 3 = cy
+            // if percentages, cy and ry are calculated from the element's reference box height
+            options.isHeightRelated = (i === 1 || i === 3) ? true : false;
+
+            return CSSUtils.convertToPixels(arg, element, options);
+        });
+
+        coords = {
+            rx: args[0].value,
+            rxUnit: args[0].unit,
+            ry: args[1].value,
+            ryUnit: args[1].unit,
+            cx: args[2].value,
+            cxUnit: args[2].unit,
+            cy: args[3].value,
+            cyUnit: args[3].unit,
+        };
 
         return coords;
-    };
-
-    /*
-        Attempt to infer the coordinates for an ellipse that fits within the element.
-        The center is at the element's center. The x radius is half the element's width.
-        The y radius is half the element's height.
-
-        @throws Error if the element has no width or height.
-
-        @param {HTMLElement} element Element from which to infer the shape.
-        @return {Object} coordinates for ellipse. @see EllipseEditor.parseShape()
-    */
-    EllipseEditor.prototype.inferShapeFromElement = function(element){
-        if (!(element instanceof HTMLElement)){
-            throw new TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element);
-        }
-
-        var box = CSSUtils.getContentBoxOf(element);
-
-        if (!box.height || !box.width){
-            throw new Error('inferShapeFromElement() \n Cannot infer shape from element because it has no width or height');
-        }
-
-        // TODO: also infer unit values
-        return {
-            cx: box.width / 2,
-            cxUnit: this.config.cxUnit,
-            cy: box.height / 2,
-            cyUnit: this.config.cyUnit,
-            rx: box.width / 2,
-            rxUnit: this.config.rxUnit,
-            ry: box.height / 2,
-            ryUnit: this.config.ryUnit
-        };
     };
 
     EllipseEditor.prototype.getCSSValue = function(){
@@ -247,7 +256,7 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         rx = CSSUtils.convertFromPixels(rx, this.coords.rxUnit, this.target, { isHeightRelated: false, boxType: refBox });
         ry = CSSUtils.convertFromPixels(ry, this.coords.ryUnit, this.target, { isHeightRelated: true, boxType: refBox });
 
-        value = 'ellipse(' + [cx, cy, rx, ry].join(', ') + ')';
+        value = 'ellipse(' + [rx, ry, 'at', cx, cy].join(' ') + ')';
 
         // expose reference box keyword only if it was given as input,
         if (this.refBox){

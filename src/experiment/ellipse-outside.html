@@ -7,7 +7,7 @@
 .shape {
   width: 400px;
   height: 200px;
-  shape-outside: ellipse(50%, 50%, 50%, 50%) margin-box;
+  shape-outside: ellipse(50% 50% at center center) border-box;
 }
 </style>
 
@@ -31,6 +31,8 @@
       var el = document.querySelector('.shape');
       var property = 'shape-outside';
       var value = getComputedStyle(el, null)[property];
+
+      console.log(value)
 
       var ed = new CSSShapesEditor(el, value)
 
