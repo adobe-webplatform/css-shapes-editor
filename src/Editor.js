@@ -20,9 +20,9 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
         // default reference box for shape coordinate system
         this.defaultRefBox = 'margin-box';
 
-        // reference box for coordinate system as parsed from shape value
+        // reference box for coordinate system as parsed from shape value string
         // set up by parseShape() higher in the prototype chanin
-        this.refBox = this.defaultRefBox;
+        this.refBox = null;
 
         // target element offsets with regards to the page
         // set up by setupOffsets() higher in the prototype chain
@@ -37,6 +37,8 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
             this.setupEditorHolder();
             this.setupDrawingSurface();
             this.setupOffsets();
+
+            // TODO use this.config.defaultRefBox if given; should be 'border-box' for clip-path & shape-inside
 
             window.setTimeout(function(){
                 this.trigger('ready');
@@ -86,7 +88,8 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
 
         setupOffsets: function() {
             var rect = this.target.getBoundingClientRect(),
-                box = CSSUtils.getBox(this.target, this.refBox);
+                refBox = this.refBox || this.defaultRefBox,
+                box = CSSUtils.getBox(this.target, refBox);
 
             this.offsets.left = rect.left + window.scrollX + box.left;
             this.offsets.top = rect.top + window.scrollY + box.top;

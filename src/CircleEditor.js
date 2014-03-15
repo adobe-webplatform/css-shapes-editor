@@ -191,7 +191,8 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             args.push(center.y);
         }
 
-        this.refBox = infos[3] || this.defaultRefBox;
+        // if reference box is undefined (falsy), default reference box will be used later in the code
+        this.refBox = infos[3];
 
         /*
         args[0] = radius
@@ -224,48 +225,25 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         return coords;
     };
 
-    /*
-        Attempt to infer the coordinates for a circle that fits within the element.
-        The center is at the element's center. The radius is the distance from the center to the closest edge.
-
-        @throws Error if the element has no width or height.
-
-        @param {HTMLElement} element Element from which to infer the shape.
-        @return {Object} coordinates for circle. @see CircleEditor.parseShape()
-    */
-    CircleEditor.prototype.inferShapeFromElement = function(element){
-        if (!(element instanceof HTMLElement)){
-            throw new TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element);
-        }
-
-        var box = CSSUtils.getContentBoxOf(element);
-
-        if (!box.height || !box.width){
-            throw new Error('inferShapeFromElement() \n Cannot infer shape from element because it has no width or height');
-        }
-
-        // TODO: also infer unit values
-        return {
-            cx: box.width / 2,
-            cxUnit: this.config.cxUnit,
-            cy: box.height / 2,
-            cyUnit: this.config.cyUnit,
-            // pick radius in relation to closest-edge
-            r: Math.min(box.height, box.width) / 2,
-            rUnit: this.config.rUnit
-        };
-    };
-
     CircleEditor.prototype.getCSSValue = function(){
         var cx = this.coords.cx - this.offsets.left,
             cy = this.coords.cy - this.offsets.top,
-            r = this.coords.r;
+            r = this.coords.r,
+            refBox = this.refBox || this.defaultRefBox,
+            value;
 
-        cx = CSSUtils.convertFromPixels(cx, this.coords.cxUnit, this.target, { isHeightRelated: false, boxType: this.refBox });
-        cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, { isHeightRelated: true, boxType: this.refBox });
-        r = CSSUtils.convertFromPixels(r, this.coords.rUnit, this.target, { isHeightRelated: true, isRadius: true, boxType: this.refBox });
+        cx = CSSUtils.convertFromPixels(cx, this.coords.cxUnit, this.target, { isHeightRelated: false, boxType: refBox });
+        cy = CSSUtils.convertFromPixels(cy, this.coords.cyUnit, this.target, { isHeightRelated: true, boxType: refBox });
+        r = CSSUtils.convertFromPixels(r, this.coords.rUnit, this.target, { isHeightRelated: true, isRadius: true, boxType: refBox });
 
-        return 'circle(' + [r, 'at', cx, cy].join(' ') + ') ' + this.refBox;
+        value = 'circle(' + [r, 'at', cx, cy].join(' ') + ')';
+
+        // expose reference box keyword only if it was given as input,
+        if (this.refBox){
+            value += ' ' + this.refBox;
+        }
+
+        return value;
     };
 
     CircleEditor.prototype.toggleFreeTransform = function(){
