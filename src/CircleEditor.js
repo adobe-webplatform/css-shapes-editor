@@ -168,7 +168,7 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         infos = shapeRE.exec(shape.trim());
 
         if (!infos){
-            return;
+            throw new Error('Invalid shape provided: ' + shape);
         }
 
         // if no radius given, compute naive 'closest-side' by assuming center is 50% 50%
