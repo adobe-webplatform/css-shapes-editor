@@ -15,9 +15,9 @@ module.exports = function (grunt) {
         pattern: ['grunt-*', '!grunt-template-jasmine-requirejs']
     });
 
-    var pkg = grunt.file.readJSON("package.json");
-
     grunt.initConfig({
+
+        pkg: grunt.file.readJSON("package.json"),
 
         // configurable paths
         yeoman: {
@@ -27,9 +27,9 @@ module.exports = function (grunt) {
         },
 
         banner: grunt.file.read('./COPYRIGHT')
-                    .replace(/@NAME/, pkg.name)
-                    .replace(/@DESCRIPTION/, pkg.description)
-                    .replace(/@VERSION/, pkg.version)
+                    .replace(/@NAME/, '<%= pkg.name %>')
+                    .replace(/@DESCRIPTION/, '<%= pkg.description %>')
+                    .replace(/@VERSION/, '<%= pkg.version %>')
                     .replace(/@DATE/, grunt.template.today("yyyy-mm-dd")),
 
         watch: {
@@ -68,7 +68,7 @@ module.exports = function (grunt) {
                 options: {
                     baseUrl: '<%= yeoman.src %>',
                     mainConfigFile: '<%= yeoman.src %>/main.js',
-                    out: pkg.main,
+                    out: '<%= pkg.main %>',
                     name: 'main',
                     include: ['third-party/almond/almond'],
                     wrap: {
@@ -87,8 +87,32 @@ module.exports = function (grunt) {
                     banner: '<%= banner %>'
                 },
                 files: {
-                    src: [ pkg.main ]
+                    src: [ '<%= pkg.main %>' ]
                 }
+            }
+        },
+        /*
+        Usage:
+        grunt bump:minor
+        grunt bump:build
+        grunt bump:major
+        grunt bump --setversion=2.0.1
+
+        grunt bump-only:patch
+        */
+        bump: {
+            options: {
+                files: ['package.json'],
+                updateConfigs: ['pkg'],
+                commit: true,
+                commitMessage: 'Release v%VERSION%',
+                commitFiles: ['package.json','<%= yeoman.dist %>'], // '-a' for all files
+                createTag: true,
+                tagName: 'v%VERSION%',
+                tagMessage: 'Version %VERSION%',
+                push: false,
+                pushTo: 'origin',
+                gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d' // options to use with '$ git describe'
             }
         }
     });
@@ -99,9 +123,9 @@ module.exports = function (grunt) {
 
     grunt.registerTask('lint', ['jshint:src']);
 
-    grunt.registerTask('default', [
-        'jshint:src',
-        // 'test',
-        // 'build'
-    ]);
+    grunt.registerTask('release', function (type) {
+        type = type ? type : 'patch';     // Default release type
+        grunt.task.run('bump:' + type);   // Bump up the version
+        grunt.task.run('build');          // Build the file
+    });
 };
