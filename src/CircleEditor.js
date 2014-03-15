@@ -57,10 +57,6 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
 
     CircleEditor.prototype.setupCoordinates = function(){
         this.coords = this.parseShape(this.value);
-
-        if (!this.coords){
-            this.coords = this.inferShapeFromElement(this.target);
-        }
     };
 
     CircleEditor.prototype.update = function(value){
@@ -137,6 +133,7 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
             infos,
             args = [],
             center,
+            box,
             shapeRE;
 
         // superficial check for shape declaration
@@ -160,7 +157,6 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         circle(50% at 100px 10rem) border-box;
 
         TODO: handle 'closest-side' and 'farthest-side'
-        TODO: remove inferShapeFromElement, because circle() === circle(closest-side at 50%, 50%);
         */
         shapeRE = /circle\s*\((\s*[0-9\.]+[a-z%]{0,3})?(?:\s*at((?:\s+(?:top|right|bottom|left|center|-?[0-9\.]+[a-z%]{0,3})){1,2}))?\s*\)\s*((?:margin|content|border|padding)-box)?/i;
 
@@ -171,14 +167,18 @@ define(['Editor','CSSUtils', 'snap', 'lodash'], function(Editor, CSSUtils, Snap,
         */
         infos = shapeRE.exec(shape.trim());
 
-        // didn't match a circle shape; bail out and infer everything
         if (!infos){
             return;
         }
 
-        // if no radius given, assume 50%
-        // TODO: handle as 'closest-side'
-        args.push(infos[1] || '50%');
+        // if no radius given, compute naive 'closest-side' by assuming center is 50% 50%
+        if (!infos[1]){
+            box = CSSUtils.getBox(element, infos[3] || defaultRefBox);
+            args.push((Math.min(box.height, box.width) / 2) + 'px');
+        }
+        else{
+            args.push(infos[1]);
+        }
 
         // if no center coords given, assume 50% 50%
         if (!infos[2]){
