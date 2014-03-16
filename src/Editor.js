@@ -4,7 +4,9 @@
 define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
     "use strict";
 
-    function Editor(target, value){
+    var REFERENCE_BOXES = ['margin-box','border-box','padding-box','content-box'];
+
+    function Editor(target, value, options){
 
         if (!target || !(target instanceof HTMLElement)){
             throw new TypeError('Target expected as HTMLElement object, but was: ' + typeof target);
@@ -18,7 +20,13 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
         this.holder = null;
 
         // default reference box for shape coordinate system
-        this.defaultRefBox = 'margin-box';
+        this.defaultRefBox = REFERENCE_BOXES[0];
+
+        // accept new default refence box if defined and recognized
+        // @see: https://github.com/adobe-webplatform/css-shapes-editor/issues/12
+        if (options && options.defaultRefBox && REFERENCE_BOXES.indexOf(options.defaultRefBox) > -1){
+            this.defaultRefBox = options.defaultRefBox;
+        }
 
         // reference box for coordinate system as parsed from shape value string
         // set up by parseShape() higher in the prototype chanin
@@ -34,11 +42,10 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
 
     Editor.prototype = {
         setup: function(){
+
             this.setupEditorHolder();
             this.setupDrawingSurface();
             this.setupOffsets();
-
-            // TODO use this.config.defaultRefBox if given; should be 'border-box' for clip-path & shape-inside
 
             window.setTimeout(function(){
                 this.trigger('ready');
@@ -66,7 +73,6 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
             this.holder.style.left = 0;
             this.holder.style.right = 0;
             this.holder.style.bottom = 0;
-
             // make sure editor is the top-most thing on the page
             // see http://softwareas.com/whats-the-maximum-z-index
             this.holder.style.zIndex = 2147483647;

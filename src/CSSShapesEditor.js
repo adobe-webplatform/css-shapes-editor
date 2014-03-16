@@ -28,7 +28,8 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
                 fill: 'none',
                 'stroke-dasharray': '0, 0',
                 opacity: 0.8
-            }
+            },
+            defaultRefBox: 'margin-box'
         };
 
         options = _.extend({}, _defaults, options);
@@ -97,7 +98,7 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
         var _shape = _getShape(value),
             Factory = _getFactory(_shape),
             _editor = new Factory(target, value, options);
-        
+
         return _editor;
     }
 
