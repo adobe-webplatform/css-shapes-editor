@@ -530,7 +530,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
 
             // restores vertex editing
             this.draw();
-            this.outline.attr('visibility', 'hidden');
+            this.outline.attr('visibility', 'visible');
 
             return;
         }
