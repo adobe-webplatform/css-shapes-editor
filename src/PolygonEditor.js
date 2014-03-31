@@ -338,14 +338,15 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
 
         } else {
 
-            edge = this.polygonEdgeNear({x: e.x, y: e.y});
+            // pageX/pageY accounts for scrolling
+            edge = this.polygonEdgeNear({x: e.pageX, y: e.pageY});
 
             if (edge){
                 // insert new vertex
                 // TODO: insert vertex precisely on the segment, or at event ?
                 this.vertices.splice(edge.index1, 0, {
-                    x: e.x,
-                    y: e.y,
+                    x: e.offsetX,
+                    y: e.offsetY,
                     // TODO: infer units from the vertices of the edge
                     xUnits: this.config.xUnit,
                     yUnits: this.config.yUnit,
@@ -408,8 +409,8 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
     PolygonEditor.prototype.onMouseMove = function(e){
         // 'this' is the PolygonEditor instance
         var vertex = this.vertices[this.activeVertexIndex];
-        vertex.x = e.x;
-        vertex.y = e.y;
+        vertex.x = e.pageX;
+        vertex.y = e.pageY;
 
         this.draw();
     };
