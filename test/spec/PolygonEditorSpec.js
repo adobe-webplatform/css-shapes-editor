@@ -21,6 +21,15 @@ function($, markup, PolygonEditor){
         ].join('');
     }
 
+    function _getMockEvent(x, y){
+      return {
+        x: x,
+        y: y,
+        pageX: x,
+        pageY: y
+      }
+    }
+
     describe('PolygonEditor', function(){
         var editor,
             target,
@@ -148,11 +157,7 @@ function($, markup, PolygonEditor){
         it('should add new vertex when edge is clicked', function(){
             var inValue = 'polygon()',
                 box = target.getBoundingClientRect(),
-                mockEvent = {
-                    x: target.offsetLeft,
-                    // mid-way on the left edge
-                    y: target.offsetTop + box.height / 2
-                },
+                mockEvent = _getMockEvent(target.offsetLeft, target.offsetTop + box.height / 2),
                 expectedVerticesLength;
 
             editor = new PolygonEditor(target, inValue);
@@ -168,11 +173,7 @@ function($, markup, PolygonEditor){
         it('should trigger "shapechange" event when new vertex is added', function(){
             var inValue = 'polygon()',
                 box = target.getBoundingClientRect(),
-                mockEvent = {
-                    x: target.offsetLeft,
-                    // mid-way on the left edge
-                    y: target.offsetTop + box.height / 2
-                };
+                mockEvent = _getMockEvent(target.offsetLeft, target.offsetTop + box.height / 2);
 
             editor = new PolygonEditor(target, inValue);
             spyOn(editor, 'trigger');
@@ -186,10 +187,7 @@ function($, markup, PolygonEditor){
 
         it('should remove vertex when double clicked', function(){
             var inValue = 'polygon()',
-                mockEvent = {
-                    x: target.offsetLeft,
-                    y: target.offsetTop
-                },
+                mockEvent = _getMockEvent(target.offsetLeft, target.offsetTop),
                 expectedVerticesLength;
 
             editor = new PolygonEditor(target, inValue);
@@ -204,10 +202,7 @@ function($, markup, PolygonEditor){
 
         it('should trigger "shapechange" event when vertex is removed', function(){
             var inValue = 'polygon()',
-                mockEvent = {
-                    x: target.offsetLeft,
-                    y: target.offsetTop
-                };
+                mockEvent = _getMockEvent(target.offsetLeft, target.offsetTop);
 
             editor = new PolygonEditor(target, inValue);
             spyOn(editor, 'trigger')
@@ -222,14 +217,8 @@ function($, markup, PolygonEditor){
         it('should trigger "shapechange" event when vertex is moved', function(){
             var inValue = 'polygon()',
                 moveBy = 100,
-                mockMouseDownEvent = {
-                    x: target.offsetLeft,
-                    y: target.offsetTop
-                },
-                mockMouseMoveEvent = {
-                    x: target.offsetLeft + moveBy,
-                    y: target.offsetTop + moveBy
-                },
+                mockMouseDownEvent = _getMockEvent(target.offsetLeft, target.offsetTop),
+                mockMouseMoveEvent = _getMockEvent(target.offsetLeft + moveBy, target.offsetTop + moveBy),
                 firstVertex = {};
 
             editor = new PolygonEditor(target, inValue);
@@ -279,11 +268,7 @@ function($, markup, PolygonEditor){
         it('should not add new vertex when transform editor is on', function(){
             var inValue = 'polygon()',
                 box = target.getBoundingClientRect(),
-                mockEvent = {
-                    x: target.offsetLeft,
-                    // mid-way on the left edge
-                    y: target.offsetTop + box.height / 2
-                },
+                mockEvent = _getMockEvent(target.offsetLeft, target.offsetTop + box.height / 2),
                 expectedVerticesLength;
 
             editor = new PolygonEditor(target, inValue);
@@ -321,11 +306,8 @@ function($, markup, PolygonEditor){
         it('should add new vertex after transform editor is turned off', function(){
             var inValue = 'polygon()',
                 box = target.getBoundingClientRect(),
-                mockEvent = {
-                    x: target.offsetLeft,
-                    // mid-way on the left edge
-                    y: target.offsetTop + box.height / 2
-                },
+                // halfway on left edge
+                mockEvent = _getMockEvent(target.offsetLeft, target.offsetTop + box.height / 2),
                 expectedVerticesLength;
 
             editor = new PolygonEditor(target, inValue);
