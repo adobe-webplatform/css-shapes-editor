@@ -324,6 +324,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
     */
     PolygonEditor.prototype.onMouseDown = function(e){
         var edge,
+            projection,
             // need target as a Raphael obj reference; e.target won't suffice.
             target = Snap.getElementByPoint(e.x, e.y);
 
@@ -342,11 +343,13 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             edge = this.polygonEdgeNear({x: e.pageX, y: e.pageY});
 
             if (edge){
+                // coords for the nearest point on the edge projected from mouse event position
+                projection = _projectionPointOnLine(this.vertices[edge.index0], this.vertices[edge.index1], {x: e.pageX, y: e.pageY});
+
                 // insert new vertex
-                // TODO: insert vertex precisely on the segment, or at event ?
                 this.vertices.splice(edge.index1, 0, {
-                    x: e.offsetX,
-                    y: e.offsetY,
+                    x: projection.x,
+                    y: projection.y,
                     // TODO: infer units from the vertices of the edge
                     xUnits: this.config.xUnit,
                     yUnits: this.config.yUnit,
@@ -425,16 +428,20 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         @param {Object} p Object with x, y coordinates for the point to find nearby polygon edge.
         @return {Object | null}
     */
-    PolygonEditor.prototype.polygonEdgeNear = function(p){
+    PolygonEditor.prototype.polygonEdgeNear = function(point){
         var edge = null,
             vertices = this.vertices,
             thresholdDistance = this.edgeClickThresholdDistance;
 
         vertices.forEach(function(v, i){
             var v0 = vertices[i],
-                v1 = vertices[(i + 1) % vertices.length];
+                v1 = vertices[(i + 1) % vertices.length],
+                projection = _projectionPointOnLine(v0, v1, point),
+                // get the squared distance between the point and its nearest projection on the edge
+                distance = Math.pow(projection.x - point.x, 2) + Math.pow(projection.y - point.y, 2);
 
-            if (_distanceToEdgeSquared(v0, v1, p) < thresholdDistance){
+
+            if (distance < thresholdDistance){
                 edge = {index0: i, index1: (i + 1) % vertices.length};
             }
         });
@@ -559,7 +566,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
     };
 
     /*
-        Calculate min distance between a point and a line,
+        Get coordinates for the nearest projection of a point on a line.
         @see http://paulbourke.net/geometry/pointlineplane/
         Accepts three points with x/y keys for unit-less coordinates.
 
@@ -567,11 +574,11 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         @param {Object} p2 End of line
         @param {Object} p3 Point away from line
 
-        @example _distanceToEdgeSquared({x:0, y:0}, {x: 0, y: 100}, {x: 100, 100})
+        @example _projectionPointOnLine({x:0, y:0}, {x: 0, y: 100}, {x: 100, 100})
 
-        @return {Number} distance from point to line
+        @return {Object} with x,y coordinates of projection point
     */
-    function _distanceToEdgeSquared(p1, p2, p3){
+    function _projectionPointOnLine(p1, p2, p3){
         var dx = p2.x - p1.x;
         var dy = p2.y - p1.y;
 
@@ -588,7 +595,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         var x = p1.x + u * dx;  // closest point on edge p1,p2 to p3
         var y = p1.y + u * dy;
 
-        return Math.pow(p3.x - x, 2) + Math.pow(p3.y - y, 2);
+        return {x: x, y: y};
     }
 
     return PolygonEditor;
