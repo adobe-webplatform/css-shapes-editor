@@ -350,9 +350,9 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
                 this.vertices.splice(edge.index1, 0, {
                     x: projection.x,
                     y: projection.y,
-                    // TODO: infer units from the vertices of the edge
-                    xUnits: this.config.xUnit,
-                    yUnits: this.config.yUnit,
+                    // inherit units from the preceding vertex, or use defaults
+                    xUnit: this.vertices[edge.index0].xUnit || this.config.xUnit,
+                    yUnit: this.vertices[edge.index0].yUnit || this.config.yUnit,
                 });
 
                 this.activeVertexIndex = edge.index1;

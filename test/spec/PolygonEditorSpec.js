@@ -170,6 +170,30 @@ function($, markup, PolygonEditor){
             expect(editor.vertices.length).toEqual(expectedVerticesLength);
         });
 
+        it('should add new vertex which inherits unit types from preceding vertex', function(){
+            var inValue = 'polygon(nonzero, 0% 0px, 800px 0%, 800px 400px, 0% 100%)',
+                box = target.getBoundingClientRect(),
+                mockEvent = _getMockEvent(target.offsetLeft + 100, target.offsetTop),
+                expectedVerticesLength;
+
+            editor = new PolygonEditor(target, inValue);
+            // expect to add one more vertex
+            expectedVerticesLength = editor.vertices.length + 1;
+
+            // 800px 0%
+            expect(editor.vertices[1].xUnit).toEqual('px');
+            expect(editor.vertices[1].yUnit).toEqual('%');
+
+            // dispatch mock 'mousedown' event
+            editor.onMouseDown.call(editor, mockEvent);
+
+            // newly added vertex, between (0% 0px) and (800px 0%), inherits units from (0% 0px)
+            expect(editor.vertices[1].xUnit).toEqual('%');
+            expect(editor.vertices[1].yUnit).toEqual('px');
+
+            expect(editor.vertices.length).toEqual(expectedVerticesLength);
+        });
+
         it('should trigger "shapechange" event when new vertex is added', function(){
             var inValue = 'polygon()',
                 box = target.getBoundingClientRect(),
