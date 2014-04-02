@@ -19,7 +19,6 @@ require([
     'spec/PolygonEditorSpec',
     'spec/CircleEditorSpec',
     'spec/EllipseEditorSpec',
-    'spec/RectangleEditorSpec',
     'spec/CSSUtilsSpec'
 ], function(){
     'use strict';

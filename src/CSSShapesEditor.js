@@ -1,7 +1,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lodash'], function(PolygonEditor, CircleEditor, EllipseEditor, RectangleEditor, _){
+define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'lodash'], function(PolygonEditor, CircleEditor, EllipseEditor, _){
 
     'use strict';
 
@@ -69,10 +69,6 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'RectangleEditor', 'lo
 
             case 'ellipse':
                 factory = EllipseEditor;
-                break;
-
-            case 'rectangle':
-                factory = RectangleEditor;
                 break;
 
             default:
