@@ -184,7 +184,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
                     var points = pair.split(' ').map(function(pointString, i) {
                         var options = {
                             boxType: infos[3] || defaultRefBox,
-                            isHeightRelated: true
+                            isHeightRelated: (i === 1) // only y can be height related.
                         };
 
                         return CSSUtils.convertToPixels(pointString, element, options);
@@ -268,7 +268,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
 
             // turn px value into original units
             xCoord = CSSUtils.convertFromPixels(x, vertex.xUnit, element, { isHeightRelated: false, boxType: refBox });
-            yCoord = CSSUtils.convertFromPixels(y, vertex.yUnit, element, { isHeightRelated: false, boxType: refBox });
+            yCoord = CSSUtils.convertFromPixels(y, vertex.yUnit, element, { isHeightRelated: true, boxType: refBox });
 
             // return space-separted pair
             return [xCoord, yCoord].join(' ');
