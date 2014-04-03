@@ -16,13 +16,13 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         },
         bboxAttrs: {},
         axesAttrs: {
-            stroke: 'rgba(0, 192, 238, 1)',
+            stroke: 'rgba(0, 162, 255, 1)',
             'stroke-dasharray': '0, 0',
             opacity: 0.8
         },
         discAttrs: {
             fill: 'rgba(255, 255, 0, 1)',
-            stroke: 'rgba(0, 192, 238, 1)'
+            stroke: 'rgba(0, 162, 255, 1)'
         },
         xUnit: 'px',
         yUnit: 'px'

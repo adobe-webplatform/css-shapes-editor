@@ -1,4 +1,4 @@
-// css-shapes-editor 0.5.0
+// css-shapes-editor 0.5.1
 // 
 // Editor for CSS Shapes in the browser.
 // 
@@ -16,7 +16,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // 
-// build: 2014-04-02
+// build: 2014-04-03
 
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -9291,13 +9291,13 @@ define('PolygonEditor',['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransf
         },
         bboxAttrs: {},
         axesAttrs: {
-            stroke: 'rgba(0, 192, 238, 1)',
+            stroke: 'rgba(0, 162, 255, 1)',
             'stroke-dasharray': '0, 0',
             opacity: 0.8
         },
         discAttrs: {
             fill: 'rgba(255, 255, 0, 1)',
-            stroke: 'rgba(0, 192, 238, 1)'
+            stroke: 'rgba(0, 162, 255, 1)'
         },
         xUnit: 'px',
         yUnit: 'px'
@@ -10513,17 +10513,17 @@ define('CSSShapesEditor',['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'lod
                     stroke: 'rgba(255, 255, 255, 0.5)',
                 },
                 {
-                    stroke: 'rgba(0, 192, 238, 1)',
+                    stroke: 'rgba(0, 162, 255, 1)',
                     'stroke-dasharray': '4, 5'
                 }
             ],
             point: {
                 radius: 4,
-                stroke: 'rgba(0, 192, 238, 1)',
+                stroke: 'rgba(0, 162, 255, 1)',
                 fill: 'rgba(252, 252, 252, 1)',
             },
             bboxAttrs: {
-                stroke: 'rgba(0, 192, 238, 1)',
+                stroke: 'rgba(0, 162, 255, 1)',
                 fill: 'none',
                 'stroke-dasharray': '0, 0',
                 opacity: 0.8

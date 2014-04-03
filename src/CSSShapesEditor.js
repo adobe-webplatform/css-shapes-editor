@@ -14,17 +14,17 @@ define(['PolygonEditor', 'CircleEditor', 'EllipseEditor', 'lodash'], function(Po
                     stroke: 'rgba(255, 255, 255, 0.5)',
                 },
                 {
-                    stroke: 'rgba(0, 192, 238, 1)',
+                    stroke: 'rgba(0, 162, 255, 1)',
                     'stroke-dasharray': '4, 5'
                 }
             ],
             point: {
                 radius: 4,
-                stroke: 'rgba(0, 192, 238, 1)',
+                stroke: 'rgba(0, 162, 255, 1)',
                 fill: 'rgba(252, 252, 252, 1)',
             },
             bboxAttrs: {
-                stroke: 'rgba(0, 192, 238, 1)',
+                stroke: 'rgba(0, 162, 255, 1)',
                 fill: 'none',
                 'stroke-dasharray': '0, 0',
                 opacity: 0.8
