@@ -130,6 +130,17 @@ function($, markup, PolygonEditor){
             expect(outValue).toEqual(inValue);
         });
 
+        it('should parse polygon with whitespace-padded fill-mode', function(){
+            var inValue = 'polygon( nonzero , 0px 0px, 100px 0px, 100px 100px)',
+                outValue,
+                expected = 'polygon(nonzero, 0px 0px, 100px 0px, 100px 100px)';
+
+            editor = new PolygonEditor(target, inValue);
+            outValue = editor.getCSSValue();
+
+            expect(outValue).toEqual(expected);
+        });
+
         it('should infer polygon from element when value contains empty polygon', function(){
             // empty polygon declaration tells the editor to automatically infer the shape
             // should not throw error.

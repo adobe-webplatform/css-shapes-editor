@@ -171,7 +171,7 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
             throw new Error('No polygon() function definition in provided value');
         }
 
-        infos = /polygon\s*\((?:([a-z]*),)?\s*((?:[-+0-9.]+[a-z%]*|\s|\,)*)\)\s*((?:margin|content|border|padding)\-box)?/i.exec(shape.trim());
+        infos = /polygon\s*\((?:\s*([a-z]*)\s*,)?\s*((?:[-+0-9.]+[a-z%]*|\s|\,)*)\)\s*((?:margin|content|border|padding)\-box)?/i.exec(shape.trim());
 
         if (infos && infos[2].length > 0){
             coords = (
