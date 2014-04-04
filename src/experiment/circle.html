@@ -8,19 +8,16 @@ body{
   background: aliceblue;
   margin: 0;
 }
-.shape {
-/*  box-sizing: border-box;*/
-  width: 400px;
-  height: 400px;
-  margin: 50px;
-  padding: 50px;
-  outline: 1px solid red;
-  border: 50px solid rgba(0, 0, 250, 0.4);
-  shape-outside: circle(50% at 50% 50%) border-box;
-  float: left;
-}
 p{
   margin: 0;
+}
+#content {
+  position: relative;
+  width: 800px;
+  height: 400px;
+  margin: 0 auto;
+  background: papayawhip;
+  shape-inside: circle(50% at 50% 50%);
 }
 </style>
 
@@ -45,15 +42,10 @@ p{
 
     require(['main'], function(CSSShapesEditor){
 
-      $ = function(){ return document.querySelector.call(document, arguments[0]) }
-
-      var el = document.querySelector('#content');
-      console.log($('.shape').getBoundingClientRect())
-
-      var property = '-webkit-shape-inside';
+      var el = document.querySelector('.shape');
+      var property = 'shape-inside';
       var value = getComputedStyle(el, null)[property];
-
-      // var ed = new CSSShapesEditor(el, value)
+      var ed = new CSSShapesEditor(el, value)
 
       ed.on('ready', function(){
         console.log('editor ready')

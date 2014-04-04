@@ -41,9 +41,8 @@
 
       // toggle free transform
       document.addEventListener('keypress', function(e){
-
-        // 'T' key
-        if (e.keyCode === 116){
+        // 'Ctrl + T'
+        if (e.keyIdentifier === "U+0054" && e.ctrlKey){
           ed.toggleFreeTransform()
         }
       })
