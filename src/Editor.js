@@ -77,6 +77,10 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
             // see http://softwareas.com/whats-the-maximum-z-index
             this.holder.style.zIndex = 2147483647;
 
+            // prevents text selection when doing dbl click
+            this.holder.style.webkitUserSelect = "none";
+            this.holder.style.userSelect = "none";
+
             this.holder.setAttribute('data-role', 'shape-editor');
 
             // add this layer to the document
