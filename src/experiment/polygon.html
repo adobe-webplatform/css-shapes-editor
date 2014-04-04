@@ -12,6 +12,7 @@
   background: black;
   background: aliceblue;
   shape-inside: polygon(0 0, 800px 400px, 0 400px) border-box;
+  margin-bottom: 10px;
 }
 </style>
 
@@ -35,8 +36,8 @@
 
       var el = document.querySelector('#content');
       var property = 'shape-inside';
-      var value = getComputedStyle(el, null)[property];
-
+      // var value = getComputedStyle(el, null)[property];
+      value = "polygon(0 0, 800px 400px, 0 400px) border-box"
       var ed = new CSSShapesEditor(el, value)
       ed.on('ready', function(){
         console.log('editor ready')
@@ -52,9 +53,10 @@
 
       // toggle free transform
       document.addEventListener('keypress', function(e){
+        console.log(e)
 
-        // 'T' key
-        if (e.keyCode === 116){
+        // 'Ctrl + T'
+        if (e.keyIdentifier === "U+0054" && e.ctrlKey){
           ed.toggleFreeTransform()
         }
       })
