@@ -1,0 +1,10 @@
+.support-warning{
+  padding: 1em;
+  background: #fc5;
+  color: #444;
+}
+@supports (shape-outside: circle(50% at 50% 50%)){
+  .support-warning {
+    display: none;
+  }
+}
