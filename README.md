@@ -6,19 +6,23 @@ JavaScript library for interactive editing of CSS Shapes values like `polygon()`
 
 See the `demo/` folder for examples.
 
-## Usage
+## Basi usage
 
 Load `dist/CSSShapesEditor.js` into the page:
 
     <srcipt src="dist/CSSShapesEditor.js"></srcipt>
 
-Setup the editor on an element to edit a CSS shape value:
+Setup the editor on an element to edit a CSS shape value. An interactive editor for the shape value will be drawn on top of the element.
 
     var element = document.querySelector('#element');
     var shape = window.getComputedStyle(element)['shape-outside'];
     var editor = CSSShapesEditor(element, shape);
 
-An interactive editor for the shape will be drawn on top of the element.
+    editor.on('shapechange', function(){
+      // update the CSS shape value on the element
+      element.style['shape-outside'] = editor.getCSSValue();
+    })
+
 
 Supported shape values:
 
@@ -51,9 +55,23 @@ The `"removed"` event is dispatched after the editor has been turned off and rem
       // editor is gone; do other clean-up
     })
 
+## API  
+
 Turn off editor and remove if from the page. **Unsaved changes will be lost.**
 
     editor.remove()
+
+Get the CSS shape value as text for use in a stylesheet:
+
+    editor.getCSSValue()
+
+Programmatically update the shape editor with a new shape value:
+
+    editor.update("circle(50% at center)")
+
+Toggle the free-transform editor (scale, move, rotate) for the shape:
+
+    editor.toggleFreeTransform();
 
 
 ## Contributing
