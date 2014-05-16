@@ -1,64 +1,90 @@
 # CSS Shapes Editor
 
-JavaScript component for editing CSS Shapes like polygon(), circle(), ellipse() and rectangle() right in the browser.
+JavaScript library for interactive editing of CSS Shapes values like `polygon()`, `circle()` and `ellipse()` right in the browser.
+
+## Demo
+
+See the `demo/` folder for examples.
 
 ## Usage
 
-Load the `CSSShapesEditor.js` file into the page
+Load `dist/CSSShapesEditor.js` into the page:
 
     <srcipt src="dist/CSSShapesEditor.js"></srcipt>
 
-Setup the editor on an element to edit a CSS shape value
+Setup the editor on an element to edit a CSS shape value:
 
-    var element = document.querySelector('#content');
-    var shape = window.getComputedStyle(element)['shape-inside'];
+    var element = document.querySelector('#element');
+    var shape = window.getComputedStyle(element)['shape-outside'];
     var editor = CSSShapesEditor(element, shape);
 
-An editor appropriate for the shape will be drawn on top of the element. Supported shapes are: `polygon()`, `circle()`, `ellipse()` and `rectangle()`;
+An interactive editor for the shape will be drawn on top of the element.
 
-Create a new shape from scratch passing a shape delcaration with no coordinates.
+Supported shape values:
+
+ - `polygon()`
+ - `circle()`
+ - `ellipse()`
+
+Create a new shape from scratch by passing a shape declaration with no coordinates.
 
     var editor = CSSShapesEditor(element, 'polygon()');
 
-Live update the CSS shape on the element by reacting to `shapechange` events.
+## Events
+
+The `"ready"` event is dispatched after the editor was initialized
+
+    editor.on('ready', function(){
+      // editor is ready to work with
+    })
+
+The `"shapechange"` event is dispatched after the shape was changed in the editor
 
     editor.on('shapechange', function(){
-      element.style['shape-inside'] = editor.getCSSValue();
+      // update the CSS shape value on the element
+      element.style['shape-outside'] = editor.getCSSValue();
+    })
+
+The `"removed"` event is dispatched after the editor has been turned off and removed by using `editor.remove()`.
+
+    editor.on('removed', function(){
+      // editor is gone; do other clean-up
     })
 
 Turn off editor and remove if from the page. **Unsaved changes will be lost.**
 
     editor.remove()
-    
-__TODO: add detailed API docs explaining methods and events__
 
-__TODO: add basic example__
 
 ## Contributing
 
-Edit source in the `src/` directory. Add tests to `test/spec/`. Build output goes into `dist/`. Do not edit souce in `dist/`, it gets replaced automatically by the Grunt build process.
-
-Requirements:
+### Requirements:
 
   - [node.js](http://nodejs.org/)
   - [Grunt](http://gruntjs.com/)
 
 ### Setup dev environment
 
-Install dependencies
+Install dependencies:
 
-    npm install
-
-### Test
-
-__TODO: add test task in Gruntfile__
-
-If using [testem](https://github.com/airportyh/testem) for continous integration testing run:
-
-    testem
+    $ npm install
 
 ### Build
 
-    grunt build
+Edit source in the `src/` directory. Build with Grunt:
 
-Collects all dependencies builds them into a sigle file output in `dist/`
+    $ grunt build
+
+Build output goes into `dist/`. Do not edit source in `dist/`, it gets replaced automatically by the Grunt build process.
+
+### Test
+
+Add tests to `test/spec/`. Run tests with Testem:
+
+    $ testem
+
+Testem uses the configuration found in `testem.json`
+
+## License
+
+Apache 2.0 See [LICENSE.md](./LICENSE.md)
