@@ -6,7 +6,7 @@ JavaScript library for interactive editing of CSS Shapes values like `polygon()`
 
 See the `demo/` folder for examples.
 
-## Basi usage
+## Basic usage
 
 Load `dist/CSSShapesEditor.js` into the page:
 
