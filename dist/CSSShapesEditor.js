@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// css-shapes-editor 0.5.4
+// css-shapes-editor 0.5.5
 //
 // Editor for CSS Shapes in the browser.
 //
-// build: 2014-05-16
+// build: 2014-06-30
 
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -1013,8 +1013,8 @@ define('CSSUtils',[],function(){
             break;
 
         case 'padding-box':
-            box.top = topPadding;
-            box.left = leftPadding;
+            box.top = topBorder;
+            box.left = leftBorder;
             box.width = width - leftBorder - rightBorder;
             box.height = height - topBorder - bottomBorder;
             break;
