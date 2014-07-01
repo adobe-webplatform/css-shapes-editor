@@ -158,7 +158,7 @@ define(['lodash', 'snap'], function(_, Snap){
             y: (typeof pos.y === 'number') ? pos.y : oldY
         };
 
-        this.body.attr(newPos);
+        this.body.transform('translate('+newPos.x+','+newPos.y+')');
 
         return newPos;
     };
