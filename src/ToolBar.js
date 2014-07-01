@@ -97,6 +97,12 @@ define(['lodash', 'snap'], function(_, Snap){
         }
 
         var tool = this.tools[id];
+
+        // only deactivate if already active
+        if (!tool.el.data('selected')){
+            return;
+        }
+
         tool.el.data('selected', false);
         tool.el.attr({fill: 'red'});
         tool.onDeactivate.call(this);
@@ -107,7 +113,8 @@ define(['lodash', 'snap'], function(_, Snap){
             throw new Error('Tool with id "' + id + '" already exists.');
         }
 
-        var config = _.extend({}, options, _defaultTool),
+        // TODO: rename config to tool
+        var config = _.extend({}, _defaultTool, options),
             size = this.config.toolsSize;
 
         config.el = this.paper.rect();
