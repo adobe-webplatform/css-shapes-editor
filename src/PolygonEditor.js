@@ -15,7 +15,7 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
 /*global define */
 
-define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plugins'], function(Editor, CSSUtils, _, Snap, freeTransform){
+define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform', 'snap.plugins'], function(Editor, CSSUtils, ToolBar, _, Snap, freeTransform){
     "use strict";
 
     var _defaults = {
@@ -114,6 +114,23 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         window.addEventListener('resize', this.refresh.bind(this));
         this.holder.addEventListener('mousedown', this.onMouseDown.bind(this));
         this.holder.addEventListener('dblclick', this.onDblClick.bind(this));
+
+        this.toolbar = new ToolBar({
+            paper: this.paper
+        });
+
+        var self = this;
+        this.toolbar.add('move-rotate', {name: "Move & Rotate"});
+        this.toolbar.add('rel-rotate', {name: "Move & Rotate",
+            onActivate: function(){
+                self.turnOnFreeTransform();
+            },
+            onDeactivate: function(){
+                self.turnOffFreeTransform();
+            }
+        });
+
+        this.toolbar.activate('move-rotate');
     };
 
     PolygonEditor.prototype.setupCoordinates = function(){
@@ -523,6 +540,12 @@ define(['Editor', 'CSSUtils', 'lodash', 'snap', 'snap.freeTransform', 'snap.plug
         this.shape.attr('path', commands).toBack();
 
         this.trigger('shapechange', this);
+
+        var thisbb = this.shape.getBBox();
+        this.toolbar.position({
+            x: thisbb.x + thisbb.width,
+            y: thisbb.y
+        });
     };
 
     PolygonEditor.prototype.toggleFreeTransform = function(){
