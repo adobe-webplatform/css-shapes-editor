@@ -30,12 +30,13 @@ define(['lodash', 'snap'], function(_, Snap){
         },
 
         type: "full",
-        toolsSize: 32
+        toolsSize: 24
     };
 
     var _defaultTool = {
         name: "tool",
-        icon: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4PSIwcHgiIHk9IjBweCIgd2lkdGg9IjEwMHB4IiBoZWlnaHQ9IjEwMHB4IiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTAwIDEwMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8cG9seWdvbiBzdHlsZT0iZmlsbDojMDEwMTAxOyIgcG9pbnRzPSI1Ni4yNSw2Mi41IDU2LjI1LDgxLjI1IDY4Ljc1LDgxLjI1IDUwLDEwMCAzMS4yNSw4MS4yNSA0My43NSw4MS4yNSA0My43NSw2Mi41ICIvPgo8cG9seWdvbiBzdHlsZT0iZmlsbDojMDEwMTAxOyIgcG9pbnRzPSIzNy41LDU2LjI1IDE4Ljc1LDU2LjI1IDE4Ljc1LDY4Ljc1IDAsNTAgMTguNzUsMzEuMjUgMTguNzUsNDMuNzUgMzcuNSw0My43NSAiLz4KPHBvbHlnb24gc3R5bGU9ImZpbGw6IzAxMDEwMTsiIHBvaW50cz0iNDMuNzUsMzcuNSA0My43NSwxOC43NSAzMS4yNSwxOC43NSA1MCwwIDY4Ljc1LDE4Ljc1IDU2LjI1LDE4Ljc1IDU2LjI1LDM3LjUgIi8+Cjxwb2x5Z29uIHN0eWxlPSJmaWxsOiMwMTAxMDE7IiBwb2ludHM9IjYyLjUsNDMuNzUgODEuMjUsNDMuNzUgODEuMjUsMzEuMjUgMTAwLDUwIDgxLjI1LDY4Ljc1IDgxLjI1LDU2LjI1IDYyLjUsNTYuMjUgIi8+Cjwvc3ZnPg==",
+        activeFill: 'red',
+        inactiveFill: 'gray',
         onActivate: function () { /* 'this' scoped to ToolBar instance */ },
         onDeactivate: function () { /* 'this' scoped to ToolBar instance */ },
     };
@@ -47,7 +48,7 @@ define(['lodash', 'snap'], function(_, Snap){
 
         this.paper = this.config.paper || new Snap('100%','100%').paper;
 
-        this.body = this.paper.g();
+        this.body = this.paper.g().drag();
 
         this.tools = {};
 
@@ -87,7 +88,7 @@ define(['lodash', 'snap'], function(_, Snap){
 
         var tool = this.tools[id];
         tool.el.data('selected', true);
-        tool.el.attr({fill: 'blue'});
+        tool.el.attr({fill: tool.activeFill});
         tool.onActivate.call(this);
     };
 
@@ -104,7 +105,7 @@ define(['lodash', 'snap'], function(_, Snap){
         }
 
         tool.el.data('selected', false);
-        tool.el.attr({fill: 'red'});
+        tool.el.attr({fill: tool.inactiveFill});
         tool.onDeactivate.call(this);
     };
 
@@ -127,9 +128,22 @@ define(['lodash', 'snap'], function(_, Snap){
             y: Object.keys(this.tools).length * size,
         });
 
+        config.el.attr({
+            fill: config.inactiveFill
+        });
+
         config.el.click(this.onToolClick.bind(this));
 
         this.tools[id] = config;
+
+        [config.inactiveFill, config.activeFill].forEach(function(fill){
+            if (fill && fill.type && fill.type === 'pattern'){
+                fill.attr({
+                    width: size,
+                    height: size
+                });
+            }
+        });
 
         this.height(Object.keys(this.tools).length * size);
         this.body.append(config.el);
