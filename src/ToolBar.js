@@ -19,7 +19,7 @@ define(['lodash', 'snap'], function(_, Snap){
     "use strict";
 
     var _defaults = {
-        toolsSize: 24
+        toolSize: 24
     };
 
     var _defaultTool = {
@@ -105,7 +105,7 @@ define(['lodash', 'snap'], function(_, Snap){
 
         // TODO: rename config to tool
         var config = _.extend({}, _defaultTool, options),
-            size = this.config.toolsSize;
+            size = this.config.toolSize;
 
         config.el = this.paper.rect();
         config.el.attr({
