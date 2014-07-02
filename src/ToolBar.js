@@ -19,17 +19,6 @@ define(['lodash', 'snap'], function(_, Snap){
     "use strict";
 
     var _defaults = {
-        path: {
-            stroke: 'black',
-            fill: 'rgba(0, 0, 0, 0)'
-        },
-        point: {
-            radius: 5,
-            stroke: 'rgba(0, 0, 0, 1)',
-            fill: 'rgba(252, 252, 252, 1)'
-        },
-
-        type: "full",
         toolsSize: 24
     };
 
