@@ -121,9 +121,24 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
     PolygonEditor.prototype.setupToolBar = function(){
         var self = this;
 
-        this.toolbar = new ToolBar({
-            paper: this.paper
-        });
+        function autoPosition(){
+            /*jshint validthis:true */
+            // 'this' is PolygonEditor context
+
+            if (!this.toolbar || !this.shape){
+                return;
+            }
+
+            // remove handler; run only once for first position
+            this.off('shapechange', autoPosition);
+
+            var thisbb = this.shape.getBBox();
+
+            this.toolbar.position({
+                x: thisbb.x + thisbb.width,
+                y: thisbb.y
+            });
+        }
 
         function colorizeActive(el){
             var ico = el.clone(),
@@ -167,11 +182,14 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
         icoMR = this.paper.g().append(icoMR).toDefs();
         icoEP = this.paper.g().append(icoEP).toDefs();
 
+        this.toolbar = new ToolBar({
+            paper: this.paper
+        });
+
         this.toolbar.add('tool-edit-points', { name: "Edit Points",
             inactiveFill: (function(){
                 return colorizeInactive(icoEP).pattern();
             })(),
-
             activeFill: (function(){
                 return colorizeActive(icoEP).pattern();
             })()
@@ -184,17 +202,17 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
             onDeactivate: function(){
                 self.turnOffFreeTransform();
             },
-
             inactiveFill: (function(){
                 return colorizeInactive(icoMR).pattern();
             })(),
-
             activeFill: (function(){
                 return colorizeActive(icoMR).pattern();
             })()
         });
 
         this.toolbar.activate('tool-edit-points');
+
+        this.on('shapechange', autoPosition);
     };
 
     PolygonEditor.prototype.setupCoordinates = function(){
@@ -604,12 +622,6 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
         this.shape.attr('path', commands).toBack();
 
         this.trigger('shapechange', this);
-
-        var thisbb = this.shape.getBBox();
-        this.toolbar.position({
-            x: thisbb.x + thisbb.width,
-            y: thisbb.y
-        });
     };
 
     PolygonEditor.prototype.toggleFreeTransform = function(){
