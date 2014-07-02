@@ -151,8 +151,8 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
 
         function colorizeInactive(el){
             var ico = el.clone(),
-                accent = 'rgba(0, 162, 255, 1)',
-                base = '#fff';
+                accent = 'gray',
+                base = 'lightgray';
 
             ico.selectAll('.ico-bg').attr({
                 fill: base,
