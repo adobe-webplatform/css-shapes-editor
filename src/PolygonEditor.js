@@ -125,12 +125,6 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
             paper: this.paper
         });
 
-        this.toolbar.add('tool-edit-points', {name: "Edit Points"});
-
-        var icoMR = Snap.parse('<rect height="100" width="100" class="ico-bg" fill="#fff" stroke="#000"/><g><polygon class="ico-detail" fill="#000" points="55.125,60.25 55.125,75.625 65.375,75.625 50,91 34.625,75.625 44.875,75.625 44.875,60.25 "/><polygon class="ico-detail" fill="#000" points="39.75,55.125 24.375001907348633,55.125 24.375001907348633,65.375 9,50 24.375001907348633,34.625 24.375001907348633,44.875 39.75,44.875 "/><polygon class="ico-detail" fill="#000" points="44.875,39.75 44.875,24.375001907348633 34.625,24.375001907348633 50,9 65.375,24.375001907348633 55.125,24.375001907348633 55.125,39.75 "/><polygon class="ico-detail" fill="#000" points="60.25,44.875 75.625,44.875 75.625,34.625 91,50 75.625,65.375 75.625,55.125 60.25,55.125 "/></g>');
-
-        icoMR = this.paper.g().append(icoMR).toDefs();
-
         function colorizeActive(el){
             var ico = el.clone(),
                 accent = 'white',
@@ -166,6 +160,22 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
 
             return ico;
         }
+
+        var icoMR = Snap.parse('<rect height="100" width="100" class="ico-bg" fill="#fff" stroke="#000"/><g><polygon class="ico-detail" fill="#000" points="55.125,60.25 55.125,75.625 65.375,75.625 50,91 34.625,75.625 44.875,75.625 44.875,60.25 "/><polygon class="ico-detail" fill="#000" points="39.75,55.125 24.375001907348633,55.125 24.375001907348633,65.375 9,50 24.375001907348633,34.625 24.375001907348633,44.875 39.75,44.875 "/><polygon class="ico-detail" fill="#000" points="44.875,39.75 44.875,24.375001907348633 34.625,24.375001907348633 50,9 65.375,24.375001907348633 55.125,24.375001907348633 55.125,39.75 "/><polygon class="ico-detail" fill="#000" points="60.25,44.875 75.625,44.875 75.625,34.625 91,50 75.625,65.375 75.625,55.125 60.25,55.125 "/></g>');
+        var icoEP = Snap.parse('<rect height="100" width="100" class="ico-bg" fill="#fff"/><polygon class="ico-detail" fill="#000" points="73.64800262451172,71.30729675292969 56.48988342285156,49.05104446411133 68.54986572265625,39.75430679321289 24.352001190185547,17.625 34.506996154785156,65.99810409545898 46.56697463989258,56.70136260986328 63.723533630371094,78.95684051513672" />');
+
+        icoMR = this.paper.g().append(icoMR).toDefs();
+        icoEP = this.paper.g().append(icoEP).toDefs();
+
+        this.toolbar.add('tool-edit-points', { name: "Edit Points",
+            inactiveFill: (function(){
+                return colorizeInactive(icoEP).pattern();
+            })(),
+
+            activeFill: (function(){
+                return colorizeActive(icoEP).pattern();
+            })()
+        });
 
         this.toolbar.add('tool-move-rotate', {name: "Move & Rotate",
             onActivate: function(){
