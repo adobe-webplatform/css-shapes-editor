@@ -118,6 +118,13 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
         this.holder.addEventListener('dblclick', this.onDblClick.bind(this));
     };
 
+    /*
+        Setup a visual toolbar with buttons to toggle between point editing
+        and free transform (move/scale/rotate) polygons.
+
+        The toolbar is positioned automatically near the bounding box of the shape,
+        but is user-draggable to anywhere on the screen.
+    */
     PolygonEditor.prototype.setupToolBar = function(){
         var self = this;
 
@@ -186,6 +193,8 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
             paper: this.paper
         });
 
+        // mock-toggle for editing points (move/add/remove)
+        // no handlers required; this is on autmatically, unless free-transform is on (see below)
         this.toolbar.add('tool-edit-points', { name: "Edit Points",
             inactiveFill: (function(){
                 return colorizeInactive(icoEP).pattern();
@@ -195,7 +204,8 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
             })()
         });
 
-        this.toolbar.add('tool-move-rotate', {name: "Move & Rotate",
+        // toggle for shape free-transform behavior (move/rotate/scale)
+        this.toolbar.add('tool-free-transform', {name: "Move, Scale & Rotate Shape",
             onActivate: function(){
                 self.turnOnFreeTransform();
             },
