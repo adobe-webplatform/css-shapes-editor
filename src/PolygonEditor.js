@@ -139,12 +139,24 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
             // remove handler; run only once for first position
             this.off('shapechange', autoPosition);
 
-            var thisbb = this.shape.getBBox();
+            var shapeBox = this.shape.getBBox(),
+                toolSize = this.toolbar.config.toolSize,
+                maxX = window.innerWidth - this.toolbar.width() * 2, // don't fall off the edge of the screen
+                minX = 0, // don't put toolbar under the left edge of the screen
+                minY = 0, // don't put toolbar higher than the top of the screen
+                pos = {
+                    x: minX,
+                    y: Math.max(minY, shapeBox.y)
+                };
 
-            this.toolbar.position({
-                x: thisbb.x + thisbb.width,
-                y: thisbb.y
-            });
+            // try to keep the toolbar away from the shape bounding box, but still on-screen
+            if (shapeBox.x > this.toolbar.width() * 2){
+                pos.x = shapeBox.x - this.toolbar.width() * 2;
+            } else {
+                pos.x = Math.min(shapeBox.x + shapeBox.width + this.toolbar.width(), maxX);
+            }
+
+            this.toolbar.position(pos);
         }
 
         function colorizeActive(el){
