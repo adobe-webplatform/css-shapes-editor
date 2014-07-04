@@ -165,12 +165,14 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
         turnOnFreeTransform: function(){
             if (!this.transformEditor){
                 this.toggleFreeTransform();
+                this.trigger('transformEditorOn', {});
             }
         },
 
         turnOffFreeTransform: function(){
             if (this.transformEditor){
                 this.toggleFreeTransform();
+                this.trigger('transformEditorOff', {});
             }
         },
 
