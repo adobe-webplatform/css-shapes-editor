@@ -134,7 +134,7 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
             }
 
             // enforce an array of path attribute objects
-            if (typeof path === 'object' && typeof path.length !== 'number'){
+            if (!Array.isArray(path)){
                 path = [path];
             }
 
