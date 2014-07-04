@@ -163,21 +163,15 @@ define(['eve', 'CSSUtils', 'snap'], function(eve, CSSUtils, Snap){
         },
 
         turnOnFreeTransform: function(){
-            if (this.transformEditor){
-                // aready turned on
-                return;
+            if (!this.transformEditor){
+                this.toggleFreeTransform();
             }
-
-            this.toggleFreeTransform();
         },
 
         turnOffFreeTransform: function(){
-            if (!this.transformEditor){
-                // already turned off
-                return;
+            if (this.transformEditor){
+                this.toggleFreeTransform();
             }
-
-            this.toggleFreeTransform();
         },
 
         on: eve.on,
