@@ -106,3 +106,17 @@ Testem uses the configuration found in `testem.json`
 ## License
 
 Apache 2.0 See [LICENSE.md](./LICENSE.md)
+
+## Thanks
+
+The work of many people has contributed both directly and indirectly in building the CSS Shapes Editor library:
+
+- [Razvan Caliman](https://github.com/oslego)
+- [Bear Travis](https://github.com/betravis)
+- [Laurence Mclister](https://github.com/lmclister)
+- [Hans Muller](https://github.com/hansmuller)
+- [Lawrence Hsu](https://github.com/larz0)
+- [Dmitry Baranovskiy](https://github.com/DmitryBaranovskiy) for creating [Snap.svg](http://snapsvg.io/)
+- [Elbert Alias](https://github.com/elbertf) for creating [Raphael.FreeTransform ](https://github.com/ElbertF/Raphael.FreeTransform)
+
+and many, many others. Thank you!
