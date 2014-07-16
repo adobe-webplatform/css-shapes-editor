@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// css-shapes-editor 0.6.1
+// css-shapes-editor 0.6.2
 //
 // Editor for CSS Shapes in the browser.
 //
-// build: 2014-07-04
+// build: 2014-07-16
 
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -8278,12 +8278,11 @@ define('ToolBar',['lodash', 'snap'], function(_, Snap){
             throw new Error('Tool with id "' + id + '" already exists.');
         }
 
-        // TODO: rename config to tool
-        var config = _.extend({}, _defaultTool, options),
+        var tool = _.extend({}, _defaultTool, options),
             size = this.config.toolSize;
 
-        config.el = this.paper.rect();
-        config.el.attr({
+        tool.el = this.paper.rect();
+        tool.el.attr({
             width: size,
             height: size,
             id: id,
@@ -8292,15 +8291,15 @@ define('ToolBar',['lodash', 'snap'], function(_, Snap){
             y: Object.keys(this.tools).length * size,
         });
 
-        config.el.attr({
-            fill: config.inactiveFill
+        tool.el.attr({
+            fill: tool.inactiveFill
         });
 
-        config.el.click(this.onToolClick.bind(this));
+        tool.el.click(this.onToolClick.bind(this));
 
-        this.tools[id] = config;
+        this.tools[id] = tool;
 
-        [config.inactiveFill, config.activeFill].forEach(function(fill){
+        [tool.inactiveFill, tool.activeFill].forEach(function(fill){
             if (fill && fill.type && fill.type === 'pattern'){
                 fill.attr({
                     width: size,
@@ -8310,7 +8309,7 @@ define('ToolBar',['lodash', 'snap'], function(_, Snap){
         });
 
         this.height(Object.keys(this.tools).length * size);
-        this.body.append(config.el);
+        this.body.append(tool.el);
         this.body.transform('translate(100, 100)');
     };
 
@@ -9568,6 +9567,8 @@ define('PolygonEditor',['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap
 
         this.setup();
 
+        this.setupToolBar();
+
         this.update(this.value);
     }
 
@@ -9581,7 +9582,7 @@ define('PolygonEditor',['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap
 
         /*
             Sets up: this.holder, this.paper, this.snap, this.offsets
-            Called manually so you have the option to implement a different drawing surface
+            Called manually so you have the option to implement a different dring surface
         */
         Editor.prototype.setup.call(this);
 
@@ -9603,8 +9604,6 @@ define('PolygonEditor',['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap
 
         // Apply decorations for the shape
         Editor.prototype.setupShapeDecoration.call(this, this.config.path);
-
-        this.setupToolBar();
 
         window.addEventListener('resize', this.refresh.bind(this));
         this.holder.addEventListener('mousedown', this.onMouseDown.bind(this));
@@ -9898,7 +9897,7 @@ define('PolygonEditor',['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap
             xCoord = CSSUtils.convertFromPixels(x, vertex.xUnit, element, { isHeightRelated: false, boxType: refBox });
             yCoord = CSSUtils.convertFromPixels(y, vertex.yUnit, element, { isHeightRelated: true, boxType: refBox });
 
-            // return space-separted pair
+            // return space-separated pair
             return [xCoord, yCoord].join(' ');
         });
 
