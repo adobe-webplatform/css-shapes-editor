@@ -363,7 +363,7 @@ define(['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap.freeTransform',
             throw new TypeError('inferShapeFromElement() \n Expected HTMLElement, got: ' + typeof element + ' ' + element);
         }
 
-        var box = CSSUtils.getContentBoxOf(element);
+        var box = CSSUtils.getBox(element, this.defaultRefBox);
 
         // TODO: also infer unit values
         var coords = [
