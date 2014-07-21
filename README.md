@@ -132,6 +132,7 @@ The work of many people has contributed, both directly and indirectly, to buildi
 
 - [Razvan Caliman](https://github.com/oslego)
 - [Bear Travis](https://github.com/betravis)
+- [François Remy](https://github.com/FremyCompany)
 - [Laurence Mclister](https://github.com/lmclister)
 - [Hans Muller](https://github.com/hansmuller)
 - [Lawrence Hsu](https://github.com/larz0)
