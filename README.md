@@ -75,6 +75,14 @@ Get the CSS shape value as a string to use in a stylesheet:
 editor.getCSSValue()
 ```
 
+Get the CSS shape value as a string with coordinates converted to a specific unit type:
+
+```js
+editor.getCSSValue('%')
+// supported values: ["px", "in", "cm", "mm", "pt", "pc", "em", "rem", "vw", "vh", "%"]
+
+```
+
 Programmatically update the shape editor with a new shape value:
 
 ```js
