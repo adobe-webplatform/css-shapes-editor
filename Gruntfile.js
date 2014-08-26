@@ -19,19 +19,16 @@ module.exports = function (grunt) {
 
     'use strict';
 
-    require('load-grunt-tasks')(grunt, {
-        pattern: ['grunt-*', '!grunt-template-jasmine-requirejs']
-    });
+    require('load-grunt-tasks')(grunt);
 
     grunt.initConfig({
 
         pkg: grunt.file.readJSON("package.json"),
 
         // configurable paths
-        yeoman: {
-            src: 'src',
-            dist: 'dist',
-            test: 'test'
+        project: {
+            out:    'dist/CSSShapesEditor.js',
+            outmin: 'dist/CSSShapesEditor-min.js'
         },
 
         banner: grunt.file.read('./COPYRIGHT')
@@ -41,8 +38,8 @@ module.exports = function (grunt) {
                     .replace(/@DATE/, grunt.template.today("yyyy-mm-dd")),
 
         watch: {
-            files: ['<%= yeoman.src %>/{,*/}*.js'],
-            // tasks: ['jshint']
+            files: ['src/{,*/}*.js'],
+            tasks: ['jshint:src']
         },
 
         jshint: {
@@ -50,10 +47,9 @@ module.exports = function (grunt) {
                 jshintrc: '.jshintrc'
             },
             src: [
-                '<%= yeoman.src %>/*.js',
+                'src/*.js',
                 // 'test/spec/{,*/}*.js'
-            ],
-            dist: ['<%= yeoman.dist %>/*.js']
+            ]
         },
 
         jasmine: {
@@ -74,14 +70,14 @@ module.exports = function (grunt) {
         requirejs: {
             compile: {
                 options: {
-                    baseUrl: '<%= yeoman.src %>',
-                    mainConfigFile: '<%= yeoman.src %>/main.js',
-                    out: '<%= pkg.main %>',
+                    baseUrl: 'src/',
+                    mainConfigFile: 'src/main.js',
+                    out: '<%= project.out %>',
                     name: 'main',
                     include: ['third-party/almond/almond'],
                     wrap: {
-                        startFile: '<%= yeoman.src %>/fragments/start.frag',
-                        endFile: '<%= yeoman.src %>/fragments/end.frag'
+                        startFile: 'src/fragments/start.frag',
+                        endFile: 'src/fragments/end.frag'
                     },
                     optimize: 'none'
                 }
@@ -94,18 +90,19 @@ module.exports = function (grunt) {
                 report: "min"
             },
             dist: {
-                src: "<%= requirejs.compile.options.out %>",
-                dest: "dist/CSSShapesEditor-min.js"
+                src:  "<%= project.out %>",
+                dest: "<%= project.outmin %>"
             }
         },
 
+        // Used just to concat the copyright banner
         concat: {
             options: {
                 banner: "<%= banner %>"
             },
-            target: {
-                dest: "<%= requirejs.compile.options.out %>",
-                src: ["<%= requirejs.compile.options.out %>"]
+            dist: {
+                dest: "<%= project.out %>",
+                src: ["<%= project.out %>"]
             }
         },
 
@@ -124,7 +121,7 @@ module.exports = function (grunt) {
                 updateConfigs: ['pkg'],
                 commit: true,
                 commitMessage: 'Release v%VERSION%',
-                commitFiles: ['package.json','<%= yeoman.dist %>'], // '-a' for all files
+                commitFiles: ['package.json','dist/'], // '-a' for all files
                 createTag: true,
                 tagName: 'v%VERSION%',
                 tagMessage: 'Version %VERSION%',
