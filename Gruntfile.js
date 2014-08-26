@@ -88,6 +88,17 @@ module.exports = function (grunt) {
             }
         },
 
+        uglify: {
+            options: {
+                banner: "<%= banner %>",
+                report: "min"
+            },
+            dist: {
+                src: "<%= requirejs.compile.options.out %>",
+                dest: "dist/CSSShapesEditor-min.js"
+            }
+        },
+
         usebanner: {
             dist: {
                 options: {
@@ -125,7 +136,7 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('build', ['jshint:src', 'requirejs', 'usebanner']);
+    grunt.registerTask('build', ['jshint:src', 'requirejs', 'usebanner', 'uglify']);
 
     grunt.registerTask('test', ['jasmine']);
 

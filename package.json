@@ -22,7 +22,8 @@
     "grunt-template-jasmine-requirejs": "~0.1.8",
     "grunt-banner": "~0.2.0",
     "grunt-bump": "0.0.13",
-    "testem": "^0.6.15"
+    "testem": "^0.6.15",
+    "grunt-contrib-uglify": "^0.5.1"
   },
   "engines": {
     "node": ">=0.8.0"
