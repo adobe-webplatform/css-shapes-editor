@@ -99,17 +99,16 @@ module.exports = function (grunt) {
             }
         },
 
-        usebanner: {
-            dist: {
-                options: {
-                    position: 'top',
-                    banner: '<%= banner %>'
-                },
-                files: {
-                    src: [ '<%= pkg.main %>' ]
-                }
+        concat: {
+            options: {
+                banner: "<%= banner %>"
+            },
+            target: {
+                dest: "<%= requirejs.compile.options.out %>",
+                src: ["<%= requirejs.compile.options.out %>"]
             }
         },
+
         /*
         Usage:
         grunt bump:minor
@@ -136,7 +135,7 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('build', ['jshint:src', 'requirejs', 'usebanner', 'uglify']);
+    grunt.registerTask('build', ['jshint:src', 'requirejs', 'concat', 'uglify']);
 
     grunt.registerTask('test', ['jasmine']);
 
