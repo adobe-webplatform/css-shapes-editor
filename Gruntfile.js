@@ -52,19 +52,10 @@ module.exports = function (grunt) {
             ]
         },
 
-        jasmine: {
-            src: '<%= yeoman.src %>/*.js',
-            options: {
-                specs: '<%= yeoman.test %>/spec/*Spec.js',
-                helpers: '<%= yeoman.test %>/*Helper.js',
-                template: require('grunt-template-jasmine-requirejs'),
-                templateOptions: {
-                    requireConfigFile: '<%= yeoman.test %>/main.js',
-                    requireConfig: {
-                        baseUrl: '<%= yeoman.src %>',
-                    }
-                }
-            }
+        testem: {
+          chrome: {
+            options: JSON.parse(grunt.file.read('testem.json'))
+          }
         },
 
         requirejs: {
@@ -134,7 +125,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', ['jshint:src', 'requirejs', 'concat', 'uglify']);
 
-    grunt.registerTask('test', ['jasmine']);
+    grunt.registerTask('test', ['testem:run:chrome']);
 
     grunt.registerTask('lint', ['jshint:src']);
 
