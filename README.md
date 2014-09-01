@@ -1,6 +1,6 @@
 # CSS Shapes Editor
 
-JavaScript library for interactive editing of CSS Shapes values right in the browser. It works functional values like `polygon()`, `circle()` and `ellipse()`.
+JavaScript library for interactive editing of CSS Shapes values right in the browser. It works with functional values like `polygon()`, `circle()` and `ellipse()`.
 
 ## Demo
 
