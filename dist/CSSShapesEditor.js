@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-// css-shapes-editor 0.8.0
+// css-shapes-editor 0.10.0
 //
 // Editor for CSS Shapes in the browser.
 //
-// build: 2014-08-26
+// build: 2015-05-21
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define(factory);
@@ -9765,6 +9765,8 @@ define('PolygonEditor',['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap
             throw new Error('No polygon() function definition in provided value');
         }
 
+        // console.log(shape);
+
         infos = /polygon\s*\((?:\s*([a-z]*)\s*,)?\s*((?:[-+0-9.]+[a-z%]*|\s|\,)*)\)\s*((?:margin|content|border|padding)\-box)?/i.exec(shape.trim());
 
         if (infos && infos[2].length > 0){
@@ -9784,8 +9786,30 @@ define('PolygonEditor',['Editor', 'CSSUtils', 'ToolBar', 'lodash', 'snap', 'snap
                         return CSSUtils.convertToPixels(pointString, element, options);
                     });
 
-                    if( !points[0] ) { points[0] = { value: 0 }; }
-                    if( !points[1] ) { points[1] = { value: 0 }; }
+                    if ( !points[0] ) { points[0] = { value: 0 }; }
+                    if ( !points[1] ) { points[1] = { value: 0 }; }
+
+                    /*
+                      Browsers default to pixels when parsing unit-less values:
+                      @example: 0 100% => 0px 100%
+
+                      In most cases, users expect the same unit for coordinates in a pair
+                      when one of them is zero.
+
+                      If mixed unit types in pair, let zero inherit unit from non-zero coord
+                      if zero's unit is pixels. Ignore if zero unit is not pixels.
+
+                      @example: 0px 100% => 0% 100%
+                      @example: 0% 100px => 0% 100px
+                    */
+                    if ( points[0].unit !== points[1].unit && (points[0].value === 0 || points[1].value === 0) ){
+                        if ( points[0].value === 0 && points[0].unit === 'px' ){
+                            points[0].unit = points[1].unit;
+                        }
+                        if ( points[1].value === 0 && points[1].unit === 'px' ){
+                            points[1].unit = points[0].unit;
+                        }
+                    }
 
                     return {
                         x: points[0].value,
