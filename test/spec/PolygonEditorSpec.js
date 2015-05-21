@@ -132,6 +132,18 @@ function($, markup, PolygonEditor){
             it('should parse whitespace-padded reference box', function(){
                 expect(_parseRefBox('   padding-box   ')).toEqual('padding-box');
             });
+
+            it('should infer unit type for 0 (zero) from sibling coordinate', function(){
+                var input    = 'polygon(nonzero, 0 100%, 100px 0px, 100px 100px)',
+                    expected = 'polygon(nonzero, 0% 100%, 100px 0px, 100px 100px)',
+                    output;
+
+                editor = new PolygonEditor(target, input);
+                output = editor.getCSSValue();
+
+                expect(output).toEqual(expected);
+            });
+
         });
 
 
@@ -235,7 +247,7 @@ function($, markup, PolygonEditor){
         });
 
         it('should add new vertex which inherits unit types from preceding vertex', function(){
-            var inValue = 'polygon(nonzero, 0% 0px, 800px 0%, 800px 400px, 0% 100%)',
+            var inValue = 'polygon(nonzero, 0% 0%, 800px 0%, 800px 400px, 0% 100%)',
                 box = target.getBoundingClientRect(),
                 mockEvent = _getMockEvent(target.offsetLeft + 100, target.offsetTop),
                 expectedVerticesLength;
@@ -251,9 +263,10 @@ function($, markup, PolygonEditor){
             // dispatch mock 'mousedown' event
             editor.onMouseDown.call(editor, mockEvent);
 
-            // newly added vertex, between (0% 0px) and (800px 0%), inherits units from (0% 0px)
+            // newly added vertex, between (0% 0%) and (800px 0%), inherits units from (0% 0%)
             expect(editor.vertices[1].xUnit).toEqual('%');
-            expect(editor.vertices[1].yUnit).toEqual('px');
+            expect(editor.vertices[1].yUnit).toEqual('%');
+
 
             expect(editor.vertices.length).toEqual(expectedVerticesLength);
         });
